@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* just for using it with clerkAppearance, for UI under our control use the Button component instead */
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 flex items-center justify-center rounded-md text-white transition-colors;
+  }
+}
+
+html,
+body {
+  @apply h-full;
+  /* General text color */
+  @apply text-gray-700;
+}

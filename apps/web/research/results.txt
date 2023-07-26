@@ -1,0 +1,20 @@
+How big is a project in AST nodes?
+
+Project | AST NODES
++--- | --- | ---
+Cal.com total - 675140
+Cal.com apps - 202750
+Cal.com apps/api - 23285
+Cal.com apps/web - 177125
+redwood-realworld-example-app - 17325
+next-real-world-next-ts-apollo - 31248
+conduit-realworld-example-app-react-express - 15123
+custom-shopify-app-1-ts - 24124
+custom-shopify-app-2-js - 19549
+todomvc-typescript-react - 2327
+
+Results:
+- Small apps: 1-10k
+- Medium-sized apps: 10-50k
+- Big apps: 50-200k
+- Enterprise-level apps: 200k+

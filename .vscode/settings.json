@@ -1,0 +1,31 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.formatOnSave": true,
+  "cSpell.words": [
+    "CodePortal",
+    "debuggability",
+    "Flexsearch",
+    "Galarza",
+    "haikunate",
+    "Haikunator",
+    "liveblocks",
+    "pino",
+    "posthog",
+    "supabase",
+    "sveltekit",
+    "Vercel",
+    "waitlist"
+  ],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8"
+  },
+  "python.formatting.provider": "none",
+  "tailwindCSS.classAttributes": ["class", "className", "contentClassName", "overlayClassName"]
+}
