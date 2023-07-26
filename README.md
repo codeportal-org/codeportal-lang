@@ -1,4 +1,4 @@
-<img src="./app/web/.png" width="100" title="CodePortal logo">
+<img src="./apps/web/public/favicon.png" width="35" title="CodePortal logo">
 
 # CodePortal
 
