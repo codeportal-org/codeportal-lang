@@ -26,7 +26,7 @@ export default function Home() {
           </h1>
 
           <p className="mx-2 mb-8 max-w-3xl text-left text-center text-lg sm:text-xl">
-            CodePortal is the programming platform for indie hackers and makers! Build, launch, and
+            CodePortal is the open-source full-stack programming platform for indie hackers and makers! Build, launch, and
             scale your products all in one place without the headaches of traditional programming.
           </p>
           <div className="mb-16 flex justify-center">

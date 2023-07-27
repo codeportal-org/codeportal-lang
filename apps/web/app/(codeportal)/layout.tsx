@@ -5,7 +5,7 @@ import "@/styles/globals.css"
 
 export const metadata = {
   title: "CodePortal | Turn ideas into reality — faster!",
-  description: "CodePortal is the programming platform for indie hackers and makers!",
+  description: "CodePortal is the open-source full-stack programming platform for indie hackers and makers!",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
