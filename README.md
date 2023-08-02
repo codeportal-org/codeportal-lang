@@ -50,12 +50,13 @@ The goal of the Portal Language is to be independent from the CodePortal Platfor
 
 **The Runtime**: It is an interpreter and debugger that runs the Code Tree. In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted. It also includes the basic functionality of the language, a standard library, the UI framework, and the web server.
 
-### The Platform (CodePortal)
+### The CodePortal Platform
 
 The platform is our PaaS offering of the Portal Language. Its main parts are:
 
-- **The web app:** You can find it inside the `apps/web` folder. It has the API, web UI and handles auth, billing, DB connections, etc. It is a Next.js app hosted on Vercel.
-- **The worker:** It is in charge of long running tasks (background jobs) both internal and the ones that users create. It is a Node.js app. You can find it inside the `apps/worker` folder. It is hosted on Railway.
+**The web app:** You can find it inside the `apps/web` folder. It has the API, web UI and handles auth, billing, DB connections, etc. It is a Next.js app hosted on Vercel.
+
+**The worker:** It is in charge of long running tasks (background jobs) both internal and the ones that users create. It is a Node.js app. You can find it inside the `apps/worker` folder. It is hosted on Railway.
 
 ## Why (long form)
 
