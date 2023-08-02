@@ -25,13 +25,22 @@ CodePortal is an open-source GUI-based, web-based programming language and platf
 
 ## Why (short form)
 
-There is so much clutter in programming right now. I don't want to settle with what exists. I want something that truly sparks joy and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form below. If not, just try the thing!
+There is so much clutter in programming right now. And, I don't want to settle with what exists. I want something that truly sparks joy and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form of the "why" below. If not, just try the thing!
 
 ## Try the thing!
 
-Go to [codeportal.io](https://codeportal.io), create an account and start using it. It's free to start and then usage based. You can also host it yourself, I will add instructions on how to do that soon.
+Go to [codeportal.io](https://codeportal.io), create an account and start using it. It's free to start and then usage based. You can also host it yourself, I will add instructions on how to do that soon. In the meantime, you can check out the code, run it locally, and read how it works below. Also, you can join the [Discord](https://codeportal.io/discord) to get help and chat with other users.
 
 ## How does it work?
+
+### The Portal Language or the engine
+
+We call all of the above the engine internally, and it constitutes the Portal Programming language. Its goal is to be independent from the platform an be easily embeddable into other systems and platforms. To recap, the PortalLang or the engine is:
+
+- The Code Tree (CT) format.
+- The Storage API.
+- The Editor.
+- The Runtime.
 
 **The Code Tree (CT)**: Ground zero is forgetting about saving code as text. Instead, we save it as what it really is, structured data. We use call that the Code Tree (CT). This is the representation of the code as a tree of nodes and connections. In text-based programming, this is referred to as the AST (Abstract Syntax Tree), however, since there is no syntax here, that name doesn't fit anymore. The Code Tree is the source of truth. It is the code itself. It is always stored and modified in this format. It is also the format that is used to run the code.
 
@@ -39,16 +48,7 @@ Go to [codeportal.io](https://codeportal.io), create an account and start using 
 
 **The Editor**: It allows you to explore, understand and modify the Code Tree. This where a lot of the magic happens. It is an extensible UI that benefits from the Code Tree graph format and the Storage API to give the best DX possible. It also integrates with the Runtime to provide debugging features.
 
-**The Runtime**: It an the interpreter and debugger that runs the Code Tree.
-
-**The Portal Language or the engine**: We call all of the above the engine internally, and it constitutes the Portal Programming language. Its goal is to be independent from the platform an be easily embeddable into other systems and platforms. To recap, the PortalLang or the engine is:
-
-- The Code Tree (CT) format.
-- The Storage API.
-- The Editor.
-- The Runtime.
-
-In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted.
+**The Runtime**: It an the interpreter and debugger that runs the Code Tree. In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted.
 
 ### The Platform (CodePortal)
 
