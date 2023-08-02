@@ -35,7 +35,7 @@ Go to [codeportal.io](https://codeportal.io), create an account and start using 
 
 ### The Portal Language
 
-The goal of the Portal Programming Language is to be independent from the CodePortal Platform an be easily embeddable into other systems and platforms. So PortalLang is:
+The goal of the Portal Language is to be independent from the CodePortal Platform and be easily embeddable into other systems and platforms. PortalLang is comprised of 4 main parts:
 
 - The Code Tree (CT) format.
 - The Storage API.
