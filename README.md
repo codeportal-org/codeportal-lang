@@ -46,7 +46,7 @@ The goal of the Portal Language is to be independent from the CodePortal Platfor
 
 **The Storage**: This is the layer in charge of querying and mutating the Code Tree. It includes various indexes, and a simple API for the Editor to interact with the Code Tree. For now, it is a simple in-memory storage, that we persist as blobs but we will be evolving it as we see fit, maybe into a fully fledged DB, or we will using and existing one, 🤔 open for discussion.
 
-**The Editor**: It allows you to explore, understand and modify the Code Tree. This where a lot of the magic happens. It is an extensible UI that benefits from the Code Tree graph format and the Storage to give the best DX possible. It also integrates with the Runtime to provide debugging features.
+**The Editor**: It allows you to explore, understand and modify the Code Tree. This is where a lot of the magic happens 🪄. It is an extensible UI that benefits from the Code Tree graph format and the Storage to give the best DX possible. It also integrates with the Runtime to provide debugging features.
 
 **The Runtime**: It an the interpreter and debugger that runs the Code Tree. In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted.
 
