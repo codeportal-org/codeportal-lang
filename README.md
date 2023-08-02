@@ -25,7 +25,7 @@ CodePortal is an open-source GUI-based, web-based programming language and platf
 
 ## Why (short form)
 
-There is so much clutter in programming right now. And, I don't want to settle with what exists. I want something that truly sparks joy and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form of the "why" below. If not, just try the thing! - @carloslfu
+There is so much clutter in programming right now. And, I don't want to settle with what exists. I want something that truly sparks joy ✨ and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form of the "why" below. If not, just try the thing! - Carlos Galarza
 
 ## Try the thing!
 
@@ -42,7 +42,7 @@ The goal of the Portal Programming Language (the engine internally) goal is to b
 - The Editor.
 - The Runtime.
 
-**The Code Tree format (CT)**: Ground zero is forgetting about saving code as text. Instead, we save it as what it really is, structured data. We call that the Code Tree (CT). This is the representation of the code as a tree of nodes and connections. In text-based programming, this is referred to as the AST (Abstract Syntax Tree), however, since there is no syntax here, that name doesn't fit anymore. The Code Tree is the source of truth. It is the code itself. It is always stored and modified in this format. It is also the format that is used to run the code.
+**The Code Tree format (CT)**: Ground zero is forgetting about saving code as text. Instead, we save it as what it really is, structured data. We call that the Code Tree (CT). This is the representation of the code as a tree of nodes and connections. In text-based programming, this is referred to as the AST (Abstract Syntax Tree), however, since there is no syntax here, that name doesn't fit anymore. Additionally, it's a simpler name ✨. The Code Tree is the source of truth. It is the code itself. It is always stored and modified in this format. It is also the format that is used to run the code.
 
 **The Storage API**: This is the layer in charge of querying and mutating the Code Tree. It includes various indexes, and a simple API for the Editor to interact with the Code Tree. For now, it is a simple in-memory storage, that we persist as blobs but we will be evolving it as we see fit, maybe into a fully fledged DB, or we will using and existing one, 🤔 open for discussion.
 
