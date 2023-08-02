@@ -66,3 +66,10 @@ I never found a good answer! Maybe, I am too picky or too demanding, some people
 I have learned from all these efforts, from the mistakes, and from the good things. So I decided to set out to create a new programming language and platform. I decided to start from first principles and design something simple, smooth, and with a focus on developer experience. Something that is easy to use and flexible enough to create any type of application without sacrificing power, and flexibility. That is CodePortal! I would not call it no-code because it **IS** code, also is not low-code, because it very different to what people call that. So, I think a proper name for it is **new-code**. It is a new way to code. I borrowed this from the SQL -> NoSQL -> NewSQL evolution, and I think it fits well its purpose. So, this is a new-code tool! Let's build it together!
 
 - Carlos Galarza
+
+## Inspiration
+
+- ["Stop Writing Dead Programs" by Jack Rusher (Strange Loop 2022)](https://www.youtube.com/watch?v=8Ab3ArE8W3s): This talk is amazing! Thanks Jack!
+- ["The Future of Programming" by Bret Victor](https://www.youtube.com/watch?v=8pTEmbeENF4): A classic and a must watch!
+- ["Moldable development" by Tudor Gîrba](https://www.youtube.com/watch?v=Pot9GnHFOVU): Custom tools built for each problem is pretty neat approach!
+- ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea!
