@@ -59,7 +59,7 @@ The platform is our PaaS offering of the Portal Language. Its main parts are:
 
 ## Why (long form)
 
-I have wanted to code in a better way for a while. A way that removed all the clutter from programming and let me flow and just create stuff. I tried all kinds of things, many programming paradigms, lots of editors, lots of programming languages, even no-code and low-code tools but those are limiting and you sacrifice power and flexibility. I rather code things most of the time, however those have their place and I use them when it makes sense.
+I have wanted to code in a better way for a while. A way that removed all the clutter from programming and let me flow and just create stuff. I tried all kinds of things, many programming paradigms, lots of editors, lots of programming languages, even no-code and low-code tools but those are limiting and you sacrifice power and flexibility. I rather use code for things most of the time, however those have their place and I use them when it makes sense.
 
 I never found a good answer! Maybe, I am too picky or too demanding, some people say so! haha! 😅 Also, most approaches and efforts that attempted to radically improve programming have failed or died - I keep a list of them. Some still exist, but they have not gained enough adoption, or they are thriving in a niche. BTW, thriving in a niche is great! It is a good use case for those tools. There are structured editors like Scratch and Snap but they are mostly for education and/or niche applications not for general purpose stuff.
 
