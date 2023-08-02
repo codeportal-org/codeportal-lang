@@ -42,7 +42,7 @@ The goal of the Portal Programming Language (the engine internally) goal is to b
 - The Editor.
 - The Runtime.
 
-**The Code Tree format (CT)**: Ground zero is forgetting about saving code as text. Instead, we save it as what it really is, structured data. We use call that the Code Tree (CT). This is the representation of the code as a tree of nodes and connections. In text-based programming, this is referred to as the AST (Abstract Syntax Tree), however, since there is no syntax here, that name doesn't fit anymore. The Code Tree is the source of truth. It is the code itself. It is always stored and modified in this format. It is also the format that is used to run the code.
+**The Code Tree format (CT)**: Ground zero is forgetting about saving code as text. Instead, we save it as what it really is, structured data. We call that the Code Tree (CT). This is the representation of the code as a tree of nodes and connections. In text-based programming, this is referred to as the AST (Abstract Syntax Tree), however, since there is no syntax here, that name doesn't fit anymore. The Code Tree is the source of truth. It is the code itself. It is always stored and modified in this format. It is also the format that is used to run the code.
 
 **The Storage API**: This is the layer in charge of querying and mutating the Code Tree. It includes various indexes, and a simple API for the Editor to interact with the Code Tree. For now, it is a simple in-memory storage, that we persist as blobs but we will be evolving it as we see fit, maybe into a fully fledged DB, or we will using and existing one, 🤔 open for discussion.
 
