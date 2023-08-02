@@ -23,15 +23,11 @@ CodePortal is an open-source GUI-based, web-based programming language and platf
 - The UI is block-based/node-based, not text-based. This makes it easier to work with and more intuitive.
 - Every node or part of the code is addressable by a unique ID (nanoid).
 
-## Why
+## Why (short form)
 
-I have wanted to code in a better way for a while. A way that removed all the clutter from programming and let me flow and just create stuff. I tried all kinds of things, many programming paradigms, lots of editors, lots of programming languages, even no-code and low-code tools but those are limiting and you sacrifice power and flexibility. I rather code things most of the time, however those have their place and I use them when it makes sense.
+There is so much clutter in programming right now. I don't want to settle with what exists. I want something that truly sparks joy and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form below. If not, just try the thing!
 
-I never found a good answer! Maybe, I am too picky or too demanding, some people say so! haha! 😅 Also, most approaches and efforts that attempted to radically improve programming have failed or died - I keep a list of them. Some still exist, but they have not gained enough adoption, or they are thriving in a niche. BTW, thriving in a niche is great! It is a good use case for those tools. There are structured editors like Scratch and Snap but they are mostly for education and/or niche applications not for general purpose stuff.
-
-I have learned from all these efforts, from the mistakes, and from the good things. So I set out to create a new programming language. I decided to start from first principles and design something simple, smooth, and with a focus on developer experience. Something that is easy to use and flexible enough to create any type of application without sacrificing power, and flexibility. That is CodePortal! I would not call it no-code because it **IS** code, also is not low-code, because it very close to it. So, I think a proper name for it is **new-code**. It is a new way to code. I borrowed this from the SQL -> NoSQL -> NewSQL evolution and I think it fits well its purpose.
-
-## Getting Started
+## Try the thing!
 
 Go to [codeportal.io](https://codeportal.io), create an account and start using it. It's free to start and then usage based. You can also host it yourself, I will add instructions on how to do that soon.
 
@@ -54,7 +50,17 @@ Go to [codeportal.io](https://codeportal.io), create an account and start using 
 
 In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted.
 
-**The Platform (CodePortal)**: The platform is our PaaS offering of the Portal Language. Its main parts are:
+### The Platform (CodePortal)
+
+The platform is our PaaS offering of the Portal Language. Its main parts are:
 
 - **The web app:** You can find it inside the `apps/web` folder. It has the API, web UI and handles auth, billing, DB connections, etc. It is a Next.js app hosted on Vercel.
 - **The worker:** It is in charge of long running tasks (background jobs) both internal and the ones that users create. It is a Node.js app.
+
+## Why (long form)
+
+I have wanted to code in a better way for a while. A way that removed all the clutter from programming and let me flow and just create stuff. I tried all kinds of things, many programming paradigms, lots of editors, lots of programming languages, even no-code and low-code tools but those are limiting and you sacrifice power and flexibility. I rather code things most of the time, however those have their place and I use them when it makes sense.
+
+I never found a good answer! Maybe, I am too picky or too demanding, some people say so! haha! 😅 Also, most approaches and efforts that attempted to radically improve programming have failed or died - I keep a list of them. Some still exist, but they have not gained enough adoption, or they are thriving in a niche. BTW, thriving in a niche is great! It is a good use case for those tools. There are structured editors like Scratch and Snap but they are mostly for education and/or niche applications not for general purpose stuff.
+
+I have learned from all these efforts, from the mistakes, and from the good things. So I set out to create a new programming language. I decided to start from first principles and design something simple, smooth, and with a focus on developer experience. Something that is easy to use and flexible enough to create any type of application without sacrificing power, and flexibility. That is CodePortal! I would not call it no-code because it **IS** code, also is not low-code, because it very close to it. So, I think a proper name for it is **new-code**. It is a new way to code. I borrowed this from the SQL -> NoSQL -> NewSQL evolution and I think it fits well its purpose.
