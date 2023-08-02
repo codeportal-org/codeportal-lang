@@ -33,9 +33,9 @@ Go to [codeportal.io](https://codeportal.io), create an account and start using 
 
 ## How does it work?
 
-### The Portal Language or the engine
+### The Portal Language
 
-The goal of the Portal Programming Language (the engine internally) goal is to be independent from the Platform an be easily embeddable into other systems and platforms. The PortalLang or the engine is:
+The goal of the Portal Programming Language is to be independent from the CodePortal Platform an be easily embeddable into other systems and platforms. So PortalLang is:
 
 - The Code Tree (CT) format.
 - The Storage API.
