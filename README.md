@@ -50,6 +50,8 @@ The goal of the Portal Language is to be independent from the CodePortal Platfor
 
 **The Runtime**: It is an interpreter and debugger that runs the Code Tree. In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted. It also includes the basic functionality of the language, a standard library, the UI framework, and the web server.
 
+You can find the code for the Portal Language inside the `packages/portal-lang` folder.
+
 ### The CodePortal Platform
 
 The platform is our PaaS offering of the Portal Language. Its main parts are:
