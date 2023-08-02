@@ -34,3 +34,27 @@ I have learned from all these efforts, from the mistakes, and from the good thin
 ## Getting Started
 
 Go to [codeportal.io](https://codeportal.io), create an account and start using it. It's free to start and then usage based. You can also host it yourself, I will add instructions on how to do that soon.
+
+## How does it work?
+
+**The Code Tree (CT)**: Ground zero is forgetting about saving code as text. Instead, we save it as what it really is, structured data. We use call that the Code Tree (CT). This is the representation of the code as a tree of nodes and connections. In text-based programming, this is referred to as the AST (Abstract Syntax Tree), however, since there is no syntax here, that name doesn't fit anymore. The Code Tree is the source of truth. It is the code itself. It is always stored and modified in this format. It is also the format that is used to run the code.
+
+**The Storage API**: This is the layer in charge of querying and mutating the Code Tree. It includes various indexes, and a simple API for the Editor to interact with the Code Tree. For now, it is a simple in-memory storage, that we persist as blobs but we will be evolving it as we see fit, maybe into a fully fledged DB, or we will using and existing one, 🤔 open for discussion.
+
+**The Editor**: It allows you to explore, understand and modify the Code Tree. This where a lot of the magic happens. It is an extensible UI that benefits from the Code Tree graph format and the Storage API to give the best DX possible. It also integrates with the Runtime to provide debugging features.
+
+**The Runtime**: It an the interpreter and debugger that runs the Code Tree.
+
+**The Portal Language or the engine**: We call all of the above the engine internally, and it constitutes the Portal Programming language. Its goal is to be independent from the platform an be easily embeddable into other systems and platforms. To recap, the PortalLang or the engine is:
+
+- The Code Tree (CT) format.
+- The Storage API.
+- The Editor.
+- The Runtime.
+
+In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted.
+
+**The Platform (CodePortal)**: The platform is our PaaS offering of the Portal Language. Its main parts are:
+
+- **The web app:** You can find it inside the `apps/web` folder. It has the API, web UI and handles auth, billing, DB connections, etc. It is a Next.js app hosted on Vercel.
+- **The worker:** It is in charge of long running tasks (background jobs) both internal and the ones that users create. It is a Node.js app.
