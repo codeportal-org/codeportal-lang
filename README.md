@@ -38,15 +38,15 @@ Go to [codeportal.io](https://codeportal.io), create an account and start using 
 The goal of the Portal Language is to be independent from the CodePortal Platform and be easily embeddable into other systems and platforms. PortalLang is comprised of 4 main parts:
 
 - The Code Tree (CT) format.
-- The Storage API.
+- The Storage.
 - The Editor.
 - The Runtime.
 
 **The Code Tree format (CT)**: Ground zero is forgetting about saving code as text. Instead, we save it as what it really is, structured data. We call that the Code Tree (CT). This is the representation of the code as a tree of nodes and connections. In text-based programming, this is referred to as the AST (Abstract Syntax Tree), however, since there is no syntax here, that name doesn't fit anymore. Additionally, it's a simpler name ✨. The Code Tree is the source of truth. Code is always stored, and modified in this format. It is also the format that is used to run the code. It is JSON based but we will see how this goes as the requirements evolve. I guess we will need an additional format for the Runtime, but that's an optimization for our future selves.
 
-**The Storage API**: This is the layer in charge of querying and mutating the Code Tree. It includes various indexes, and a simple API for the Editor to interact with the Code Tree. For now, it is a simple in-memory storage, that we persist as blobs but we will be evolving it as we see fit, maybe into a fully fledged DB, or we will using and existing one, 🤔 open for discussion.
+**The Storage**: This is the layer in charge of querying and mutating the Code Tree. It includes various indexes, and a simple API for the Editor to interact with the Code Tree. For now, it is a simple in-memory storage, that we persist as blobs but we will be evolving it as we see fit, maybe into a fully fledged DB, or we will using and existing one, 🤔 open for discussion.
 
-**The Editor**: It allows you to explore, understand and modify the Code Tree. This where a lot of the magic happens. It is an extensible UI that benefits from the Code Tree graph format and the Storage API to give the best DX possible. It also integrates with the Runtime to provide debugging features.
+**The Editor**: It allows you to explore, understand and modify the Code Tree. This where a lot of the magic happens. It is an extensible UI that benefits from the Code Tree graph format and the Storage to give the best DX possible. It also integrates with the Runtime to provide debugging features.
 
 **The Runtime**: It an the interpreter and debugger that runs the Code Tree. In the future we would love explore compilation (staring at you WASM 👀) for certain parts but for now it is fully interpreted.
 
