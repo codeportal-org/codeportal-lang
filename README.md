@@ -70,7 +70,7 @@ Carlos Galarza, Founder
 
 ## Inspiration
 
-- ["Stop Writing Dead Programs" by Jack Rusher (Strange Loop 2022)](https://www.youtube.com/watch?v=8Ab3ArE8W3s): This talk is amazing! Thanks Jack!
-- ["The Future of Programming" by Bret Victor](https://www.youtube.com/watch?v=8pTEmbeENF4): A classic and a must watch!
-- ["Moldable development" by Tudor Gîrba](https://www.youtube.com/watch?v=Pot9GnHFOVU): Custom tools built for each problem is pretty neat approach!
-- ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea!
+- ["Stop Writing Dead Programs" by Jack Rusher (Strange Loop 2022)](https://www.youtube.com/watch?v=8Ab3ArE8W3s): This talk is amazing! Thanks Jack! 🚀
+- ["The Future of Programming" by Bret Victor](https://www.youtube.com/watch?v=8pTEmbeENF4): A classic and a must watch! 💾
+- ["Moldable development" by Tudor Gîrba](https://www.youtube.com/watch?v=Pot9GnHFOVU): Custom tools built for each problem is pretty neat approach! Having different views of your system/code 💡.
+- ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea! 📍
