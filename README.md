@@ -25,7 +25,7 @@ CodePortal is an open-source GUI-based, web-based programming language and platf
 
 ## Why (short form)
 
-There is so much clutter in programming right now. And, I don't want to settle with what exists. I want something that truly sparks joy and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form of the "why" below. If not, just try the thing!
+There is so much clutter in programming right now. And, I don't want to settle with what exists. I want something that truly sparks joy and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form of the "why" below. If not, just try the thing! - Carlos Galarza
 
 ## Try the thing!
 
@@ -64,3 +64,5 @@ I have wanted to code in a better way for a while. A way that removed all the cl
 I never found a good answer! Maybe, I am too picky or too demanding, some people say so! haha! 😅 Also, most approaches and efforts that attempted to radically improve programming have failed or died - I keep a list of them. Some still exist, but they have not gained enough adoption, or they are thriving in a niche. BTW, thriving in a niche is great! It is a good use case for those tools. There are structured editors like Scratch and Snap but they are mostly for education and/or niche applications not for general purpose stuff.
 
 I have learned from all these efforts, from the mistakes, and from the good things. So I set out to create a new programming language. I decided to start from first principles and design something simple, smooth, and with a focus on developer experience. Something that is easy to use and flexible enough to create any type of application without sacrificing power, and flexibility. That is CodePortal! I would not call it no-code because it **IS** code, also is not low-code, because it very close to it. So, I think a proper name for it is **new-code**. It is a new way to code. I borrowed this from the SQL -> NoSQL -> NewSQL evolution and I think it fits well its purpose.
+
+- Carlos Galarza
