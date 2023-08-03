@@ -15,6 +15,9 @@
     "clean": {
       "cache": false
     },
+    "storybook": {
+      "cache": false
+    },
     "prisma:generate": {
       "cache": false
     }

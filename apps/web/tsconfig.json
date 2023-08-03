@@ -1,5 +1,5 @@
 {
-  "extends": "tsconfig/nextjs.json",
+  "extends": "@codeportal/tsconfig/nextjs.json",
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
