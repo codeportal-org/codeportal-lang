@@ -59,7 +59,7 @@ The goal of the Portal Language is to be independent from the CodePortal Platfor
 
 ### The CodePortal Platform
 
-The platform is our PaaS offering of the Portal Language. Its main parts are:
+The Platform is our PaaS offering of the Portal Language. Its main parts are:
 
 **The web app:** You can find it inside the `apps/web` folder. It has the API, web UI and handles auth, billing, DB connections, etc. It is a Next.js app hosted on Vercel.
 
