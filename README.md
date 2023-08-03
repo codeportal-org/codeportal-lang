@@ -13,9 +13,10 @@
 
 ## Intro
 
-CodePortal is an open-source GUI-based, web-based programming language and platform that tries to remove as much clutter and unnecessary complexity as possible out of programming. A few key features that set it apart from other programming languages and platforms are:
+CodePortal is an open-source GUI-based, web-based programming language and platform that tries to remove as much clutter and unnecessary complexity as possible out of programming. The editor is heavily focused on developer experience and thought from the ground up to be AI-first. CodePortal is currently very early and in beta so many of the features are actively being developed and some are part of the roadmap and coming soon. A few key features that set it apart from other programming languages and platforms are:
 
-- The editor is heavily focused on developer experience and thought from the ground up to be AI-first.
+- Code can be seen in multiple ways, from the main block-based view, to a graph view, a canvas view, notebooks and it offers a way to extend these views even further. Graph view and canvas view are coming soon.
+- AI-first, meaning that it includes code gen/explain capabilities and other AI features. This is coming soon.
 - It is a full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
 - It is a web-based platform, so it is easy to use and accessible from anywhere. It is also easy to share and collaborate with others.
 - For the server side, it uses an interpreter which allows for instant deployments and updates. No need to recompile or restart the server, [inspired by Darklang](https://blog.darklang.com/how-dark-deploys-code-in-50ms/).
@@ -46,7 +47,7 @@ The goal of the Portal Language is to be independent from the CodePortal Platfor
 
 **The Storage**: This is the layer in charge of querying and mutating the Code Tree. It includes various indexes, and a simple API for the Editor to interact with the Code Tree. For now, it is a simple in-memory storage, that we persist as blobs but we will be evolving it as we see fit, maybe into a fully fledged DB, or we will be using and existing one 🤔, this is open for analysis/discussion.
 
-**The Editor**: It allows you to explore, understand and modify the Code Tree. This is where a lot of the magic happens 🪄. It is an extensible UI that benefits from the Code Tree graph format and the Storage to give the best DX possible. It also integrates with the Runtime to provide debugging features.
+**The Editor**: It allows you to explore, understand and modify the Code Tree. This is where a lot of the magic happens 🪄. It is an extensible UI that benefits from the Code Tree graph format and the Storage to give the best DX possible. It enables for multiple representations or views of code, from the main one which is block-based, to a graph view, a canvas view, notebooks and it offers a way to extend these views even further. It also integrates with the Runtime to provide debugging features.
 
 **The Runtime**: It is an interpreter and debugger that runs the Code Tree. In the future we would love explore compilation/partial-generation (staring at you WASM 👀) for certain parts but for now it is fully interpreted. It also includes the basic functionality of the language, a standard library, the UI framework, and the web server.
 
