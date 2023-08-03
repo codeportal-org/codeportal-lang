@@ -13,15 +13,21 @@
 
 ## Intro
 
-CodePortal is an open-source GUI-based, web-based programming language and platform that tries to remove as much clutter and unnecessary complexity as possible out of programming. The editor is heavily focused on developer experience and thought from the ground up to be AI-first. CodePortal is currently very early and in beta so many of the features are actively being developed and some are part of the roadmap and coming soon. A few key features that set it apart from other programming languages and platforms are:
+CodePortal is an open-source GUI-based, web-based programming language and platform that tries to remove as much clutter and unnecessary complexity as possible out of programming. The editor is heavily focused on developer experience and thought from the ground up to be AI-first. CodePortal is currently very early and in beta so many of the features are actively being developed and some are part of the roadmap and coming soon.
 
-- Code can be seen in multiple ways, from the main block-based view, to a graph view, a canvas view, notebooks and it offers a way to extend these views even further. Graph view and canvas view are coming soon.
-- AI-first, meaning that it includes code gen/explain capabilities and other AI features. This is coming soon.
+This project has two main parts, the Portal Language (PortalLang) and the CodePortal Platform which is our PaaS offering.
+
+A few key features that set this project apart from others are:
+
+- Block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax).
+- PortalLang resembles natural language and is designed to be easy to understand. It draws inspiration from Python 🐍.
+- PortalLang has names with spaces, which is the right way to name things! 🌶️ No more CamelCase, snake_case, kebab-case, etc.
+- Code can be seen in multiple ways, from the main block-based view, to a graph view, a canvas view, notebooks and more. Additionally, it offers ways to extend these views even further. Graph view, notebooks, and canvas view are coming soon.
+- AI-first, meaning that it includes code gen/explain capabilities and other AI features. This is coming soon 🤖.
 - It is a full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
 - It is a web-based platform, so it is easy to use and accessible from anywhere. It is also easy to share and collaborate with others.
 - For the server side, it uses an interpreter which allows for instant deployments and updates. No need to recompile or restart the server, [inspired by Darklang](https://blog.darklang.com/how-dark-deploys-code-in-50ms/).
 - It stores code as a graph of nodes and connections in a database, not as text files. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files. Also, the code is always modified in this graph format.
-- The UI is block-based/node-based, not text-based. This makes it easier to work with and more intuitive.
 - Every node or part of the code is addressable by a unique ID (nanoid).
 
 ## Why (short form)
