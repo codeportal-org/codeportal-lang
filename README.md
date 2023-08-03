@@ -19,16 +19,15 @@ This project has two main parts, the Portal Language (PortalLang) and the CodePo
 
 A few key features that set this project apart from others are:
 
-- Block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax).
 - PortalLang resembles natural language and is designed to be easy to understand. It draws inspiration from Python 🐍.
-- PortalLang has names with spaces, which is the right way to name things! 🌶️ No more CamelCase, snake_case, kebab-case, etc.
-- Code can be seen in multiple ways, from the main block-based view, to a graph view, a canvas view, notebooks and more. Additionally, it offers ways to extend these views even further. Graph view, notebooks, and canvas view are coming soon.
+- Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folder. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, better tooling and version control. Also, every node is addressable by a unique ID (using `nanoid`).
+- Code can be seen and navigated in multiple ways, block view, graph view, canvas view, notebooks and more. Additionally, PortalLang offers ways to extend these views even further. Graph view, notebooks, and canvas view are coming soon.
+- PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ No more CamelCase, snake_case, kebab-case, etc.
+- Block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax, just UI).
 - AI-first, meaning that it includes code gen/explain capabilities and other AI features. This is coming soon 🤖.
 - It is a full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
 - It is a web-based platform, so it is easy to use and accessible from anywhere. It is also easy to share and collaborate with others.
 - For the server side, it uses an interpreter which allows for instant deployments and updates. No need to recompile or restart the server, [inspired by Darklang](https://blog.darklang.com/how-dark-deploys-code-in-50ms/).
-- It stores code as a graph of nodes and connections in a database, not as text files. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files. Also, the code is always modified in this graph format.
-- Every node or part of the code is addressable by a unique ID (nanoid).
 
 ## Why (short form)
 
@@ -81,3 +80,9 @@ Carlos Galarza, Founder
 - ["The Future of Programming" by Bret Victor](https://www.youtube.com/watch?v=8pTEmbeENF4): A classic and a must watch! 💾
 - ["Moldable development" by Tudor Gîrba](https://www.youtube.com/watch?v=Pot9GnHFOVU): Custom tools built for each problem is pretty neat approach! Having different views of your system/code! 💡
 - ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea! 📍
+
+## Ideas
+
+### Version control
+
+I wonder what are the pros/cons of using content-addressing combined with the IDs of the nodes. We will explore this as we build the versioning system which is not ready yet. Maybe just diffing the trees is enough? 🤔
