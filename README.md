@@ -2,7 +2,7 @@
 <img src="./apps/web/public/favicon.png" width="80" title="CodePortal logo">
 </div>
 
-<div align="center"><strong>CodePortal (Beta) 🚀</strong></div>
+<div align="center"><strong>CodePortal (Alpha) 🚀</strong></div>
 <div align="center">The full-stack programming platform for indie hackers and makers.<br />A place for all your creations. Simple, powerful, and flexible!</div>
 <br />
 <div align="center">
@@ -11,13 +11,13 @@
 <a href="https://codeportal.io/discord">Discord</a>
 </div>
 
-## Intro
+## Introduction
 
-CodePortal is an open-source GUI-based, web-based programming language and platform that tries to remove as much clutter and unnecessary complexity as possible out of programming. The editor is heavily focused on developer experience and thought from the ground up to be AI-first. CodePortal is currently very early and in beta so many of the features are actively being developed and some are part of the roadmap and coming soon.
+CodePortal is an open-source GUI-based, web-based programming language and platform that tries to remove as much clutter and unnecessary complexity as possible out of programming. The editor is heavily focused on developer experience and thought from the ground up to be AI-first. CodePortal is currently very early and in alpha so many of the features we mention are being actively developed, and coming soon.
 
-This project has two main parts, the Portal Language (PortalLang) and the CodePortal Platform which is our PaaS offering.
+This project has two main parts, the Portal Language (PortalLang) and the CodePortal Platform which is our PaaS offering. I will expand on this below.
 
-A few key features that set this project apart from others are:
+A few key features of this project are:
 
 - PortalLang resembles natural language and is designed to be easy to understand. It draws inspiration from Python 🐍.
 - Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, better tooling and version control. Also, every node is addressable by a unique ID (using `nanoid`).
@@ -25,7 +25,7 @@ A few key features that set this project apart from others are:
 - PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ 😉 No more camelCase, snake_case, kebab-case, etc. Inspired by [this Douglas Crockford talk](https://www.youtube.com/watch?v=99Zacm7SsWQ&t=2927s). So, you can name a function, variable or anything just as you would with natural language, no need to remember weird conventions or sacrifice readability.
 - PortalLang solved the tabs vs spaces debate! 😅 It uses UI space instead! 🤯 🌶️ No need to type it, and it is configurable!
 - Block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax, just UI).
-- AI-first, meaning that it includes code gen/explain capabilities and other AI features. This is coming soon 🤖.
+- AI-first, meaning that it includes code gen, code explain and other AI features. This is coming soon 🤖.
 - It is a full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
 - It is a web-based platform, so it is easy to use and accessible from anywhere. It is also easy to share and collaborate with others.
 - For the server side, it uses an interpreter which allows for instant deployments and updates. No need to recompile or restart the server, [inspired by Darklang](https://blog.darklang.com/how-dark-deploys-code-in-50ms/).
