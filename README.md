@@ -55,7 +55,7 @@ The goal of the Portal Language is to be independent from the CodePortal Platfor
 
 **The Editor**: It allows you to explore, understand and modify the Code Tree. This is where a lot of the magic happens 🪄. It is an extensible UI that benefits from the Code Tree graph format and the Storage to give the best DX possible. It enables for multiple representations or views of the code, like the main one which is block-based, the graph view, the canvas view, notebooks and it offers a way to extend these views even further. It also integrates with the Runtime to provide debugging features.
 
-**The Runtime**: It is an interpreter and debugger that runs the Code Tree. In the future we would love explore compilation/partial-generation (staring at you WASM 👀) for certain parts but for now it is fully interpreted. It also includes the basic functionality of the language, a standard library, the UI framework, and the web server.
+**The Runtime**: It is an interpreter and debugger that runs the Code Tree. In the future we would love explore compilation/partial-generation (staring at you WASM 👀) for certain parts but for now it is fully interpreted. It also includes the basic functionality of the language, a standard library, the UI framework, the JS interop layer, and the web server.
 
 ### The CodePortal Platform
 
