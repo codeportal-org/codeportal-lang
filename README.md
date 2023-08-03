@@ -22,7 +22,8 @@ A few key features that set this project apart from others are:
 - PortalLang resembles natural language and is designed to be easy to understand. It draws inspiration from Python 🐍.
 - Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folder. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, better tooling and version control. Also, every node is addressable by a unique ID (using `nanoid`).
 - Code can be seen and navigated in multiple ways, block view, graph view, canvas view, notebooks and more. Additionally, PortalLang offers ways to extend these views even further. Graph view, notebooks, and canvas view are coming soon.
-- PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ No more CamelCase, snake_case, kebab-case, etc.
+- PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ 😉 No more camelCase, snake_case, kebab-case, etc. Inspired by [this Douglas Crockford talk](https://www.youtube.com/watch?v=99Zacm7SsWQ&t=2927s).
+- PortalLang solved the tabs vs spaces debate! It uses margin instead! 🤯 🌶️
 - Block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax, just UI).
 - AI-first, meaning that it includes code gen/explain capabilities and other AI features. This is coming soon 🤖.
 - It is a full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
@@ -80,6 +81,7 @@ Carlos Galarza, Founder
 - ["The Future of Programming" by Bret Victor](https://www.youtube.com/watch?v=8pTEmbeENF4): A classic and a must watch! 💾
 - ["Moldable development" by Tudor Gîrba](https://www.youtube.com/watch?v=Pot9GnHFOVU): Custom tools built for each problem is pretty neat approach! Having different views of your system/code! 💡
 - ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea! 📍
+- ["The Post JavaScript Apocalypse" - Douglas Crockford](https://www.youtube.com/watch?v=99Zacm7SsWQ): Lots of wisdom here! It sparks joy! ✨
 
 ## Ideas
 
