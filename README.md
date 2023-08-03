@@ -80,7 +80,8 @@ Carlos Galarza, Founder
 - ["Stop Writing Dead Programs" by Jack Rusher (Strange Loop 2022)](https://www.youtube.com/watch?v=8Ab3ArE8W3s): This talk is amazing! Thanks Jack! 🚀
 - ["The Future of Programming" by Bret Victor](https://www.youtube.com/watch?v=8pTEmbeENF4): A classic and a must watch! 💾
 - ["Moldable development" by Tudor Gîrba](https://www.youtube.com/watch?v=Pot9GnHFOVU): Having multiple views of a system, and having your dev environment be moldable are big ideas! 💡
-- ["The Post JavaScript Apocalypse" - Douglas Crockford](https://www.youtube.com/watch?v=99Zacm7SsWQ): Lots of wisdom here! It sparks joy! ✨ Many hot takes! 🌶️ Names with spaces! 🤯
+- ["The Post JavaScript Apocalypse" by Douglas Crockford](https://www.youtube.com/watch?v=99Zacm7SsWQ): Lots of wisdom here! It sparks joy! ✨ Many hot takes! 🌶️ Names with spaces! 🤯 Let's get rid of stuff in our languages.
+- ["Why Dark" by Paul Biggar](https://www.youtube.com/watch?v=66w4Pdp5RhI): Simplifying, and getting rid of accidental complexity! Thinking about the important parts of what we do as an industry. Some great gems here! 💎
 - ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea! 📍
 
 ## Ideas
