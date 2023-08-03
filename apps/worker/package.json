@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "A worker instance.",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "build": "rimraf ./build && tsc",
     "dev": "nodemon",
@@ -12,8 +13,10 @@
     "test:dev": "jest --watchAll"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@types/jest": "^29.5.3",
+    "@codeportal/portal-lang": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^18.11.9",
     "eslint": "^8.20.0",
@@ -25,8 +28,5 @@
     "ts-node": "^10.9.1",
     "tsconfig": "workspace:*",
     "typescript": "^4.9.4"
-  },
-  "dependencies": {
-    "@types/jest": "^29.5.3"
   }
 }

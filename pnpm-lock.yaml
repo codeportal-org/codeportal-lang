@@ -35,6 +35,9 @@ importers:
       '@clerk/nextjs':
         specifier: ^4.23.1
         version: 4.23.1(next@13.4.12)(react-dom@18.2.0)(react@18.2.0)
+      '@codeportal/portal-lang':
+        specifier: workspace:*
+        version: link:../../packages/portal-lang
       '@dnd-kit/core':
         specifier: ^6.0.8
         version: 6.0.8(react-dom@18.2.0)(react@18.2.0)
@@ -92,9 +95,6 @@ importers:
       tinykeys:
         specifier: ^2.1.0
         version: 2.1.0
-      ui:
-        specifier: workspace:*
-        version: link:../../packages/ui
       zustand:
         specifier: ^4.3.9
         version: 4.3.9(react@18.2.0)
@@ -138,6 +138,9 @@ importers:
 
   apps/worker:
     dependencies:
+      '@codeportal/portal-lang':
+        specifier: workspace:*
+        version: link:../../packages/portal-lang
       '@types/jest':
         specifier: ^29.5.3
         version: 29.5.3
@@ -188,21 +191,7 @@ importers:
         specifier: 7.28.0
         version: 7.28.0(eslint@8.45.0)
 
-  packages/tailwind-config:
-    devDependencies:
-      '@tailwindcss/forms':
-        specifier: ^0.5.4
-        version: 0.5.4(tailwindcss@3.3.3)
-      '@tailwindcss/typography':
-        specifier: ^0.5.9
-        version: 0.5.9(tailwindcss@3.3.3)
-      tailwindcss:
-        specifier: ^3.3.3
-        version: 3.3.3
-
-  packages/tsconfig: {}
-
-  packages/ui:
+  packages/portal-lang:
     devDependencies:
       '@types/react':
         specifier: ^18.2.5
@@ -231,6 +220,20 @@ importers:
       typescript:
         specifier: ^4.9.4
         version: 4.9.4
+
+  packages/tailwind-config:
+    devDependencies:
+      '@tailwindcss/forms':
+        specifier: ^0.5.4
+        version: 0.5.4(tailwindcss@3.3.3)
+      '@tailwindcss/typography':
+        specifier: ^0.5.9
+        version: 0.5.9(tailwindcss@3.3.3)
+      tailwindcss:
+        specifier: ^3.3.3
+        version: 3.3.3
+
+  packages/tsconfig: {}
 
 packages:
 
