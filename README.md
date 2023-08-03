@@ -23,7 +23,7 @@ A few key features that set this project apart from others are:
 - Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folder. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, better tooling and version control. Also, every node is addressable by a unique ID (using `nanoid`).
 - Code can be seen and navigated in multiple ways, block view, graph view, canvas view, notebooks and more. Additionally, PortalLang offers ways to extend these views even further. Graph view, notebooks, and canvas view are coming soon.
 - PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ 😉 No more camelCase, snake_case, kebab-case, etc. Inspired by [this Douglas Crockford talk](https://www.youtube.com/watch?v=99Zacm7SsWQ&t=2927s).
-- PortalLang solved the tabs vs spaces debate! It uses margin instead! 🤯 🌶️
+- PortalLang solved the tabs vs spaces debate! It uses UI space instead! 🤯 🌶️ No need to type it, and it is configurable!
 - Block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax, just UI).
 - AI-first, meaning that it includes code gen/explain capabilities and other AI features. This is coming soon 🤖.
 - It is a full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
