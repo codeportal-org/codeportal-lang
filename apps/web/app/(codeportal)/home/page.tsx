@@ -13,7 +13,7 @@ export default function Home() {
       <header className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
         <Link className="flex items-center" href="/">
           <CodePortalLogo />
-          <div className="ml-1 text-xl font-bold text-gray-700">CodePortal</div>
+          <div className="ml-1 text-xl font-bold text-gray-700">CodePortal (alpha)</div>
         </Link>
 
         <LeftMenuLandingPage />
@@ -26,11 +26,12 @@ export default function Home() {
           </h1>
 
           <p className="mx-2 mb-8 max-w-3xl text-left text-center text-lg sm:text-xl">
-            CodePortal is the open-source full-stack programming platform for indie hackers and makers! Build, launch, and
-            scale your products all in one place without the headaches of traditional programming.
+            CodePortal is the open-source full-stack programming platform for indie hackers and
+            makers! Build, launch, and scale your products all in one place without the headaches of
+            traditional programming.
           </p>
           <div className="mb-16 flex justify-center">
-            <EarlyAccessButton>Join our closed beta!</EarlyAccessButton>
+            <EarlyAccessButton>Join our closed alpha!</EarlyAccessButton>
           </div>
 
           <MakerLaunchIllustration className="h-auto w-full sm:w-96" />

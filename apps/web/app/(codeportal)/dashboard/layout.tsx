@@ -32,7 +32,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <div className="flex max-w-2xl flex-col items-center px-2">
               {
                 <p className="mb-5 max-w-lg text-center text-xl leading-relaxed">
-                  You are in the closed beta waitlist!
+                  You are in the closed alpha waitlist!
                   <br /> We will get in touch with you soon!
                 </p>
               }
