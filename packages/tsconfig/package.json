@@ -1,7 +1,6 @@
 {
-  "name": "tsconfig",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@codeportal/tsconfig",
+  "version": "0.0.1",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

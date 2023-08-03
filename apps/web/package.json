@@ -45,9 +45,9 @@
     "postcss": "^8.4.21",
     "prisma": "^5.0.0",
     "sass": "^1.64.1",
-    "tailwind-config": "workspace:*",
+    "@codeportal/tailwind-config": "workspace:*",
     "tailwindcss": "^3.2.4",
-    "tsconfig": "workspace:*",
+    "@codeportal/tsconfig": "workspace:*",
     "typescript": "^4.9.4"
   }
 }

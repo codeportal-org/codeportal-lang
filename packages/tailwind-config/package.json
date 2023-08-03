@@ -1,7 +1,6 @@
 {
-  "name": "tailwind-config",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@codeportal/tailwind-config",
+  "version": "0.0.1",
   "main": "index.js",
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.4",
