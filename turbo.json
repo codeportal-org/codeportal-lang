@@ -15,6 +15,9 @@
     "clean": {
       "cache": false
     },
+    "test": {
+      "cache": false
+    },
     "storybook": {
       "cache": false
     },
