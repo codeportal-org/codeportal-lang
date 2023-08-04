@@ -31,9 +31,12 @@ They are loaded locally on startup and changes are sent to the cloud one by one.
 
 ## Editor
 
-- Block-view.
-- Autocomplete to add blocks.
-- ...
+- Editor view
+- Block-view:
+  - Autocomplete to add blocks.
+  - ...
+- Blocks:
+  - ...
 
 ## Runtime
 
