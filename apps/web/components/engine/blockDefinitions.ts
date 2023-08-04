@@ -134,8 +134,8 @@ let blockDefinitions: BlockDefinition[] = [
   {
     name: BlockName.text,
     type: "expression",
-    inline: true,
     description: "This block lets you hold text",
+    inline: true,
     parts: [
       {
         type: "group",
