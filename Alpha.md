@@ -47,4 +47,5 @@ They are loaded locally on startup and changes are sent to the cloud one by one.
 
 - Create and deploy app.
 - Custom domains.
+- ...
 - Basic usage based billing.
