@@ -19,7 +19,9 @@ This project has two main parts, the Portal Language (PortalLang) and the CodePo
 
 A few key features of this project are:
 
-- PortalLang resembles natural language and is designed to be easy to understand. It draws inspiration from Python 🐍.
+- Intuitive and extensible UI for code with support for themes. Enriched with widgets and UIs for data and debugging.
+- Support for translations! The programming language and platform can be translated to any language. This is a big deal for accessibility! 🌎
+- PortalLang resembles natural language and is designed to be easy to read. It draws inspiration from Python 🐍.
 - Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, better tooling and version control. Also, every node is addressable by a unique ID (using `nanoid`).
 - Code can be seen and navigated in multiple ways, block view, graph view, canvas view, notebooks and more. Additionally, PortalLang offers ways to extend these views even further. Graph view, notebooks, and canvas view are coming soon.
 - PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ 😉 No more camelCase, snake_case, kebab-case, etc. Inspired by [this Douglas Crockford talk](https://www.youtube.com/watch?v=99Zacm7SsWQ&t=2927s). So, you can name a function, variable or anything just as you would with natural language, no need to remember weird conventions or sacrifice readability.
