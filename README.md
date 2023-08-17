@@ -17,20 +17,29 @@ CodePortal is an open-source GUI-based, web-based programming language and platf
 
 This project has two main parts, the Portal Language (PortalLang) and the CodePortal Platform which is our PaaS offering. I will expand on this below.
 
-A few key features of this project are:
+Our goals are bold! We want to make programming drastically better! Here what we envision for PortalLang and CodePortal:
 
-- Intuitive and extensible UI for code with support for themes. Enriched with widgets and UIs for data and debugging.
-- Support for translations! The programming language and platform can be translated to any language. This is a big deal for accessibility! 🌎
-- PortalLang resembles natural language and is designed to be easy to read. It draws inspiration from Python 🐍.
+- Intuitive and extensible UI for code with support for themes ✨.
+- UI enriched with widgets for visualizing and working with data and for debugging.
+- Resemble natural language, be easy to read and to understand. Draw inspiration from Python 🐍.
 - Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. This is a more natural medium for code and it is easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, better tooling and version control. Also, every node is addressable by a unique ID (using `nanoid`).
-- Code can be seen and navigated in multiple ways, block view, graph view, canvas view, notebooks and more. Additionally, PortalLang offers ways to extend these views even further. Graph view, notebooks, and canvas view are coming soon.
+- Code can be read, modified and navigated in multiple ways, block view, graph view, canvas view, notebooks and more. Also, offer ways to extend these views even further.
 - PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ 😉 No more camelCase, snake_case, kebab-case, etc. Inspired by [this Douglas Crockford talk](https://www.youtube.com/watch?v=99Zacm7SsWQ&t=2927s). So, you can name a function, variable or anything just as you would with natural language, no need to remember weird conventions or sacrifice readability.
 - PortalLang solved the tabs vs spaces debate! 😅 It uses UI space instead! 🤯 🌶️ No need to type it, and it is configurable!
+- Support for translations! The programming language and platform can be translated to any language. This is a big deal for accessibility! 🌎
 - Block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax, just UI).
-- AI-first, meaning that it includes code gen, code explain and other AI features. This is coming soon 🤖.
+- AI-first, meaning that it includes code gen, code explain and other AI features.
 - It is a full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
 - It is a web-based platform, so it is easy to use and accessible from anywhere. It is also easy to share and collaborate with others.
 - For the server side, it uses an interpreter which allows for instant deployments and updates. No need to recompile or restart the server, [inspired by Darklang](https://blog.darklang.com/how-dark-deploys-code-in-50ms/).
+- Implement content-addressed code ala Unison, see [Unison: 💡 The big idea](https://www.unison-lang.org/learn/the-big-idea/).
+- Built-in code versioning and collaboration.
+- Package manager and marketplace for sharing and installing code.
+- Types are optional, and inferred. You can add them if you want, but you don't have to.
+- JS ecosystem interop, so you can use any JS library or package.
+- TS interop.
+
+To see what parts of this are already implemented, check out the [Roadmap](./Roadmap.md)
 
 ## Why (short form)
 
@@ -85,9 +94,3 @@ Carlos Galarza, Founder
 - ["The Post JavaScript Apocalypse" by Douglas Crockford](https://www.youtube.com/watch?v=99Zacm7SsWQ): Lots of wisdom here! It sparks joy! ✨ Many hot takes! Like names with spaces! 🌶️ 🤯
 - ["Why Dark" by Paul Biggar](https://www.youtube.com/watch?v=66w4Pdp5RhI): Simplifying, and getting rid of accidental complexity! Thinking about the important parts of what we do as an industry. Instant deployments! Live values (trace-driven development)! Some great gems here! 💎
 - ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea! 📍
-
-## Ideas
-
-### Version control
-
-I wonder what are the pros/cons of using content-addressing combined with the IDs of the nodes. We will explore this as we build the versioning system which is not ready yet. Maybe just diffing the trees is enough? 🤔
