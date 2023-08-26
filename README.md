@@ -19,7 +19,7 @@ This project has two main parts, the Portal Language (PortalLang) and the CodePo
 
 - ✨ Code can be read, modified and navigated in multiple ways. Some are: block-based view, graph view, canvas view, notebook view, and visual UI builder. Also, we offer ways to extend these views even further. This makes the system accessible to more people, and makes it easier to understand and to work with. Additionally, it enables new ways of working with code that are not possible with text-based programming. Imagine there is a different representation of the code depending on the task at hand or the person that is interacting with the system.
 - 🕸️ Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. We have seen this is a more natural medium for code that's easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, tooling and version control (AST-based). Also, every node is addressable by a unique ID (using `nanoid`).
-- ❌ There are no files and folders. Everything is interconnected by unique ids and classified with metadata (tags, types, etc). We think modern coding is better when it relies heavily on, forward and back references, full-text search, and semantic search.
+- 🔍 There are no files and folders. Everything is interconnected by unique IDs and classified with metadata (tags, types, etc.). We think modern coding is better when it heavily relies on forward and back references, full-text/metadata/semantic search, and system views to explore and understand the code and to find the right code.
 
 Here is what we envision for PortalLang and CodePortal and a few extra ideas that we think are important:
 
