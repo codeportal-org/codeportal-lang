@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>E-commerce Shipping Calculator</title>
+  </head>
+  <body>
+    <script type="module">
+      import htm from "https://esm.sh/htm"
+      import { h, render } from "https://esm.sh/preact"
+      import { useState } from "https://esm.sh/preact/hooks"
+
+      const html = htm.bind(h)
+
+      function ShippingCalculator() {
+        let [weight, setWeight] = useState(0)
+        let shippingCost = weight * 5
+
+        const handleInput = (e) => {
+          e.preventDefault()
+          let value = e.target.value
+          if (value < 0) {
+            value = 0
+          }
+          console.log("value", value)
+          setWeight(value)
+        }
+
+        console.log("weight", weight)
+
+        return html`
+          <div>
+            <h2>Shipping Calculator</h2>
+            <input type="number" value=${weight} onInput=${handleInput} />
+            <p>Shipping cost: $${shippingCost}</p>
+          </div>
+        `
+      }
+
+      render(html`<${ShippingCalculator} />`, document.body)
+    </script>
+  </body>
+</html>

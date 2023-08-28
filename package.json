@@ -6,13 +6,18 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "clean": "turbo clean",
-    "storybook:portal": "turbo storybook --filter @codeportal/portal-lang",
+    "storybook:portal": "turbo storybook --filter @codeportal/lang-core",
     "format": "prettier --write \"**/*.{css,js,json,jsx,ts,tsx,md}\"",
     "dev:db": "pscale connect codeportal main --port 3309",
     "db:generate": "turbo run prisma:generate --filter web",
-    "dev:full": "pnpm db:generate && concurrently \"pnpm dev\" \"pnpm dev:db\" --kill-others"
+    "dev:full": "pnpm db:generate && concurrently \"pnpm dev\" \"pnpm dev:db\" --kill-others",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish"
   },
+  "license": "Elastic License 2.0 (ELv2)",
   "devDependencies": {
+    "@changesets/cli": "^2.26.2",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "concurrently": "^8.2.0",
     "eslint": "^7.32.0",

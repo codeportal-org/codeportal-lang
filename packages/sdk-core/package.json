@@ -1,5 +1,5 @@
 {
-  "name": "@codeportal/portal-lang",
+  "name": "@codeportal/sdk-core",
   "version": "0.0.1",
   "sideEffects": [
     "**/*.css"

@@ -33,7 +33,7 @@
     "react-resizable-panels": "^0.0.54",
     "swr": "^2.2.0",
     "tinykeys": "^2.1.0",
-    "@codeportal/portal-lang": "workspace:*",
+    "@codeportal/lang-core": "workspace:*",
     "zustand": "^4.3.9"
   },
   "devDependencies": {

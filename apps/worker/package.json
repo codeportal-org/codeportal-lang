@@ -15,7 +15,7 @@
   "keywords": [],
   "dependencies": {
     "@types/jest": "^29.5.3",
-    "@codeportal/portal-lang": "workspace:*"
+    "@codeportal/lang-core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",

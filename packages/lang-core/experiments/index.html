@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My App</title>
+  </head>
+  <body>
+    <div id="app-container"></div>
+
+    <script type="module">
+      import { portal } from "https://ga.jspm.io/npm:@codeportal/sdk-code@0.0.1/dist/core.module.js"
+
+      portal.init({
+        apiKey: "a09ds8f7h3aasc0997798asdbkjbskdjf",
+      })
+
+      async function run() {
+        const myApp = await portal.getApp("app-c09ds8f7h3")
+
+        portal.render(myApp, document.getElementById("app-container"))
+      }
+
+      run()
+    </script>
+  </body>
+</html>
