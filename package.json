@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "turbo dev --filter=web --filter=worker",
     "lint": "turbo lint",
     "test": "turbo test",
     "clean": "turbo clean",
