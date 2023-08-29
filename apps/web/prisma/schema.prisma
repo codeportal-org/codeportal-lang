@@ -9,11 +9,28 @@ generator client {
 }
 
 model Application {
-  id           String    @id @default(uuid())
-  name         String
-  lastOpenedAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  deletedAt    DateTime?
-  creatorId    String
+  id                 String              @id @default(uuid())
+  name               String
+  creatorId          String
+  lastOpenedAt       DateTime?
+  mainModuleCodeTree Json?
+  modules            ApplicationModule[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model ApplicationModule {
+  id            String      @id @default(uuid())
+  name          String
+  application   Application @relation(fields: [applicationId], references: [id])
+  applicationId String
+  codeTree      Json?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([applicationId], name: "applicationId")
 }
