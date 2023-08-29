@@ -105,4 +105,8 @@ Carlos Galarza, Founder
 
 ## Local development
 
-See [Local Development.md](./LocalDev.md)
+See [Local Development.md](./local-dev.md)
+
+## Self Hosting
+
+See [Self Hosting.md](./self-hosting.md)
