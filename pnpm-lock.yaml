@@ -48,14 +48,14 @@ importers:
         specifier: ^2.0.18
         version: 2.0.18(react@18.2.0)
       '@liveblocks/client':
-        specifier: ^1.2.4
-        version: 1.2.4
+        specifier: ^1.1.8
+        version: 1.1.8
       '@liveblocks/node':
-        specifier: ^1.2.4
-        version: 1.2.4
+        specifier: ^1.1.8
+        version: 1.1.8
       '@liveblocks/react':
-        specifier: ^1.2.4
-        version: 1.2.4(react@18.2.0)
+        specifier: ^1.1.8
+        version: 1.1.8(react@18.2.0)
       '@prisma/client':
         specifier: ^5.2.0
         version: 5.2.0(prisma@5.2.0)
@@ -3075,31 +3075,31 @@ packages:
     resolution: {integrity: sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==}
     dev: true
 
-  /@liveblocks/client@1.2.4:
-    resolution: {integrity: sha512-BdJ0gU5J5acKlqJtAfPk6P4VFNwf/k7JVP+ybTb09TPpMlSS3hyc1Ks2w9s0mHCOxHG4zo5QjStscqHI20G9cQ==}
+  /@liveblocks/client@1.1.8:
+    resolution: {integrity: sha512-H6DhVATp+Vl3A+vVTq6igKF7slNhOMjqc7NMOfzM7hfgxeZu48Ly1pNATRkFXiGcYPwUta5mBsmsNA77VrJY6g==}
     dependencies:
-      '@liveblocks/core': 1.2.4
+      '@liveblocks/core': 1.1.8
     dev: false
 
-  /@liveblocks/core@1.2.4:
-    resolution: {integrity: sha512-gj17lM0CHXYWbYsaRyM+NWF2OBbo+VhpBqe/7Zx4CLxDrlexnL2SwvpwRxRkc+4lT6lNGH9mf+Xo0TtMJvP58g==}
+  /@liveblocks/core@1.1.8:
+    resolution: {integrity: sha512-P0SlLa6hWtu/Zg+OKMbE5y60OFMUkbhmRu8Nxu3UH66h07Yncp0ySGjgolE0kc89AGXjdI2nKYWk70Ryf8sVcg==}
     dev: false
 
-  /@liveblocks/node@1.2.4:
-    resolution: {integrity: sha512-lHFPrKhParBpO8c/RFfUlHMuNztIoOSL+v9HFMDEQqM4SXgZiHM9oIqgkSap1ZApEZtfHq+5gjJ40hYLkGhPRg==}
+  /@liveblocks/node@1.1.8:
+    resolution: {integrity: sha512-U00wzVRLR1aukE0lH47+MtXHokMwRpN1+bVkfafMkf57ayL8XKRpkdDwdoSYmDdFI8MeMwUHvGxpAkyYBHsxow==}
     dependencies:
       node-fetch: 2.7.0
     transitivePeerDependencies:
       - encoding
     dev: false
 
-  /@liveblocks/react@1.2.4(react@18.2.0):
-    resolution: {integrity: sha512-FAbIwqLDjxDgHxIIlbqsGcV0ORXGpcGWhlPVph0JCEkMHUZaY+jLX+J9QCiUVl9PZUqozHfBi76dm2SA1t3ibA==}
+  /@liveblocks/react@1.1.8(react@18.2.0):
+    resolution: {integrity: sha512-TiItRIkvQZWZ9uaYz2q0jfmuIQVywg3uznhTOlpus0GePy2WkyjuhEmcwgnDP0da+7KZs7AyUAvz2+fO4dZJIQ==}
     peerDependencies:
       react: ^16.14.0 || ^17 || ^18
     dependencies:
-      '@liveblocks/client': 1.2.4
-      '@liveblocks/core': 1.2.4
+      '@liveblocks/client': 1.1.8
+      '@liveblocks/core': 1.1.8
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false

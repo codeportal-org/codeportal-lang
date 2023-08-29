@@ -16,11 +16,12 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.23.3",
+    "@codeportal/lang-core": "workspace:*",
     "@dnd-kit/core": "^6.0.8",
     "@heroicons/react": "^2.0.18",
-    "@liveblocks/client": "^1.2.4",
-    "@liveblocks/node": "^1.2.4",
-    "@liveblocks/react": "^1.2.4",
+    "@liveblocks/client": "^1.1.8",
+    "@liveblocks/node": "^1.1.8",
+    "@liveblocks/react": "^1.1.8",
     "@prisma/client": "^5.2.0",
     "@vercel/analytics": "^1.0.1",
     "carloslfu-cmdk-internal": "^0.3.0",
@@ -35,10 +36,11 @@
     "react-resizable-panels": "^0.0.54",
     "swr": "^2.2.0",
     "tinykeys": "^2.1.0",
-    "@codeportal/lang-core": "workspace:*",
     "zustand": "^4.3.9"
   },
   "devDependencies": {
+    "@codeportal/tailwind-config": "workspace:*",
+    "@codeportal/tsconfig": "workspace:*",
     "@types/node": "^18.11.17",
     "@types/react": "^18.2.5",
     "@types/react-dom": "^18.2.4",
@@ -47,9 +49,7 @@
     "postcss": "^8.4.21",
     "prisma": "^5.2.0",
     "sass": "^1.64.1",
-    "@codeportal/tailwind-config": "workspace:*",
     "tailwindcss": "^3.2.4",
-    "@codeportal/tsconfig": "workspace:*",
     "typescript": "^4.9.4"
   }
 }
