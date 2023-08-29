@@ -10,3 +10,7 @@ Prerequisites:
 Run:
 
 - pnpm dev:full
+
+Push db changes:
+
+- pnpm db:push

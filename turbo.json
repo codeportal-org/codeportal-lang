@@ -23,6 +23,12 @@
     },
     "prisma:generate": {
       "cache": false
+    },
+    "prisma:push": {
+      "cache": false
+    },
+    "prisma:studio": {
+      "cache": false
     }
   }
 }
