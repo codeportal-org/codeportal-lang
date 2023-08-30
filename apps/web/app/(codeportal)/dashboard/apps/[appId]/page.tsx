@@ -19,7 +19,6 @@ import { Editor } from "./Editor"
 
 export default function AppPage({ params }: { params: { appId: string } }) {
   const [isResizing, setIsResizing] = useState(false)
-  const toggleCommandBar = useCommandBarStore((state) => state.toggle)
 
   const trackAppOpened = useTrackAppOpened(params.appId)
   const getApp = useGetApp(params.appId)
@@ -48,40 +47,7 @@ export default function AppPage({ params }: { params: { appId: string } }) {
 
   return (
     <div className="h-full overflow-hidden">
-      <div className="flex h-8 items-center justify-between px-2">
-        <div>
-          <span>{appName}</span>
-        </div>
-        <div>
-          <button
-            className="mr-2 rounded px-2 hover:bg-slate-300"
-            onClick={() => {
-              toggleCommandBar()
-            }}
-          >
-            Command bar (
-            {getPlatform() === "Mac" ? (
-              <kbd className="font-sans font-semibold dark:text-slate-500">
-                <abbr title="Command" className="text-slate-300 no-underline dark:text-slate-500">
-                  ⌘
-                </abbr>
-                K
-              </kbd>
-            ) : (
-              <kbd className="font-sans font-semibold dark:text-slate-500">
-                <abbr title="Control" className="text-slate-300 no-underline dark:text-slate-500">
-                  Ctrl
-                </abbr>
-                K
-              </kbd>
-            )}
-            )
-          </button>
-          <Link href="/dashboard" className="inline-block rounded px-2 hover:bg-slate-300">
-            Back
-          </Link>
-        </div>
-      </div>
+      <TopBar appName={appName || ""} />
 
       <PanelGroup
         direction="horizontal"
@@ -145,6 +111,47 @@ export default function AppPage({ params }: { params: { appId: string } }) {
           },
         ]}
       />
+    </div>
+  )
+}
+
+function TopBar({ appName }: { appName: string }) {
+  const toggleCommandBar = useCommandBarStore((state) => state.toggle)
+
+  return (
+    <div className="flex h-8 items-center justify-between px-2">
+      <div>
+        <span>{appName}</span>
+      </div>
+      <div>
+        <button
+          className="mr-2 rounded px-2 hover:bg-slate-300"
+          onClick={() => {
+            toggleCommandBar()
+          }}
+        >
+          Command bar (
+          {getPlatform() === "Mac" ? (
+            <kbd className="font-sans font-semibold dark:text-slate-500">
+              <abbr title="Command" className="text-slate-300 no-underline dark:text-slate-500">
+                ⌘
+              </abbr>
+              K
+            </kbd>
+          ) : (
+            <kbd className="font-sans font-semibold dark:text-slate-500">
+              <abbr title="Control" className="text-slate-300 no-underline dark:text-slate-500">
+                Ctrl
+              </abbr>
+              K
+            </kbd>
+          )}
+          )
+        </button>
+        <Link href="/dashboard" className="inline-block rounded px-2 hover:bg-slate-300">
+          Back
+        </Link>
+      </div>
     </div>
   )
 }
