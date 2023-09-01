@@ -60,11 +60,13 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
    Server side code
   */
 
-  // Interpreter runs and renders the site
+  // Interpreter runs and renders the site GG!
+  const siteRender = await portalServerRenderer({ mainModule: { src: "app.mainModuleCodeTree" } })
 
   return (
     <div style={{ padding: 40 }}>
       <h1 className="py-3 text-3xl text-blue-400">{app.name}</h1>
+      {/* {siteRender} */}
       <p>Site page ID: {params.path.join(" / ")}</p>
       <p>Search params: {JSON.stringify(searchParams)}</p>
       <ClientComp />
@@ -73,3 +75,12 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
 }
 
 export default SitePage
+
+async function portalServerRenderer({ mainModule }: { mainModule: any }) {
+  return (
+    <div>
+      <h1>PortalServerRenderer</h1>
+      <pre>{JSON.stringify(mainModule, null, 2)}</pre>
+    </div>
+  )
+}

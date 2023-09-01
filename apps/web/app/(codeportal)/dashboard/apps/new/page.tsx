@@ -5,8 +5,8 @@ import { NewAppFormData } from "app/api/apps/types"
 import { useRouter } from "next/navigation"
 import { SubmitHandler, useForm } from "react-hook-form"
 
-import { Button } from "@/components/core/Button"
-import { Input } from "@/components/core/Input"
+import { Button } from "@/components/Button"
+import { Input } from "@/components/Input"
 
 import { PageContainer } from "../../PageContainer"
 

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="h-screen bg-gray-100 text-black">
+    <div class="container mx-auto mt-10 max-w-xl rounded-lg bg-white p-4 shadow-md">
+      <h1 class="mb-4 text-xl font-semibold text-gray-800">Habit Tracker</h1>
+      <input
+        type="text"
+        id="habitInput"
+        class="w-full rounded border border-gray-300 bg-gray-100 p-2 text-black"
+        placeholder="Add a new habit..."
+      />
+      <ul id="habitList" class="mt-4">
+        <!-- Habits will be displayed here -->
+      </ul>
+    </div>
+
+    <script>
+      const habitInput = document.getElementById("habitInput")
+      const habitList = document.getElementById("habitList")
+
+      function saveHabitsToLocalStorage() {
+        const habits = []
+        document.querySelectorAll("#habitList li").forEach((habitElem) => {
+          const habitText = habitElem.querySelector("span").textContent
+          const streakCount = parseInt(
+            habitElem.querySelector(".streak").textContent.split(":")[1].trim(),
+            10,
+          )
+          habits.push({ text: habitText, streak: streakCount })
+        })
+        localStorage.setItem("habits", JSON.stringify(habits))
+      }
+
+      function loadHabitsFromLocalStorage() {
+        const savedHabits = JSON.parse(localStorage.getItem("habits"))
+        if (savedHabits) {
+          savedHabits.forEach((habit) => addHabit(habit.text, habit.streak))
+        }
+      }
+
+      habitInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && habitInput.value.trim() !== "") {
+          addHabit(habitInput.value.trim())
+          habitInput.value = ""
+          saveHabitsToLocalStorage()
+        }
+      })
+
+      function addHabit(habitText, streak = 0) {
+        const habitElem = document.createElement("li")
+        habitElem.className =
+          "flex justify-between items-center mt-2 p-2 bg-gray-200 rounded shadow-sm"
+
+        const textElem = document.createElement("span")
+        textElem.textContent = habitText
+
+        const streakElem = document.createElement("span")
+        streakElem.className = "text-blue-600 streak"
+        streakElem.textContent = `Streak: ${streak}`
+
+        const doneBtn = document.createElement("button")
+        doneBtn.className = "bg-green-400 text-white rounded p-1 ml-2"
+        doneBtn.textContent = "Done"
+
+        doneBtn.addEventListener("click", function () {
+          let currentStreak = parseInt(streakElem.textContent.split(":")[1].trim(), 10)
+          streakElem.textContent = `Streak: ${++currentStreak}`
+          saveHabitsToLocalStorage()
+        })
+
+        const deleteBtn = document.createElement("button")
+        deleteBtn.className = "bg-red-400 text-white rounded p-1 ml-2"
+        deleteBtn.textContent = "Delete"
+
+        deleteBtn.addEventListener("click", function () {
+          habitList.removeChild(habitElem)
+          saveHabitsToLocalStorage()
+        })
+
+        habitElem.appendChild(textElem)
+        habitElem.appendChild(streakElem)
+        habitElem.appendChild(doneBtn)
+        habitElem.appendChild(deleteBtn)
+        habitList.appendChild(habitElem)
+      }
+
+      // Load habits on page load
+      loadHabitsFromLocalStorage()
+    </script>
+  </body>
+</html>

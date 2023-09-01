@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs"
 
-import { Button } from "@/components/core/Button"
+import { Button } from "@/components/Button"
 
 export const LeftMenuLandingPage = () => {
   const { isSignedIn, isLoaded } = useUser()

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="h-screen bg-blue-50">
+    <div class="container mx-auto mt-10 max-w-xl rounded-lg bg-white p-4 shadow-md">
+      <h1 class="mb-4 text-xl font-semibold">Habit Tracker</h1>
+      <input
+        type="text"
+        id="habitInput"
+        class="w-full rounded border p-2"
+        placeholder="Add a new habit..."
+      />
+      <ul id="habitList" class="mt-4">
+        <!-- Habits will be displayed here -->
+      </ul>
+    </div>
+
+    <script>
+      const habitInput = document.getElementById("habitInput")
+      const habitList = document.getElementById("habitList")
+
+      // Add habit when pressing Enter
+      habitInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && habitInput.value.trim() !== "") {
+          addHabit(habitInput.value.trim())
+          habitInput.value = ""
+        }
+      })
+
+      function addHabit(habitText) {
+        // Create the habit element
+        const habitElem = document.createElement("li")
+        habitElem.className =
+          "flex justify-between items-center mt-2 p-2 bg-blue-100 rounded shadow-sm"
+
+        // Create the text element
+        const textElem = document.createElement("span")
+        textElem.textContent = habitText
+
+        // Create delete button
+        const deleteBtn = document.createElement("button")
+        deleteBtn.className = "bg-red-500 text-white rounded p-1 ml-2"
+        deleteBtn.textContent = "Delete"
+
+        deleteBtn.addEventListener("click", function () {
+          habitList.removeChild(habitElem)
+        })
+
+        // Append the elements
+        habitElem.appendChild(textElem)
+        habitElem.appendChild(deleteBtn)
+        habitList.appendChild(habitElem)
+      }
+    </script>
+  </body>
+</html>

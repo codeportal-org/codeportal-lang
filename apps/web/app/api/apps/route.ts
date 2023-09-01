@@ -1,7 +1,6 @@
 import { auth } from "@clerk/nextjs"
 import { NextResponse } from "next/server"
 
-import { nanoid } from "@/components/engine/nanoId"
 import prisma from "@/lib/prisma"
 
 import { NewAppFormData } from "./types"
@@ -31,7 +30,7 @@ export async function POST(request: Request) {
   const body: NewAppFormData = await request.json()
 
   const res = await prisma.application.create({
-    data: { id: nanoid(), name: body.name, creatorId: userId },
+    data: { name: body.name, creatorId: userId },
   })
 
   return NextResponse.json({ appId: res.id })

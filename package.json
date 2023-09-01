@@ -6,7 +6,7 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "clean": "turbo clean",
-    "storybook:portal": "turbo storybook --filter @codeportal/lang-core",
+    "storybook:lang": "turbo storybook --filter @codeportal/lang-ui",
     "format": "prettier --write \"**/*.{css,js,json,jsx,ts,tsx,md}\"",
     "dev:db": "pscale connect codeportal main --port 3309",
     "db:generate": "turbo run prisma:generate --filter web",

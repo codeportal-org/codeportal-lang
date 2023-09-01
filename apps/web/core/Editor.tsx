@@ -2,7 +2,6 @@
 
 import { ClientSideSuspense } from "@liveblocks/react"
 
-import Program from "@/components/engine/Program"
 import { PrivateRoomProvider, privateLiveRoomContext } from "@/lib/liveblocks.config"
 
 export function Editor({ appId }: { appId: string }) {
@@ -20,9 +19,5 @@ export function Editor({ appId }: { appId: string }) {
 function EditorContainer() {
   const broadcast: any = privateLiveRoomContext.useBroadcastEvent()
 
-  return (
-    <div className="h-150">
-      <Program />
-    </div>
-  )
+  return <div className="h-150 ">Program</div>
 }

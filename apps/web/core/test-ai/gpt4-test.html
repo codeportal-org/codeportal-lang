@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <title>My app</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!--
+    JSPM Generator Import Map
+    Edit URL: https://generator.jspm.io/#U2VhYGBmT85PSS3ILypJzGHIKMl1MNYz1DPUL0pNTC5hAJO6Kfm5DoYWekZ6BhABKAcASnBWMz4A
+  -->
+    <script type="importmap">
+      {
+        "imports": {
+          "htm/react": "https://ga.jspm.io/npm:htm@3.1.1/react/index.module.js",
+          "react": "https://ga.jspm.io/npm:react@18.2.0/dev.index.js",
+          "react-dom": "https://ga.jspm.io/npm:react-dom@18.2.0/dev.index.js"
+        },
+        "scopes": {
+          "https://ga.jspm.io/": {
+            "htm": "https://ga.jspm.io/npm:htm@3.1.1/dist/htm.module.js",
+            "scheduler": "https://ga.jspm.io/npm:scheduler@0.23.0/dev.index.js"
+          }
+        }
+      }
+    </script>
+
+    <!-- ES Module Shims: Import maps polyfill for older browsers without import maps support (eg Safari 16.3) -->
+    <script
+      async
+      src="https://ga.jspm.io/npm:es-module-shims@1.8.0/dist/es-module-shims.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module">
+      import { html } from "htm/react"
+      import * as react from "react"
+      import ReactDOM from "react-dom"
+
+      const App = () => {
+        const [habits, setHabits] = react.useState([])
+        const [newHabit, setNewHabit] = react.useState("")
+
+        const addHabit = (event) => {
+          event.preventDefault()
+          if (newHabit.trim() !== "") {
+            setHabits([...habits, newHabit])
+            setNewHabit("")
+          }
+        }
+
+        const deleteHabit = (index) => {
+          setHabits(habits.filter((_, i) => i !== index))
+        }
+
+        return html`
+          <div className="container mx-auto px-4">
+            <h1 className="text-4xl font-bold mb-4">Habit Tracker</h1>
+            <form onSubmit=${addHabit} className="mb-4">
+              <input
+                type="text"
+                value=${newHabit}
+                onChange=${(e) => setNewHabit(e.target.value)}
+                className="border border-gray-300 p-2 mr-2"
+                placeholder="New habit"
+              />
+              <button type="submit" className="bg-blue-500 text-white p-2">Add Habit</button>
+            </form>
+            <ul>
+              ${habits.map(
+                (habit, index) => html`
+                  <li key=${index} className="border border-gray-300 p-2 mb-2 flex justify-between">
+                    <span>${habit}</span>
+                    <button
+                      onClick=${() => deleteHabit(index)}
+                      className="bg-red-500 text-white p-2"
+                    >
+                      Delete
+                    </button>
+                  </li>
+                `,
+              )}
+            </ul>
+          </div>
+        `
+      }
+
+      ReactDOM.render(html`<${App} />`, document.getElementById("root"))
+    </script>
+  </body>
+</html>

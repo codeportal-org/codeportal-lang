@@ -13,9 +13,9 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 
 import { CommandBar } from "@/components/CommandBar"
 import { useCommandBarStore } from "@/components/CommandBar/store"
+import { Editor } from "@/core/Editor"
 
 import { getPlatform } from "../../../../../lib/platform"
-import { Editor } from "./Editor"
 
 export default function AppPage({ params }: { params: { appId: string } }) {
   const [isResizing, setIsResizing] = useState(false)

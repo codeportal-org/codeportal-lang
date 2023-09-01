@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-200 p-6">
+    <div class="container mx-auto">
+      <h1 class="mb-4 text-4xl">Habit Tracker</h1>
+      <form id="habit-form" class="mb-4">
+        <input
+          id="habit-input"
+          type="text"
+          class="w-full border-2 border-gray-300 p-2"
+          placeholder="Enter a new habit"
+        />
+      </form>
+      <ul id="habit-list" class="space-y-2"></ul>
+    </div>
+
+    <script>
+      const form = document.getElementById("habit-form")
+      const input = document.getElementById("habit-input")
+      const list = document.getElementById("habit-list")
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault()
+        const habit = input.value
+        if (habit) {
+          const li = document.createElement("li")
+          li.classList.add(
+            "p-4",
+            "border",
+            "border-gray-300",
+            "bg-white",
+            "flex",
+            "justify-between",
+            "items-center",
+          )
+          li.innerHTML = `
+                    ${habit}
+                    <button class="toggle-done bg-blue-500 text-white px-2 py-1 rounded">Mark as done</button>
+                `
+          list.appendChild(li)
+          input.value = ""
+          li.querySelector(".toggle-done").addEventListener("click", function () {
+            this.textContent = li.classList.toggle("line-through")
+              ? "Mark as undone"
+              : "Mark as done"
+            this.classList.toggle("bg-green-500")
+            this.classList.toggle("bg-blue-500")
+          })
+        }
+      })
+    </script>
+  </body>
+</html>
