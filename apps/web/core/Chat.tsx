@@ -12,6 +12,7 @@ export default function Chat({
   onFinish?: (prompt: string, completion: string) => void
 }) {
   const formRef = React.useRef<HTMLFormElement>(null)
+  const completionContainerRef = React.useRef<HTMLDivElement>(null)
   const saveCode = useSaveCode(appId)
 
   const [isFinished, setIsFinished] = useState(false)
@@ -26,6 +27,12 @@ export default function Chat({
       saveCode.trigger({ code: completion })
     },
   })
+
+  React.useEffect(() => {
+    if (completionContainerRef.current) {
+      completionContainerRef.current.scrollTop = completionContainerRef.current.scrollHeight
+    }
+  }, [completion])
 
   return (
     <div className="h-full rounded-xl border p-2">
@@ -53,7 +60,10 @@ export default function Chat({
           Create app!
         </button>
       </form>
-      <div className="my-6 w-full overflow-auto whitespace-pre-wrap">
+      <div
+        className="my-6 h-[calc(100%-200px)] overflow-auto whitespace-pre-wrap"
+        ref={completionContainerRef}
+      >
         {isLoading && <div>Creating app ...</div>}
         {completion}
       </div>

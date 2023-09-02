@@ -40,9 +40,9 @@ export default async function DevSitePage({ params, searchParams }: SitePageProp
   const SitePageComp = await SitePage({ params: { ...params, path: newPath }, searchParams })
 
   return (
-    <div className="h-full">
+    <>
       <div>{SitePageComp}</div>
       <DevClientComp appId={appId} />
-    </div>
+    </>
   )
 }

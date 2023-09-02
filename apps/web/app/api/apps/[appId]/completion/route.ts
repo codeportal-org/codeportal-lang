@@ -100,6 +100,7 @@ Instead, always write quotation marks and apostrophes like this:
 - Andreas’ ability
 - can’t, isn’t, won’t
 
+Never use the zero width space character (U+200B).
 
 Carefully design what the user requests. Make sure the buttons and the main features work correctly. If there is an input with a possible action when hitting enter, implement the action on enter key functionality. If there is an input, validate that it cannot be submitted empty. If there is a customizable list in the requirements, include a way to delete the items. If there are very common easy to implement features that are obvious, implement them. Style the container of the app so it is well aligned and well designed.
 
@@ -109,5 +110,10 @@ Do not import Tailwind CSS.
 
 I’ll start a JavaScript app which must implement the user specifications and you’ll continue exactly where I left off:
 
-\`\`\`javascript\nimport * as react from \"react\"\nimport ReactDOM from 'react-dom'\nimport { html } from 'htm/react'`
+\`\`\`javascript
+import * as react from \"react\"
+import ReactDOM from 'react-dom'
+import { html } from 'htm/react'
+
+`
 }

@@ -35,12 +35,12 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         style={{ height: "calc(100% - 28px)" }}
         disablePointerEventsDuringResize={true}
       >
-        <Panel defaultSize={20} minSize={15}>
+        <Panel defaultSize={20} minSize={15} className="pb-3 pl-2">
           <Chat appId={appId} />
         </Panel>
         <PanelResizeHandle
           className={
-            "mb-3 mr-1 flex w-3 cursor-ew-resize items-center justify-center rounded-lg transition-colors" +
+            "mb-3 ml-1 mr-1 flex w-3 cursor-ew-resize items-center justify-center rounded-lg transition-colors" +
             (isLeftResizing ? " bg-slate-300" : " hover:bg-slate-200")
           }
           onDragging={(isDragging) => {
@@ -49,12 +49,12 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         >
           <div className="h-12 w-0.5 bg-gray-400"></div>
         </PanelResizeHandle>
-        <Panel defaultSize={40} minSize={30}>
+        <Panel defaultSize={40} minSize={30} className="pb-3">
           <CodeView appId={appId} code={data && data.code !== null ? buildCode(data.code) : ""} />
         </Panel>
         <PanelResizeHandle
           className={
-            "mb-3 mr-1 flex w-3 cursor-ew-resize items-center justify-center rounded-lg transition-colors" +
+            "mb-3 ml-1 mr-1 flex w-3 cursor-ew-resize items-center justify-center rounded-lg transition-colors" +
             (isRightResizing ? " bg-slate-300" : " hover:bg-slate-200")
           }
           onDragging={(isDragging) => {
