@@ -31,7 +31,7 @@ function CodeContainer({ appId, code }: { appId: string; code: string }) {
   return (
     <>
       <button onClick={() => {}}>Send</button>
-      <textarea className="h-full w-full rounded-xl border px-4 py-2">{code}</textarea>
+      <textarea className="h-full w-full rounded-xl border px-4 py-2" value={code}></textarea>
     </>
   )
 }
