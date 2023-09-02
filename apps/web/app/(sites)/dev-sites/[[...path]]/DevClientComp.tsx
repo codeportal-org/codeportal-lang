@@ -13,29 +13,18 @@ export function DevClientComp({ appId }: { appId: string }) {
   return (
     <PublicRoomProvider id={`editor-${appId}`} initialPresence={{}}>
       <ClientSideSuspense fallback={<div>Loading...</div>}>
-        {() => (
-          <div>
-            {`editor-${appId}`}
-            <LiveExperiment />
-          </div>
-        )}
+        {() => <RealTimeListener />}
       </ClientSideSuspense>
     </PublicRoomProvider>
   )
 }
 
-function LiveExperiment() {
-  const [messageList, setMessageList] = React.useState<string[]>([])
-
+function RealTimeListener() {
   publicLiveRoomContext.useEventListener(({ connectionId, event }: any) => {
-    console.log("--- event", connectionId, event)
-    setMessageList((messageList) => [...messageList, event])
+    if (event.type === "refresh") {
+      window.location.reload()
+    }
   })
 
-  return (
-    <div>
-      <div>Client side component</div>
-      {JSON.stringify(messageList)}
-    </div>
-  )
+  return <></>
 }

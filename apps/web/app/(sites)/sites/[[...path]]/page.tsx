@@ -2,6 +2,7 @@ import { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
 import React from "react"
 
+import { buildCode } from "@/core/codeRuntime"
 import prisma from "@/lib/prisma"
 
 import { ClientComp } from "./ClientComp"
@@ -24,8 +25,6 @@ export async function generateMetadata(
     where: { id: appId },
     orderBy: { lastOpenedAt: "desc" },
   })
-
-  console.log(app)
 
   if (!app) {
     return {
@@ -61,32 +60,27 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
   */
 
   // Interpreter runs and renders the site GG!
-  const siteRender = await portalServerRenderer({ mainModule: { src: "app.mainModuleCodeTree" } })
-
-  console.log("siteRender", JSON.stringify(siteRender))
+  const siteRender = await portalServerRenderer({ mainModule: app.mainModuleCodeTree })
 
   return (
-    <div style={{ padding: 40 }}>
-      <h1 className="py-3 text-3xl text-blue-400">{app.name}</h1>
+    <>
       {siteRender}
-      <p>Site page ID: {params.path.join(" / ")}</p>
-      <p>Search params: {JSON.stringify(searchParams)}</p>
       <ClientComp />
-    </div>
+    </>
   )
 }
 
 export default SitePage
 
 async function portalServerRenderer({ mainModule }: { mainModule: any }) {
-  if (false) {
-    return <ClientComp />
-  }
+  console.log("portalServerRenderer", mainModule?.code)
+
   return (
-    <div>
-      <h1>PortalServerRenderer</h1>
-      <pre>{JSON.stringify(mainModule, null, 2)}</pre>
-      <ClientComp />
-    </div>
+    <script
+      type="module"
+      dangerouslySetInnerHTML={{
+        __html: mainModule?.code ? buildCode(mainModule?.code) : "",
+      }}
+    ></script>
   )
 }

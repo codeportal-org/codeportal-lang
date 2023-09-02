@@ -62,7 +62,7 @@ export async function POST(req: Request, { params }: { params: { appId: string }
 }
 
 function createSystemPrompt() {
-  return `You’re an app creator that responds with code that will be embedded on a website, based on the user-provided input. All content should be as impressive and exciting as possible. You can only respond with valid JavaScript code. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JavaScript. Use Tailwind CSS for styling.`
+  return `You’re an app creator that responds with code that will be embedded on a website, based on the user-provided input. All content should be as impressive and exciting as possible. You can only respond with valid JavaScript code. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JavaScript. Use React with the HTM (Hyperscript Tagged Markup) library syntax. Use the str. Use Tailwind CSS for styling.`
 }
 
 function createUserPrompt(userInput: string) {

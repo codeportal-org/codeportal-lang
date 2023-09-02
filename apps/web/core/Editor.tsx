@@ -5,6 +5,7 @@ import {
   ArrowPathIcon,
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline"
+import { useGetCode } from "app/api/apps/[appId]/code/hooks"
 import Link from "next/link"
 import { useState } from "react"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
@@ -15,10 +16,12 @@ import { getPlatform } from "@/lib/platform"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
+import { buildCode } from "./codeRuntime"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const [isLeftResizing, setIsLeftResizing] = useState(false)
   const [isRightResizing, setRightIsResizing] = useState(false)
+  const { data } = useGetCode(appId)
 
   const prodAppURL = `${window.location.protocol}//${appId}.${window.location.host}`
   const devAppURL = `${window.location.protocol}//dev-${appId}.${window.location.host}`
@@ -47,7 +50,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
           <div className="h-12 w-0.5 bg-gray-400"></div>
         </PanelResizeHandle>
         <Panel defaultSize={40} minSize={30}>
-          <CodeView appId={appId} />
+          <CodeView appId={appId} code={data && data.code !== null ? buildCode(data.code) : ""} />
         </Panel>
         <PanelResizeHandle
           className={
