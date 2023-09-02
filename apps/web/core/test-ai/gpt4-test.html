@@ -61,25 +61,35 @@
 
         return html`
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-4">Habit Tracker</h1>
+            <h1 className="text-4xl font-bold mb-4">Unleash Your Potential!</h1>
+            <p className="text-lg mb-4">
+              Welcome to Habit Tracker, your personal sidekick in your journey to greatness. Let’s
+              get those habits in check!
+            </p>
             <form onSubmit=${addHabit} className="mb-4">
               <input
                 type="text"
+                placeholder="Add a new habit"
                 value=${newHabit}
                 onChange=${(e) => setNewHabit(e.target.value)}
-                className="border border-gray-300 p-2 mr-2"
-                placeholder="New habit"
+                className="border-2 border-gray-300 p-2 rounded-lg w-full"
+                required
               />
-              <button type="submit" className="bg-blue-500 text-white p-2">Add Habit</button>
+              <button type="submit" className="bg-blue-500 text-white p-2 mt-2 rounded-lg w-full">
+                Add Habit
+              </button>
             </form>
             <ul>
               ${habits.map(
                 (habit, index) => html`
-                  <li key=${index} className="border border-gray-300 p-2 mb-2 flex justify-between">
+                  <li
+                    key=${index}
+                    className="border-2 border-gray-300 p-2 rounded-lg mb-2 flex justify-between"
+                  >
                     <span>${habit}</span>
                     <button
                       onClick=${() => deleteHabit(index)}
-                      className="bg-red-500 text-white p-2"
+                      className="bg-red-500 text-white p-2 rounded-lg"
                     >
                       Delete
                     </button>
