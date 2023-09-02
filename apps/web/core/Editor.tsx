@@ -84,11 +84,13 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
             </div>
             <iframe
               src={devAppURL}
+              title={appName || ""}
               className="w-full"
               style={{
                 height: "calc(100% - 52px)",
               }}
-              sandbox="allow-scripts allow-same-origin"
+              allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+              sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts allow-downloads allow-pointer-lock"
             ></iframe>
             <div className="h-5 bg-slate-300"></div>
           </div>

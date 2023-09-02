@@ -29,9 +29,8 @@ function CodeContainer({ appId, code }: { appId: string; code: string }) {
   }, [code])
 
   return (
-    <>
-      <button onClick={() => {}}>Send</button>
-      <textarea className="h-full w-full rounded-xl border px-4 py-2" value={code}></textarea>
-    </>
+    <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
+      {code}
+    </div>
   )
 }

@@ -27,18 +27,25 @@ export default function Chat({
   })
 
   return (
-    <div className="h-full rounded-xl border">
-      <form onSubmit={handleSubmit} className="p-2">
+    <div className="h-full rounded-xl border p-2">
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
-          className="mb-8 w-full max-w-md resize-none rounded-xl border p-2"
+          className="mb-2 w-full max-w-md resize-none rounded-xl border p-2"
           value={input}
           placeholder="Describe your app..."
           onChange={handleInputChange}
         />
-        <button type="submit">Create app!</button>
+        <button
+          type="submit"
+          className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+        >
+          Create app!
+        </button>
       </form>
-      <div className="my-6 whitespace-pre-wrap">{isLoading ? "Creating app ..." : completion}</div>
+      <div className="my-6 w-full overflow-auto whitespace-pre-wrap">
+        {isLoading ? "Creating app ..." : completion}
+      </div>
     </div>
   )
 }
