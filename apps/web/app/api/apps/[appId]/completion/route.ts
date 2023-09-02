@@ -110,7 +110,6 @@ Do not import Tailwind CSS.
 
 I’ll start a JavaScript app which must implement the user specifications and you’ll continue exactly where I left off:
 
-\`\`\`javascript
 import * as react from \"react\"
 import ReactDOM from 'react-dom'
 import { html } from 'htm/react'

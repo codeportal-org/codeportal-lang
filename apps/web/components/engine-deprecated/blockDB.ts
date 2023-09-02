@@ -4,7 +4,7 @@ import MiniSearch from "minisearch"
 import type { Block, BlockDefinition, BlockName } from "./ast"
 import { blockDefinition, blockDefinitionsNoEmpty } from "./blockDefinitions"
 import { handleError } from "./errors"
-import { nanoid } from "./nanoId"
+import { nanoid } from "./nanoid"
 
 export type BlockEvent = {
   type: "child removed"
