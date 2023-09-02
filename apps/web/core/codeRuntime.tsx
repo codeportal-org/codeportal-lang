@@ -1,6 +1,4 @@
 export function buildFullCode(completion: string) {
-  const processedCompletion = completion.trim().split("\n").slice(1, -1).join("\n")
-
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -17,7 +15,7 @@ export function buildFullCode(completion: string) {
         <div id="root"></div>
 
         <script type="module">
-          ${buildCode(processedCompletion)}
+          ${buildCode(completion)}
         </script>
       </body>
     </html>

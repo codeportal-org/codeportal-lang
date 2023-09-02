@@ -107,5 +107,7 @@ IMPORTANT - You don't include images in the app if the user does not require it 
 
 Do not import Tailwind CSS.
 
+I’ll start a JavaScript app which must implement the user specifications and you’ll continue exactly where I left off:
+
 \`\`\`javascript\nimport * as react from \"react\"\nimport ReactDOM from 'react-dom'\nimport { html } from 'htm/react'`
 }

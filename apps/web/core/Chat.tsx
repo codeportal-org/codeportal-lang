@@ -2,7 +2,7 @@
 
 import { useCompletion } from "ai/react"
 import { useSaveCode } from "app/api/apps/[appId]/code/hooks"
-import { useState } from "react"
+import React, { useState } from "react"
 
 export default function Chat({
   appId,
@@ -11,6 +11,7 @@ export default function Chat({
   appId: string
   onFinish?: (prompt: string, completion: string) => void
 }) {
+  const formRef = React.useRef<HTMLFormElement>(null)
   const saveCode = useSaveCode(appId)
 
   const [isFinished, setIsFinished] = useState(false)
@@ -28,13 +29,22 @@ export default function Chat({
 
   return (
     <div className="h-full rounded-xl border p-2">
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
+      <form onSubmit={handleSubmit} ref={formRef}>
+        <textarea
           className="mb-2 w-full max-w-md resize-none rounded-xl border p-2"
           value={input}
           placeholder="Describe your app..."
           onChange={handleInputChange}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck="false"
+          rows={4}
+          onKeyDown={(e) => {
+            console.log("keydown", e.key, e.shiftKey)
+            if (e.key === "Enter" && !e.shiftKey) {
+              formRef.current?.requestSubmit()
+            }
+          }}
         />
         <button
           type="submit"
@@ -44,7 +54,8 @@ export default function Chat({
         </button>
       </form>
       <div className="my-6 w-full overflow-auto whitespace-pre-wrap">
-        {isLoading ? "Creating app ..." : completion}
+        {isLoading && <div>Creating app ...</div>}
+        {completion}
       </div>
     </div>
   )
