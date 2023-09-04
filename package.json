@@ -3,6 +3,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev --filter=web --filter=worker",
+    "start:web": "turbo start --filter web",
+    "start:worker": "turbo start --filter worker",
     "lint": "turbo lint",
     "test": "turbo test",
     "clean": "turbo clean",
