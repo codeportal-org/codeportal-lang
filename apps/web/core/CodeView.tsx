@@ -5,6 +5,8 @@ import React from "react"
 
 import { PrivateRoomProvider, privateLiveRoomContext } from "@/lib/liveblocks.config"
 
+import { editorEmitter } from "./editorSingleton"
+
 export const CodeView = React.forwardRef<
   HTMLDivElement,
   { appId: string; code: string; isFinished: boolean }
@@ -25,7 +27,15 @@ const CodeContainer = React.forwardRef<HTMLDivElement, { code: string; isFinishe
     const broadcast: any = privateLiveRoomContext.useBroadcastEvent()
 
     React.useEffect(() => {
+      editorEmitter.on("refresh", () => {
+        console.log("----- refreshing!!!")
+        broadcast({ type: "refresh" })
+      })
+    }, [])
+
+    React.useEffect(() => {
       if (isFinished) {
+        console.log("----- refreshing!!!")
         broadcast({ type: "refresh" })
       }
     }, [code, isFinished])

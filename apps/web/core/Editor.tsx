@@ -18,9 +18,11 @@ import { getPlatform } from "@/lib/platform"
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
 import { buildCode } from "./codeRuntime"
+import { editorEmitter } from "./editorSingleton"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
+  const iframeRef = React.useRef<HTMLIFrameElement>(null)
 
   const [isLeftResizing, setIsLeftResizing] = useState(false)
   const [isRightResizing, setRightIsResizing] = useState(false)
@@ -34,8 +36,9 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
     api: `/api/apps/${appId}/completion`,
     onFinish: (prompt, completion) => {
       console.log(prompt, completion)
-      setIsFinished(true)
-      saveCode.trigger({ code: completion, prompt })
+      saveCode.trigger({ code: completion, prompt }).then(() => {
+        setIsFinished(true)
+      })
     },
   })
 
@@ -112,11 +115,13 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         </PanelResizeHandle>
         <Panel defaultSize={40} minSize={30} className="pb-3 pr-2">
           <div className="h-full overflow-hidden rounded-xl border border-slate-300 shadow-md">
-            <div className="flex h-8 items-center  bg-slate-300 pl-4">
-              <button className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400">
-                <ArrowLeftIcon className="h-full" />
-              </button>
-              <button className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400">
+            <div className="flex h-8 items-center  justify-center bg-slate-300 pl-4">
+              <button
+                className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400"
+                onClick={() => {
+                  editorEmitter.emit("refresh")
+                }}
+              >
                 <ArrowPathIcon className="h-full" />
               </button>
               <div className="mr-1 w-4/5 rounded-md bg-white px-2 py-1 text-sm">{devAppURL}</div>
@@ -130,6 +135,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
               </a>
             </div>
             <iframe
+              ref={iframeRef}
               src={devAppURL}
               title={appName || ""}
               className="w-full"
