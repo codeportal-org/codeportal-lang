@@ -120,6 +120,9 @@ importers:
       '@codeportal/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
+      '@types/luxon':
+        specifier: ^3.3.2
+        version: 3.3.2
       '@types/node':
         specifier: ^18.11.17
         version: 18.11.17
@@ -5507,6 +5510,10 @@ packages:
 
   /@types/lodash@4.14.197:
     resolution: {integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==}
+    dev: true
+
+  /@types/luxon@3.3.2:
+    resolution: {integrity: sha512-l5cpE57br4BIjK+9BSkFBOsWtwv6J9bJpC7gdXIzZyI0vuKvNTk0wZZrkQxMGsUAuGW9+WMNWF2IJMD7br2yeQ==}
     dev: true
 
   /@types/mdx@2.0.7:

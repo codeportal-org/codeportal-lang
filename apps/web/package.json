@@ -45,6 +45,7 @@
   "devDependencies": {
     "@codeportal/tailwind-config": "workspace:*",
     "@codeportal/tsconfig": "workspace:*",
+    "@types/luxon": "^3.3.2",
     "@types/node": "^18.11.17",
     "@types/react": "^18.2.5",
     "@types/react-dom": "^18.2.4",

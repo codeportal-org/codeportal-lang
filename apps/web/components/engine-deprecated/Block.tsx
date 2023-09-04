@@ -1,5 +1,4 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
-import { CSS } from "@dnd-kit/utilities"
 import cx from "classnames"
 import { useAtom } from "jotai"
 import React from "react"
