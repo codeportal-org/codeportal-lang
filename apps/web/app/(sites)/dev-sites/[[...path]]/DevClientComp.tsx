@@ -7,7 +7,11 @@ import { PublicRoomProvider, publicLiveRoomContext } from "@/lib/liveblocks.conf
 
 export function DevClientComp({ appId }: { appId: string }) {
   React.useEffect(() => {
-    console.log("---- client side code", appId)
+    window.addEventListener("message", (event) => {
+      if (event.data.type === "refresh") {
+        window.location.reload()
+      }
+    })
   }, [])
 
   return (

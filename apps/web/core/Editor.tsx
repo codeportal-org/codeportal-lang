@@ -18,7 +18,6 @@ import { getPlatform } from "@/lib/platform"
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
 import { buildCode } from "./codeRuntime"
-import { editorEmitter } from "./editorSingleton"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
@@ -34,6 +33,11 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 
   const { completion, input, handleInputChange, handleSubmit, isLoading } = useCompletion({
     api: `/api/apps/${appId}/completion`,
+    onResponse: (response) => {
+      if (response.ok) {
+        setIsFinished(false)
+      }
+    },
     onFinish: (prompt, completion) => {
       console.log(prompt, completion)
       saveCode.trigger({ code: completion, prompt }).then(() => {
@@ -119,7 +123,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
               <button
                 className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400"
                 onClick={() => {
-                  editorEmitter.emit("refresh")
+                  iframeRef.current?.contentWindow?.postMessage({ type: "refresh" }, "*")
                 }}
               >
                 <ArrowPathIcon className="h-full" />
