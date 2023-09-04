@@ -14,7 +14,7 @@
     "db:generate": "turbo run prisma:generate --filter web",
     "db:push": "turbo run prisma:push --filter web",
     "db:studio": "turbo run prisma:studio --filter web",
-    "dev:full": "pnpm db:generate && concurrently \"pnpm dev\" \"pnpm dev:db\" --kill-others",
+    "dev:all": "pnpm db:generate && concurrently \"pnpm dev\" \"pnpm dev:db\" --kill-others",
     "changeset": "changeset",
     "version": "changeset version",
     "publish-packages": "turbo run build lint test && changeset version && changeset publish"

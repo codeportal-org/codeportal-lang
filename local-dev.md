@@ -9,7 +9,7 @@ Prerequisites:
 
 Run:
 
-- pnpm dev:full
+- pnpm dev:all
 
 Push db changes:
 
