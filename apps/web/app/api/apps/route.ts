@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs"
 import { NextResponse } from "next/server"
 
-import { nanoid } from "@/components/engine-deprecated/nanoid"
+import { nanoid } from "@/lib/nanoid"
 import prisma from "@/lib/prisma"
 
 import { NewAppFormData } from "./types"

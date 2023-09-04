@@ -1,10 +1,11 @@
 import { PrimitiveAtom, atom, createStore } from "jotai"
 import MiniSearch from "minisearch"
 
+import { nanoid } from "@/lib/nanoid"
+
 import type { Block, BlockDefinition, BlockName } from "./ast"
 import { blockDefinition, blockDefinitionsNoEmpty } from "./blockDefinitions"
 import { handleError } from "./errors"
-import { nanoid } from "./nanoid"
 
 export type BlockEvent = {
   type: "child removed"
