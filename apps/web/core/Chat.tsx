@@ -4,6 +4,8 @@ import { useCompletion } from "ai/react"
 import { useSaveCode } from "app/api/apps/[appId]/code/hooks"
 import React, { useState } from "react"
 
+import { Button } from "@/components/ui/button"
+
 export default function Chat({
   appId,
   onFinish,
@@ -38,7 +40,7 @@ export default function Chat({
     <div className="h-full rounded-xl border p-2">
       <form onSubmit={handleSubmit} ref={formRef}>
         <textarea
-          className="mb-2 w-full max-w-md resize-none rounded-xl border p-2"
+          className="mb-2 w-full max-w-md resize-y rounded-xl border p-2"
           value={input}
           placeholder="Describe your app..."
           onChange={handleInputChange}
@@ -53,12 +55,7 @@ export default function Chat({
             }
           }}
         />
-        <button
-          type="submit"
-          className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
-        >
-          Create app!
-        </button>
+        <Button type="submit">Create app!</Button>
       </form>
       <div
         className="my-6 h-[calc(100%-200px)] overflow-auto whitespace-pre-wrap"
