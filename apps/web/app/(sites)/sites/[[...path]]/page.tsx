@@ -74,8 +74,6 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
 export default SitePage
 
 async function portalServerRenderer({ mainModule }: { mainModule: any }) {
-  console.log("portalServerRenderer", mainModule?.code)
-
   return (
     <Script type="module" id="mainModule">
       {mainModule?.code ? buildCode(mainModule?.code) : ""}

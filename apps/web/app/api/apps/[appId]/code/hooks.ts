@@ -1,7 +1,7 @@
 import { useClerkSWR, useClerkSWRMutation } from "@/lib/swr"
 
 export const useSaveCode = (appId: string) =>
-  useClerkSWRMutation<void, { code: string }>(`/api/apps/${appId}/code`)
+  useClerkSWRMutation<void, { code: string; prompt: string }>(`/api/apps/${appId}/code`)
 
 export const useGetCode = (appId: string) =>
-  useClerkSWR<{ code: string }>(`/api/apps/${appId}/code`)
+  useClerkSWR<{ code: string; prompt: string }>(`/api/apps/${appId}/code`)

@@ -1,36 +1,42 @@
 "use client"
 
 import { ClientSideSuspense } from "@liveblocks/react"
-import { useCompletion } from "ai/react"
-import { type } from "os"
-import React, { useState } from "react"
+import React from "react"
 
 import { PrivateRoomProvider, privateLiveRoomContext } from "@/lib/liveblocks.config"
 
-import Chat from "./Chat"
-
-export function CodeView({ appId, code }: { appId: string; code: string }) {
+export const CodeView = React.forwardRef<
+  HTMLDivElement,
+  { appId: string; code: string; isFinished: boolean }
+>(({ appId, code, isFinished }, ref) => {
   return (
     <div className="h-full">
       <PrivateRoomProvider id={`editor-${appId}`} initialPresence={{}}>
         <ClientSideSuspense fallback={<div>Loading...</div>}>
-          {() => <CodeContainer appId={appId} code={code} />}
+          {() => <CodeContainer ref={ref} code={code} isFinished={isFinished} />}
         </ClientSideSuspense>
       </PrivateRoomProvider>
     </div>
   )
-}
+})
 
-function CodeContainer({ appId, code }: { appId: string; code: string }) {
-  const broadcast: any = privateLiveRoomContext.useBroadcastEvent()
+const CodeContainer = React.forwardRef<HTMLDivElement, { code: string; isFinished: boolean }>(
+  ({ code, isFinished }, ref) => {
+    const broadcast: any = privateLiveRoomContext.useBroadcastEvent()
 
-  React.useEffect(() => {
-    broadcast({ type: "refresh" })
-  }, [code])
+    React.useEffect(() => {
+      if (isFinished) {
+        broadcast({ type: "refresh" })
+      }
+    }, [code, isFinished])
 
-  return (
-    <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
-      {code}
-    </div>
-  )
-}
+    return (
+      <div
+        ref={ref}
+        className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2"
+      >
+        {code}
+      </div>
+    )
+  },
+)

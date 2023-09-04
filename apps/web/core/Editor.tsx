@@ -5,9 +5,10 @@ import {
   ArrowPathIcon,
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline"
-import { useGetCode } from "app/api/apps/[appId]/code/hooks"
+import { useCompletion } from "ai/react"
+import { useGetCode, useSaveCode } from "app/api/apps/[appId]/code/hooks"
 import Link from "next/link"
-import { useState } from "react"
+import React, { useState } from "react"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 
 import { CommandBar } from "@/components/CommandBar"
@@ -19,12 +20,40 @@ import { CodeView } from "./CodeView"
 import { buildCode } from "./codeRuntime"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
+  const completionContainerRef = React.useRef<HTMLDivElement>(null)
+
   const [isLeftResizing, setIsLeftResizing] = useState(false)
   const [isRightResizing, setRightIsResizing] = useState(false)
-  const { data } = useGetCode(appId)
+
+  const codeQuery = useGetCode(appId)
+  const saveCode = useSaveCode(appId)
+
+  const [isFinished, setIsFinished] = useState(false)
+
+  const { completion, input, handleInputChange, handleSubmit, isLoading } = useCompletion({
+    api: `/api/apps/${appId}/completion`,
+    onFinish: (prompt, completion) => {
+      console.log(prompt, completion)
+      setIsFinished(true)
+      saveCode.trigger({ code: completion, prompt })
+    },
+  })
 
   const prodAppURL = `${window.location.protocol}//${appId}.${window.location.host}`
   const devAppURL = `${window.location.protocol}//dev-${appId}.${window.location.host}`
+
+  React.useEffect(() => {
+    if (completionContainerRef.current) {
+      completionContainerRef.current.scrollTop = completionContainerRef.current.scrollHeight
+    }
+  }, [completion])
+
+  // Sets the initial prompt if there is one
+  React.useEffect(() => {
+    if (codeQuery.data?.prompt) {
+      handleInputChange({ target: { value: codeQuery.data.prompt } } as any)
+    }
+  }, [codeQuery.data?.prompt])
 
   return (
     <div className="h-full overflow-hidden">
@@ -36,7 +65,14 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         disablePointerEventsDuringResize={true}
       >
         <Panel defaultSize={20} minSize={15} className="pb-3 pl-2">
-          <Chat appId={appId} />
+          <Chat
+            isLoading={codeQuery.isLoading}
+            existingPrompt={Boolean(codeQuery.data?.prompt)}
+            input={input}
+            handleInputChange={handleInputChange}
+            handleSubmit={handleSubmit}
+            isProcessing={isLoading}
+          />
         </Panel>
         <PanelResizeHandle
           className={
@@ -50,7 +86,18 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
           <div className="h-12 w-0.5 bg-gray-400"></div>
         </PanelResizeHandle>
         <Panel defaultSize={40} minSize={30} className="pb-3">
-          <CodeView appId={appId} code={data && data.code !== null ? buildCode(data.code) : ""} />
+          <CodeView
+            appId={appId}
+            ref={completionContainerRef}
+            isFinished={isFinished}
+            code={
+              completion !== ""
+                ? buildCode(completion)
+                : codeQuery.data && codeQuery.data.code !== null
+                ? buildCode(codeQuery.data.code)
+                : ""
+            }
+          />
         </Panel>
         <PanelResizeHandle
           className={

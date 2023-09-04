@@ -104,6 +104,8 @@ Never use the zero width space character (U+200B).
 
 Carefully design what the user requests. Make sure the buttons and the main features work correctly. If there is an input with a possible action when hitting enter, implement the action on enter key functionality. If there is an input, validate that it cannot be submitted empty. If there is a customizable list in the requirements, include a way to delete the items. If there are very common easy to implement features that are obvious, implement them. Style the container of the app so it is well aligned and well designed.
 
+If the user is asking for an app to collect end user data, include all of it including end user submitted data and derived data.
+
 IMPORTANT - You don't include images in the app if the user does not require it explicitly.
 
 Do not import Tailwind CSS.

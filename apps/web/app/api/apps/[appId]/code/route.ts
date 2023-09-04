@@ -33,7 +33,7 @@ export async function POST(request: Request, { params }: { params: { appId: stri
   await prisma.application.update({
     where: { id: params.appId },
     data: {
-      mainModuleCodeTree: { code: body.code },
+      mainModuleCodeTree: { code: body.code, prompt: body.prompt },
     },
   })
 

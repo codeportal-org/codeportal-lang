@@ -26,8 +26,6 @@ export async function generateMetadata(
 }
 
 export default async function DevSitePage({ params, searchParams }: SitePageProps) {
-  console.log("DevSitePage", params, searchParams)
-
   if (!params.path[0]) {
     return notFound()
   }
