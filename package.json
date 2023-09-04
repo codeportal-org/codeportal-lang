@@ -19,6 +19,10 @@
     "version": "changeset version",
     "publish-packages": "turbo run build lint test && changeset version && changeset publish"
   },
+  "engines": {
+    "node": ">=18.x",
+    "pnpm": ">=8.6.10"
+  },
   "license": "Elastic License 2.0 (ELv2)",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
