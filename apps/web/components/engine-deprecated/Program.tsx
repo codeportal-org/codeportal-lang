@@ -158,7 +158,7 @@ const ProgramUI = () => {
         if (programUIState) {
           setProgramUIState({
             ...programUIState,
-            availableWidth: entries[0].target.getBoundingClientRect().width,
+            availableWidth: entries[0]!.target.getBoundingClientRect().width,
           })
         }
       })

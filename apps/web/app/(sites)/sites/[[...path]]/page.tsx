@@ -1,5 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
+import Script from "next/script"
 import React from "react"
 
 import { buildCode } from "@/core/codeRuntime"
@@ -76,11 +77,8 @@ async function portalServerRenderer({ mainModule }: { mainModule: any }) {
   console.log("portalServerRenderer", mainModule?.code)
 
   return (
-    <script
-      type="module"
-      dangerouslySetInnerHTML={{
-        __html: mainModule?.code ? buildCode(mainModule?.code) : "",
-      }}
-    ></script>
+    <Script type="module" id="mainModule">
+      {mainModule?.code ? buildCode(mainModule?.code) : ""}
+    </Script>
   )
 }
