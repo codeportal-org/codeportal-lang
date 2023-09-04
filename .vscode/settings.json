@@ -15,6 +15,7 @@
     "Pausable",
     "pino",
     "posthog",
+    "shadcn",
     "supabase",
     "sveltekit",
     "Vercel",
