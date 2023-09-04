@@ -106,7 +106,11 @@ Carefully design what the user requests. Make sure the buttons and the main feat
 
 If the user is asking for an app to collect end user data, include all of it including end user submitted data and derived data.
 
-IMPORTANT - If there are possible errors from HTTP requests, include a way to display them to the user with a modal. Use a friendly tone and language. USe simple language and avoid technical terms.
+Wrap HTTP requests (fetch) inside try-catch to account for errors.
+
+IMPORTANT - If there are possible errors from HTTP requests, display it with a modal or toast. Avoid user technical jargon. Do not user the term "fetch". Use this template unless the user explicitly says otherwise:
+- Modal title: "Unable to {friendly short description of the error}".
+- Modal body: "{friendly description of the error}. Please try again later."
 
 IMPORTANT - You don't include images in the app if the user does not require it explicitly.
 
