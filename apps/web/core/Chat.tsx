@@ -42,18 +42,14 @@ export default function Chat({
           maxRows={30}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault()
               formRef.current?.requestSubmit()
             }
           }}
         />
         <Button type="submit">
           {existingPrompt ? "Recreate app!" : "Create app!"}{" "}
-          <kbd className="ml-2 font-sans font-semibold dark:text-slate-500">
-            <abbr title="Command" className="mr-1 text-slate-300 no-underline dark:text-slate-500">
-              ⌘
-            </abbr>
-            + K
-          </kbd>
+          <kbd className="ml-2 font-sans text-xs dark:text-slate-500">⏎</kbd>
         </Button>
       </form>
       <div className="my-6 h-[calc(100%-200px)] overflow-auto whitespace-pre-wrap">
