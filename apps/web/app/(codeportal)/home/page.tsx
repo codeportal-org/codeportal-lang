@@ -25,7 +25,7 @@ export default function Home() {
             Turn ideas into reality <span className="text-primary-500">— faster!</span>
           </h1>
 
-          <p className="mx-2 mb-8 max-w-3xl text-left text-center text-lg sm:text-xl">
+          <p className="mx-2 mb-8 max-w-3xl text-center text-lg sm:text-xl">
             CodePortal is the open-source full-stack programming platform for indie hackers and
             makers! Build, launch, and scale your products all in one place without the headaches of
             traditional programming.
