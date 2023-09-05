@@ -17,21 +17,6 @@ export default function middleware(request: NextRequest, event: NextFetchEvent) 
 
   const path = url.pathname
 
-  // rewrites for dashboard pages
-  if (path.startsWith("/dashboard")) {
-    console.log("->>>> dashboard")
-
-    return NextResponse.next()
-  }
-
-  // rewrites for api endpoints
-  if (path.startsWith("/api")) {
-    console.log("->>>> api")
-
-    return clerkMiddleware(request, event)
-    // return NextResponse.next()
-  }
-
   // rewrite root application to `/home` folder
   if (
     hostname === "codeportal.test" ||
@@ -39,6 +24,21 @@ export default function middleware(request: NextRequest, event: NextFetchEvent) 
     hostname === "codeportal-bice.vercel.app" ||
     hostname === "localhost:8090"
   ) {
+    // rewrites for dashboard pages
+    if (path.startsWith("/dashboard")) {
+      console.log("->>>> dashboard")
+
+      return NextResponse.next()
+    }
+
+    // rewrites for api endpoints
+    if (path.startsWith("/api")) {
+      console.log("->>>> api")
+
+      return clerkMiddleware(request, event)
+      // return NextResponse.next()
+    }
+
     console.log("->>>> root")
     if (path === "/sign-in-redirect") {
       const url = request.nextUrl.clone()
@@ -72,6 +72,13 @@ export default function middleware(request: NextRequest, event: NextFetchEvent) 
   if (currentHost.startsWith("dev-")) {
     console.log("->>>> dev sites", `/dev-sites/${currentHost}${path}`, request.url)
 
+    if (path.startsWith("/api")) {
+      const oldUrl = new URL(request.url)
+      const newUrl = new URL(`/dev-sites-api/${currentHost}${path}`, oldUrl.origin)
+      newUrl.search = oldUrl.search
+      return NextResponse.rewrite(newUrl)
+    }
+
     const oldUrl = new URL(request.url)
     const newUrl = new URL(`/dev-sites/${currentHost}${path}`, oldUrl.origin)
     newUrl.search = oldUrl.search
@@ -79,6 +86,14 @@ export default function middleware(request: NextRequest, event: NextFetchEvent) 
   }
 
   // Production sites
+
+  if (path.startsWith("/api")) {
+    const oldUrl = new URL(request.url)
+    const newUrl = new URL(`/sites-api/${currentHost}${path}`, oldUrl.origin)
+    newUrl.search = oldUrl.search
+    return NextResponse.rewrite(newUrl)
+  }
+
   console.log("->>>> sites", `/sites/${currentHost}${path}`, request.url)
   const oldUrl = new URL(request.url)
   const newUrl = new URL(`/sites/${currentHost}${path}`, oldUrl.origin)

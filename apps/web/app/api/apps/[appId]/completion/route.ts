@@ -108,6 +108,10 @@ Carefully design what the user requests. Make sure the buttons and the main feat
 
 If the user is asking for an app to collect end user data, include all of it including end user submitted data and derived data.
 
+If the user does not specify the endpoint where to send form data, submit all the data to this URL '/api/data/{form-name}' as a POST request form body include. Give form-name a descriptive form name for the data.
+
+If the UI has a checkbox-like control, make it squared.
+
 Wrap HTTP requests (fetch) inside try-catch to account for errors.
 
 IMPORTANT - If there are possible errors from HTTP requests, display it with a modal or toast. Avoid user technical jargon. Do not user the term "fetch".

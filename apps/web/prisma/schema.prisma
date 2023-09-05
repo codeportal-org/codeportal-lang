@@ -15,6 +15,8 @@ model Application {
   lastOpenedAt       DateTime?
   mainModuleCodeTree Json?
   modules            ApplicationModule[]
+  /// application data, JSON database for applications
+  data               ApplicationData[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -27,6 +29,21 @@ model ApplicationModule {
   application   Application @relation(fields: [applicationId], references: [id])
   applicationId String
   codeTree      Json?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([applicationId], name: "applicationId")
+}
+
+/// application data, JSON database for applications
+model ApplicationData {
+  id            String      @id @default(uuid())
+  name          String
+  application   Application @relation(fields: [applicationId], references: [id])
+  applicationId String
+  data          Json?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
