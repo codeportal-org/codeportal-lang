@@ -27,14 +27,14 @@ export default function Chat({
       {isLoading && <div>Loading ...</div>}
       <form onSubmit={handleSubmit} ref={formRef} className={isLoading ? "hidden" : ""}>
         <TextareaAutosize
-          className="mb-1 w-full max-w-md resize-none rounded-xl border p-2"
+          className="mb-1 w-full max-w-md resize-none rounded-xl border border-slate-300 p-2"
           value={input}
           placeholder="Describe your app's requirements in detail ..."
           onChange={handleInputChange}
           autoComplete="off"
           autoCorrect="off"
           spellCheck="false"
-          rows={4}
+          minRows={4}
           maxRows={30}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
