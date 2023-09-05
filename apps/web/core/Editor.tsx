@@ -31,20 +31,22 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 
   const [isFinished, setIsFinished] = useState(false)
 
-  const { completion, input, handleInputChange, handleSubmit, isLoading } = useCompletion({
-    api: `/api/apps/${appId}/completion`,
-    onResponse: (response) => {
-      if (response.ok) {
-        setIsFinished(false)
-      }
+  const { completion, input, handleInputChange, handleSubmit, isLoading, setInput } = useCompletion(
+    {
+      api: `/api/apps/${appId}/completion`,
+      onResponse: (response) => {
+        if (response.ok) {
+          setIsFinished(false)
+        }
+      },
+      onFinish: (prompt, completion) => {
+        console.log(prompt, completion)
+        saveCode.trigger({ code: completion, prompt }).then(() => {
+          setIsFinished(true)
+        })
+      },
     },
-    onFinish: (prompt, completion) => {
-      console.log(prompt, completion)
-      saveCode.trigger({ code: completion, prompt }).then(() => {
-        setIsFinished(true)
-      })
-    },
-  })
+  )
 
   const prodAppURL = `${window.location.protocol}//${appId}.${window.location.host}`
   const devAppURL = `${window.location.protocol}//dev-${appId}.${window.location.host}`
@@ -58,7 +60,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
   // Sets the initial prompt if there is one
   React.useEffect(() => {
     if (codeQuery.data?.prompt) {
-      handleInputChange({ target: { value: codeQuery.data.prompt } } as any)
+      setInput(codeQuery.data.prompt)
     }
   }, [codeQuery.data?.prompt])
 
