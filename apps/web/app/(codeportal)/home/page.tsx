@@ -49,8 +49,7 @@ export default function Home() {
               <li className="mb-4 flex text-lg leading-7">
                 <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
                 <span>
-                  Powerful debugging and observability. Know why things and when things fail. No
-                  extra configuration required.
+                  AI-first. CodePortal is though from the ground up to integrate with LLMs.
                 </span>
               </li>
               <li className="mb-4 flex text-lg leading-7">
@@ -85,7 +84,7 @@ export default function Home() {
           </a>
           -
           <a
-            href="https://github.com/carloslfu"
+            href="https://github.com/codeportal-org/codeportal"
             target="_blank"
             rel="noreferrer"
             className="underline"
