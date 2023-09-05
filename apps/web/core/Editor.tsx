@@ -1,19 +1,12 @@
 "use client"
 
-import {
-  ArrowLeftIcon,
-  ArrowPathIcon,
-  ArrowTopRightOnSquareIcon,
-} from "@heroicons/react/24/outline"
+import { ArrowPathIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline"
 import { useCompletion } from "ai/react"
 import { useGetCode, useSaveCode } from "app/api/apps/[appId]/code/hooks"
-import Link from "next/link"
 import React, { useState } from "react"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 
 import { CommandBar } from "@/components/CommandBar"
-import { useCommandBarStore } from "@/components/CommandBar/store"
-import { getPlatform } from "@/lib/platform"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
@@ -66,8 +59,6 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 
   return (
     <div className="h-full overflow-hidden">
-      <TopBar appName={appName || ""} />
-
       <PanelGroup
         direction="horizontal"
         style={{ height: "calc(100% - 28px)" }}
@@ -167,47 +158,6 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
           },
         ]}
       />
-    </div>
-  )
-}
-
-function TopBar({ appName }: { appName: string }) {
-  const toggleCommandBar = useCommandBarStore((state) => state.toggle)
-
-  return (
-    <div className="flex h-8 items-center justify-between px-2">
-      <div>
-        <span>{appName}</span>
-      </div>
-      <div>
-        <button
-          className="mr-2 rounded px-2 hover:bg-slate-300"
-          onClick={() => {
-            toggleCommandBar()
-          }}
-        >
-          Command bar (
-          {getPlatform() === "Mac" ? (
-            <kbd className="font-sans font-semibold dark:text-slate-500">
-              <abbr title="Command" className="text-slate-300 no-underline dark:text-slate-500">
-                ⌘
-              </abbr>
-              K
-            </kbd>
-          ) : (
-            <kbd className="font-sans font-semibold dark:text-slate-500">
-              <abbr title="Control" className="text-slate-300 no-underline dark:text-slate-500">
-                Ctrl
-              </abbr>
-              K
-            </kbd>
-          )}
-          )
-        </button>
-        <Link href="/dashboard" className="inline-block rounded px-2 hover:bg-slate-300">
-          Back
-        </Link>
-      </div>
     </div>
   )
 }

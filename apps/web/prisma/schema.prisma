@@ -9,14 +9,14 @@ generator client {
 }
 
 model Application {
-  id                 String              @id @default(uuid())
-  name               String
-  creatorId          String
-  lastOpenedAt       DateTime?
-  mainModuleCodeTree Json?
-  modules            ApplicationModule[]
+  id                     String              @id @default(uuid())
+  name                   String
+  creatorId              String
+  lastOpenedAt           DateTime?
+  mainModuleCodeTree     Json?
+  modules                ApplicationModule[]
   /// application data, JSON database for applications
-  data               ApplicationData[]
+  applicationDataEntries ApplicationData[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
