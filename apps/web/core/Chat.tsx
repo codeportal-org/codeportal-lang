@@ -23,11 +23,15 @@ export default function Chat({
   const formRef = React.useRef<HTMLFormElement>(null)
 
   return (
-    <div className="h-full rounded-xl border p-2">
+    <div className="flex h-full flex-col rounded-xl border p-2">
       {isLoading && <div>Loading ...</div>}
-      <form onSubmit={handleSubmit} ref={formRef} className={isLoading ? "hidden" : ""}>
+      <form
+        onSubmit={handleSubmit}
+        ref={formRef}
+        className={`flex flex-col gap-1 items-start${isLoading ? " hidden" : ""}`}
+      >
         <TextareaAutosize
-          className="mb-1 w-full max-w-md resize-none rounded-xl border border-slate-300 p-2"
+          className="mb-1 w-full resize-none rounded-xl border border-slate-300 p-2"
           value={input}
           placeholder="Describe your app's requirements in detail ..."
           onChange={handleInputChange}
