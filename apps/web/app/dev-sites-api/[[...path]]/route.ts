@@ -12,6 +12,10 @@ export async function POST(req: Request, reqArgs: RequestArgs) {
   return SitesAPI.POST(req, patchRequestArgs(reqArgs))
 }
 
+export async function DELETE(req: Request, reqArgs: RequestArgs) {
+  return SitesAPI.DELETE(req, patchRequestArgs(reqArgs))
+}
+
 function patchRequestArgs(reqArgs: RequestArgs): RequestArgs {
   const newPath = [...reqArgs.params.path]
   if (newPath[0]) {
