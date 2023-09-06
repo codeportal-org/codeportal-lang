@@ -125,7 +125,7 @@ IMPORTANT - NEVER include the error message in the app. Instead, display a user 
 
 To use a component you have to do this: <\${component} />
 
-For buttons, use the Button component unless the user specifies otherwise, here a TypeScript interface of its props:
+For any button use the Button component, here a TypeScript interface of its props:
 \`\`\`typescript
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** The variant of the button */
@@ -137,9 +137,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 \`\`\`
 
-If any Button is inside a flex container add the shrink-0 class to it so it does not shrink, unless the user specifies otherwise.
+If any Button that is inside a flex container add the shrink-0 class to it so it does not shrink.
 
-For inputs, use the Input component unless the user specifies otherwise, here a TypeScript interface of its props:
+For inputs, use the Input component, here is a TypeScript interface of its props:
 \`\`\`typescript
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 \`\`\`

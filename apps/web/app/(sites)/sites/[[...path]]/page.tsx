@@ -75,8 +75,14 @@ export default SitePage
 
 async function portalServerRenderer({ mainModule }: { mainModule: any }) {
   return (
-    <Script type="module" id="mainModule">
-      {mainModule?.code ? buildCode(mainModule?.code) : ""}
-    </Script>
+    <>
+      <div
+        id="root"
+        className={mainModule?.themeClass ? mainModule.themeClass : "zinc-theme"}
+      ></div>
+      <Script type="module" id="mainModule">
+        {mainModule?.code ? buildCode(mainModule?.code) : ""}
+      </Script>
+    </>
   )
 }
