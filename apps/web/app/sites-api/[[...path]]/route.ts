@@ -24,24 +24,39 @@ export async function GET(req: Request, { params }: { params: { path: string[] }
     return NextResponse.json({ message: `${app.name} API` })
   }
 
+  if (thirdSegment) {
+    const data = await prisma.applicationData.findFirst({
+      where: {
+        name: secondSegment,
+        applicationId: appId,
+        id: thirdSegment,
+      },
+    })
+
+    if (!data) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 })
+    }
+
+    return NextResponse.json({ ...(data.data as any), id: data.id, createdAt: data.createdAt })
+  }
+
   const data = await prisma.applicationData.findMany({
-    where: thirdSegment
-      ? {
-          name: secondSegment,
-          applicationId: appId,
-          id: thirdSegment,
-        }
-      : {
-          name: secondSegment,
-          applicationId: appId,
-        },
+    where: {
+      name: secondSegment,
+      applicationId: appId,
+    },
+    orderBy: { createdAt: "asc" },
   })
 
   if (!data) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 
-  const processedData = data.map((item) => ({ ...(item.data as any), id: item.id }))
+  const processedData = data.map((item) => ({
+    ...(item.data as any),
+    id: item.id,
+    createdAt: item.createdAt,
+  }))
 
   return NextResponse.json(processedData)
 }

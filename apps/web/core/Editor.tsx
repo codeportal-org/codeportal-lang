@@ -33,7 +33,6 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         }
       },
       onFinish: (prompt, completion) => {
-        console.log(prompt, completion)
         saveCode.trigger({ code: completion, prompt }).then(() => {
           setIsFinished(true)
         })
@@ -58,12 +57,8 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
   }, [codeQuery.data?.prompt])
 
   return (
-    <div className="h-full overflow-hidden">
-      <PanelGroup
-        direction="horizontal"
-        style={{ height: "calc(100% - 28px)" }}
-        disablePointerEventsDuringResize={true}
-      >
+    <div className="overflow-hidden" style={{ height: "calc(100% - 32px)" }}>
+      <PanelGroup direction="horizontal" disablePointerEventsDuringResize={true} className="h-full">
         <Panel defaultSize={20} minSize={15} className="pb-3 pl-2">
           <Chat
             isLoading={codeQuery.isLoading}
@@ -92,9 +87,9 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
             isFinished={isFinished}
             code={
               completion !== ""
-                ? buildCode(completion)
+                ? completion
                 : codeQuery.data && codeQuery.data.code !== null
-                ? buildCode(codeQuery.data.code)
+                ? codeQuery.data.code
                 : ""
             }
           />
