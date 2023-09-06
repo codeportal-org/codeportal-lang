@@ -57,24 +57,20 @@ function TopBar({ appName, appId }: { appName: string; appId: string }) {
         <span>{appName}</span>
       </div>
       <div className="flex items-center gap-1">
-        <button
+        <Link
+          href={`/dashboard/apps/${appId}`}
           className="flex h-6 items-center gap-1 rounded px-2 hover:bg-slate-300"
-          onClick={() => {
-            router.push(`/dashboard/apps/${appId}`)
-          }}
         >
           <Code className="h-4 w-4" />
           Code
-        </button>
-        <button
+        </Link>
+        <Link
+          href={`/dashboard/apps/${appId}/data`}
           className="flex h-6 items-center gap-1 rounded px-2 hover:bg-slate-300"
-          onClick={() => {
-            router.push(`/dashboard/apps/${appId}/data`)
-          }}
         >
           <Database className="h-4 w-4" />
           Database
-        </button>
+        </Link>
         <button
           className="flex h-6 items-center gap-1 rounded px-2 hover:bg-slate-300"
           onClick={() => {
@@ -104,7 +100,7 @@ function TopBar({ appName, appId }: { appName: string; appId: string }) {
         </button>
         <Link
           href="/dashboard"
-          className="flex h-6 items-center gap-1 rounded  px-2  hover:bg-slate-300"
+          className="flex h-6 items-center gap-1 rounded px-2 hover:bg-slate-300"
         >
           <LayoutGrid className="h-4 w-4" />
           Apps
