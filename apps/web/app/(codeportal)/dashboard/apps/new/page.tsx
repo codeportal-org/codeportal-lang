@@ -28,6 +28,8 @@ export default function NewAppPage() {
     })
   }
 
+  console.log("errors", errors)
+
   return (
     <PageContainer>
       <div className="sm:pl-52">
@@ -37,9 +39,15 @@ export default function NewAppPage() {
             <Input
               placeholder="App name"
               className={errors.name ? "hover:border-alert-500 focus-visible:border-alert-500" : ""}
-              {...register("name", { required: true, minLength: 1, maxLength: 20 })}
+              {...register("name", { required: "true", minLength: 1, maxLength: 30 })}
             />
-            {errors.name && <span className="text-alert-500 m-1">{errors.name?.message}</span>}
+            {errors.name && (
+              <span className="text-alert-500 m-1">
+                {errors.name.type === "required" && "App name is required"}
+                {errors.name.type === "minLength" && "App name must be at least 1 character"}
+                {errors.name.type === "maxLength" && "App name cannot exceed 30 characters"}
+              </span>
+            )}
           </div>
           <Button type="submit">Create app</Button>
         </form>
