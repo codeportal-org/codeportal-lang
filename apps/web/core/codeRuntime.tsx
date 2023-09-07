@@ -146,18 +146,8 @@ function getInputCode() {
 Input.displayName = "Input"`
 }
 
-export function getTailwindCode() {
-  return `${getTailwindImports()}
-
-${getTailwindConfigCode()}`
-}
-
-function getTailwindImports() {
-  return `import defaultTheme from 'https://esm.sh/tailwindcss@2.2.0/defaultTheme'`
-}
-
-function getTailwindConfigCode() {
-  return `window.tailwindConfig = {
+export function getTailwindConfigCode() {
+  return `window.tailwind.config = {
   darkMode: ["class"],
   theme: {
     container: {
@@ -208,9 +198,6 @@ function getTailwindConfigCode() {
         md: \`calc(var(--radius) - 2px)\`,
         sm: "calc(var(--radius) - 4px)",
       },
-      fontFamily: {
-        sans: [...defaultTheme.fontFamily.sans],
-      },
       keyframes: {
         "accordion-down": {
           from: { height: 0 },
@@ -227,10 +214,7 @@ function getTailwindConfigCode() {
       },
     },
   },
-  plugins: []
-};
-
-window.tailwindCSS?.refresh();`
+}`
 }
 
 function getToastImports() {

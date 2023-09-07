@@ -3,7 +3,7 @@
 import Script from "next/script"
 import React from "react"
 
-import { buildCode, getStyles, getTailwindCode } from "@/core/codeRuntime"
+import { buildCode, getStyles, getTailwindConfigCode } from "@/core/codeRuntime"
 
 export function ClientComp({ mainModule }: { mainModule: any }) {
   React.useEffect(() => {
@@ -12,7 +12,7 @@ export function ClientComp({ mainModule }: { mainModule: any }) {
 
   return (
     <>
-      <Script src="https://unpkg.com/tailwindcss-jit-cdn@1.3.0"></Script>
+      <Script src="https://cdn.tailwindcss.com/3.3.3"></Script>
       <div
         id="root"
         className={mainModule?.theme ? `${mainModule?.theme?.color}-theme` : "zinc-theme"}
@@ -22,8 +22,8 @@ export function ClientComp({ mainModule }: { mainModule: any }) {
           ${getStyles(mainModule?.theme)}
         `}
       </style>
-      <Script type="module" id="tailwind-module">
-        {getTailwindCode()}
+      <Script id="tailwind-module" type="module">
+        {getTailwindConfigCode()}
       </Script>
       <Script type="tailwind-config" id="tailwind-config">{`window.tailwindConfig`}</Script>
       <Script type="module" id="mainModule">
