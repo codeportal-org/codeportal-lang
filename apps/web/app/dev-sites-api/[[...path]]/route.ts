@@ -16,6 +16,14 @@ export async function DELETE(req: Request, reqArgs: RequestArgs) {
   return SitesAPI.DELETE(req, patchRequestArgs(reqArgs))
 }
 
+export async function PUT(req: Request, reqArgs: RequestArgs) {
+  return SitesAPI.PUT(req, patchRequestArgs(reqArgs))
+}
+
+export async function PATCH(req: Request, reqArgs: RequestArgs) {
+  return SitesAPI.PATCH(req, patchRequestArgs(reqArgs))
+}
+
 function patchRequestArgs(reqArgs: RequestArgs): RequestArgs {
   const newPath = [...reqArgs.params.path]
   if (newPath[0]) {

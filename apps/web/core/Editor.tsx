@@ -1,6 +1,7 @@
 "use client"
 
 import { ArrowPathIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline"
+import * as ToggleGroup from "@radix-ui/react-toggle-group"
 import { useCompletion } from "ai/react"
 import { useGetCode, useSaveCode } from "app/api/apps/[appId]/code/hooks"
 import { useGetTheme, useUpdateTheme } from "app/api/apps/[appId]/theme/hooks"
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from "react"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 
 import { CommandBar } from "@/components/CommandBar"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
@@ -173,15 +175,31 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean }) {
   const [open, setOpen] = useState(false)
 
+  const [color, setColor] = useState<"zinc" | "blue">("zinc")
+  const [radius, setRadius] = useState<string>("0.75rem")
+
   const themeQuery = useGetTheme(appId)
   const updateTheme = useUpdateTheme(appId)
 
   const theme = themeQuery.data?.theme
 
   const handleColorChanged = (color: "zinc" | "blue") => {
-    updateTheme.trigger({ theme: { color } }).then(() => {
+    if (color) {
+      setColor(color)
+    }
+  }
+
+  const handleRadiusChanged = (radius: string) => {
+    if (radius) {
+      setRadius(radius)
+    }
+  }
+
+  const handleSave = () => {
+    updateTheme.trigger({ theme: { color, radius } }).then(() => {
       editorEmitter.emit("refresh")
     })
+    setOpen(false)
   }
 
   const handleOpenChange = (open: boolean) => {
@@ -209,7 +227,7 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
           <Palette className="h-full" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80" collisionPadding={4}>
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Customize</h4>
@@ -217,45 +235,99 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
               Customize the look and feel of your app.
             </p>
           </div>
-          <div className="grid gap-2">
-            {isLoading && <div className="grid grid-cols-3 items-center gap-4">Loading...</div>}
-            {!isLoading && (
-              <div className="grid grid-cols-3 items-center gap-4">
-                <Label htmlFor="theme">Theme</Label>
-                <Select onValueChange={handleColorChanged} defaultValue={theme?.color || "zinc"}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a fruit" id="theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="zinc">
-                        <div className="flex items-center gap-2">
-                          Zinc
-                          <div
-                            style={{
-                              backgroundColor: "hsl(240 5.9% 10%)",
-                            }}
-                            className="h-4 w-4 rounded"
-                          ></div>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="blue">
-                        <div className="flex items-center gap-2">
-                          Blue
-                          <div
-                            style={{
-                              backgroundColor: "hsl(221.2 83.2% 53.3%)",
-                            }}
-                            className="h-4 w-4 rounded"
-                          ></div>
-                        </div>
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+          {isLoading && <div className="grid grid-cols-3 items-center gap-4">Loading...</div>}
+          {!isLoading && (
+            <>
+              <div className="grid gap-2">
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="theme">Color</Label>
+                  <Select onValueChange={handleColorChanged} defaultValue={theme?.color || "zinc"}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a fruit" id="theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="zinc">
+                          <div className="flex items-center gap-2">
+                            Zinc
+                            <div
+                              style={{
+                                backgroundColor: "hsl(240 5.9% 10%)",
+                              }}
+                              className="h-4 w-4 rounded"
+                            ></div>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="blue">
+                          <div className="flex items-center gap-2">
+                            Blue
+                            <div
+                              style={{
+                                backgroundColor: "hsl(221.2 83.2% 53.3%)",
+                              }}
+                              className="h-4 w-4 rounded"
+                            ></div>
+                          </div>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <Label htmlFor="theme">Radius</Label>
+                  <ToggleGroup.Root
+                    className="inline-flex gap-2"
+                    type="single"
+                    defaultValue={theme?.radius || "0.75rem"}
+                    aria-label="Text alignment"
+                    onValueChange={handleRadiusChanged}
+                  >
+                    <ToggleGroup.Item
+                      value="0rem"
+                      aria-label="rounded none"
+                      style={{ borderRadius: 0 }}
+                      className="data-[state=on]:border-primary flex h-8 w-11 items-center justify-center border border-slate-300 shadow"
+                    >
+                      0
+                    </ToggleGroup.Item>
+                    <ToggleGroup.Item
+                      value="0.25rem"
+                      aria-label="rounded 0.25rem"
+                      style={{ borderRadius: "0.25rem" }}
+                      className="data-[state=on]:border-primary flex h-8 w-11 items-center justify-center border border-slate-300 shadow"
+                    >
+                      0.25
+                    </ToggleGroup.Item>
+                    <ToggleGroup.Item
+                      value="0.5rem"
+                      aria-label="rounded large 0.5rem"
+                      style={{ borderRadius: "0.5rem" }}
+                      className="data-[state=on]:border-primary flex h-8 w-11 items-center justify-center border border-slate-300 shadow"
+                    >
+                      0.5
+                    </ToggleGroup.Item>
+                    <ToggleGroup.Item
+                      value="0.75rem"
+                      aria-label="extra rounded 0.75rem"
+                      style={{ borderRadius: "0.75rem" }}
+                      className="data-[state=on]:border-primary flex h-8 w-11 items-center justify-center border border-slate-300 shadow"
+                    >
+                      0.75
+                    </ToggleGroup.Item>
+                    <ToggleGroup.Item
+                      value="1rem"
+                      aria-label="2x rounded 1rem"
+                      style={{ borderRadius: "1rem" }}
+                      className="data-[state=on]:border-primary flex h-8 w-11 items-center justify-center border border-slate-300 shadow"
+                    >
+                      1
+                    </ToggleGroup.Item>
+                  </ToggleGroup.Root>
+                </div>
               </div>
-            )}
-          </div>
+              <Button onClick={handleSave}>Save</Button>
+            </>
+          )}
         </div>
       </PopoverContent>
     </Popover>

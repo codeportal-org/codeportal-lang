@@ -66,7 +66,7 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
   return (
     <>
       {siteRender}
-      <ClientComp />
+      <ClientComp mainModule={app.mainModuleCodeTree} />
     </>
   )
 }
@@ -74,20 +74,5 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
 export default SitePage
 
 async function portalServerRenderer({ mainModule }: { mainModule: any }) {
-  return (
-    <>
-      <Script src="https://unpkg.com/tailwindcss-jit-cdn@1.3.0"></Script>
-      <div
-        id="root"
-        className={mainModule?.theme ? `${mainModule.theme.color}-theme` : "zinc-theme"}
-      ></div>
-      <Script type="module" id="tailwind-module">
-        {getTailwindCode()}
-      </Script>
-      <Script type="tailwind-config">{`window.tailwindConfig`}</Script>
-      <Script type="module" id="mainModule">
-        {mainModule?.code ? buildCode(mainModule?.code) : ""}
-      </Script>
-    </>
-  )
+  return <></>
 }
