@@ -78,7 +78,7 @@ async function portalServerRenderer({ mainModule }: { mainModule: any }) {
     <>
       <div
         id="root"
-        className={mainModule?.themeClass ? mainModule.themeClass : "zinc-theme"}
+        className={mainModule?.theme ? `${mainModule.theme.color}-theme` : "zinc-theme"}
       ></div>
       <Script type="module" id="mainModule">
         {mainModule?.code ? buildCode(mainModule?.code) : ""}

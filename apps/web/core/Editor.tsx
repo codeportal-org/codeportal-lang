@@ -3,14 +3,26 @@
 import { ArrowPathIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline"
 import { useCompletion } from "ai/react"
 import { useGetCode, useSaveCode } from "app/api/apps/[appId]/code/hooks"
+import { useGetTheme, useUpdateTheme } from "app/api/apps/[appId]/theme/hooks"
+import { Palette } from "lucide-react"
 import React, { useState } from "react"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 
 import { CommandBar } from "@/components/CommandBar"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
-import { buildCode } from "./codeRuntime"
+import { editorEmitter } from "./editorSingleton"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
@@ -108,6 +120,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         <Panel defaultSize={40} minSize={30} className="pb-3 pr-2">
           <div className="h-full overflow-hidden rounded-xl border border-slate-300 shadow-md">
             <div className="flex h-8 items-center  justify-center bg-slate-300 pl-4">
+              <ThemePopover appId={appId} isLoading={codeQuery.isLoading} />
               <button
                 className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400"
                 onClick={() => {
@@ -154,5 +167,77 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         ]}
       />
     </div>
+  )
+}
+
+function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean }) {
+  const themeQuery = useGetTheme(appId)
+  const updateTheme = useUpdateTheme(appId)
+
+  const handleColorChanged = (color: "zinc" | "blue") => {
+    updateTheme.trigger({ theme: { color } }).then(() => {
+      editorEmitter.emit("refresh")
+    })
+  }
+
+  const theme = themeQuery.data?.theme
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400">
+          <Palette className="h-full" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="font-medium leading-none">Customize</h4>
+            <p className="text-muted-foreground text-sm">
+              Customize the look and feel of your app.
+            </p>
+          </div>
+          <div className="grid gap-2">
+            {isLoading && <div className="grid grid-cols-3 items-center gap-4">Loading...</div>}
+            {!isLoading && (
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="theme">Theme</Label>
+                <Select onValueChange={handleColorChanged} defaultValue={theme?.color || "zinc"}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select a fruit" id="theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="zinc">
+                        <div className="flex items-center gap-2">
+                          Zinc
+                          <div
+                            style={{
+                              backgroundColor: "hsl(240 5.9% 10%)",
+                            }}
+                            className="h-4 w-4 rounded"
+                          ></div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="blue">
+                        <div className="flex items-center gap-2">
+                          Blue
+                          <div
+                            style={{
+                              backgroundColor: "hsl(221.2 83.2% 53.3%)",
+                            }}
+                            className="h-4 w-4 rounded"
+                          ></div>
+                        </div>
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }

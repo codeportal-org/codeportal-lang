@@ -14,12 +14,12 @@ export function useClerkSWR<T>(url: string) {
   return useSWR<T>(url, fetcher)
 }
 
-export function useClerkSWRMutation<T, K>(url: string) {
+export function useClerkSWRMutation<T, K>(url: string, method: "POST" | "PUT" | "DELETE" = "POST") {
   const { getToken } = useAuth()
 
   const mutate = async (url: string, { arg }: { arg: K }) => {
     return fetch(url, {
-      method: "POST",
+      method,
       headers: { Authorization: `Bearer ${await getToken()}` },
       body: JSON.stringify(arg),
     }).then((res) => res.json())
