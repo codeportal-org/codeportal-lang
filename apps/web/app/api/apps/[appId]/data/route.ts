@@ -20,7 +20,15 @@ export async function GET(request: Request, { params }: { params: { appId: strin
     },
   })
 
+  const entries = app?.applicationDataEntries || []
+
+  const processedEntries = entries.map((entry) => ({
+    ...(entry.data as any),
+    id: entry.id,
+    "created at": entry.createdAt,
+  }))
+
   return NextResponse.json({
-    entries: app?.applicationDataEntries,
+    entries: processedEntries,
   })
 }

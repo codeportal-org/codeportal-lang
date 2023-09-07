@@ -39,14 +39,22 @@ export default function DataPage({ params }: { params: { appId: string } }) {
     )
   }
 
-  const data = appData.data.entries[0].data || {}
-  const columns = Object.keys(data)
-  //   const cell = appData.data && appData.data.entries
+  let columnsDict: Record<string, boolean> = {}
+  appData.data.entries.forEach((entry) => {
+    Object.keys(entry).forEach((key) => {
+      columnsDict[key] = true
+    })
+  })
+  columnsDict["id"] = false
+
+  const columns = ["id", ...Object.keys(columnsDict).filter((key) => columnsDict[key])]
 
   return (
-    <div className="p-10">
+    <div className="mx-auto p-10 lg:max-w-7xl">
+      <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+        Database
+      </h2>
       <Table>
-        <TableCaption>Your apps data.</TableCaption>
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
@@ -57,8 +65,8 @@ export default function DataPage({ params }: { params: { appId: string } }) {
         <TableBody>
           {appData.data.entries.map((entry) => (
             <TableRow key={entry.id}>
-              {Object.entries(entry.data || {}).map(([key, value]) => (
-                <TableCell key={key}>{JSON.stringify(value)}</TableCell>
+              {columns.map((column) => (
+                <TableCell key={column}>{JSON.stringify(entry[column])}</TableCell>
               ))}
             </TableRow>
           ))}
