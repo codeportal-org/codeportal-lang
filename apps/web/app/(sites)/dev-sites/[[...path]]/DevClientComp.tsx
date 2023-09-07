@@ -12,6 +12,11 @@ export function DevClientComp({ appId }: { appId: string }) {
         window.location.reload()
       }
     })
+
+    document.addEventListener("click", () => {
+      // forward click to parent to close theme popover
+      parent.postMessage({ type: "child-app-click" }, "*")
+    })
   }, [])
 
   return (

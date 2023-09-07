@@ -5,7 +5,7 @@ import { useCompletion } from "ai/react"
 import { useGetCode, useSaveCode } from "app/api/apps/[appId]/code/hooks"
 import { useGetTheme, useUpdateTheme } from "app/api/apps/[appId]/theme/hooks"
 import { Palette } from "lucide-react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
 
 import { CommandBar } from "@/components/CommandBar"
@@ -171,8 +171,12 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 }
 
 function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean }) {
+  const [open, setOpen] = useState(false)
+
   const themeQuery = useGetTheme(appId)
   const updateTheme = useUpdateTheme(appId)
+
+  const theme = themeQuery.data?.theme
 
   const handleColorChanged = (color: "zinc" | "blue") => {
     updateTheme.trigger({ theme: { color } }).then(() => {
@@ -180,10 +184,26 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
     })
   }
 
-  const theme = themeQuery.data?.theme
+  const handleOpenChange = (open: boolean) => {
+    setOpen(open)
+  }
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === "child-app-click") {
+        setOpen(false)
+      }
+    }
+
+    window.addEventListener("message", handleMessage)
+
+    return () => {
+      window.removeEventListener("message", handleMessage)
+    }
+  }, [])
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400">
           <Palette className="h-full" />
