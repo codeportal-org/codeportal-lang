@@ -71,6 +71,38 @@ function createUserPrompt(userInput: string) {
 ${userInput}
 \`\`\`
 
+Give the app a title with a h1 and a meaningful name and description.
+
+Keep titles short and catchy. Use at least a couple of sentences for all other text. Titles and subtitles
+should be bold and creative. Don’t repeat the user request verbatim in the content. Never use placeholder
+names like Jane Doe or Acme Inc., instead use real names and companies.
+
+Never use these characters:
+
+- \\'
+- \"
+
+Instead, always use these characters:
+
+- “
+- ”
+- ‘
+- ’
+
+So never write quotation marks and apostrophes like this:
+
+- \"This isn\\'t right\"
+- Andreas\\' ability
+- can\\'t, isn\\'t, won\\'t
+
+Instead, always write quotation marks and apostrophes like this:
+
+- “That’s better!”
+- Andreas’ ability
+- can’t, isn’t, won’t
+
+Never use the zero width space character (U+200B).
+
 In React when there is a derived value from two states, do not use another state, use a derived value instead.
 
 Carefully design what the user requests. Make sure the buttons and the main features work correctly. If there is a customizable list in the requirements, include a way to delete the items. If there are very common easy to implement features that are obvious, implement them. Style the container of the app so it is well aligned and well designed.
@@ -151,36 +183,6 @@ const { toast } = useToast()
 \`\`\`
 
 Dismiss the toasts automatically after 5 seconds if the user does not dismiss it manually unless explicitly specified otherwise.
-
-Keep titles short and catchy. Use at least a couple of sentences for all other text. Titles and subtitles
-should be bold and creative. Don’t repeat the user request verbatim in the content. Never use placeholder
-names like Jane Doe or Acme Inc., instead use real names and companies.
-
-Never use these characters:
-
-- \\'
-- \"
-
-Instead, always use these characters:
-
-- “
-- ”
-- ‘
-- ’
-
-So never write quotation marks and apostrophes like this:
-
-- \"This isn\\'t right\"
-- Andreas\\' ability
-- can\\'t, isn\\'t, won\\'t
-
-Instead, always write quotation marks and apostrophes like this:
-
-- “That’s better!”
-- Andreas’ ability
-- can’t, isn’t, won’t
-
-Never use the zero width space character (U+200B).
 
 When creating lists:
 - The items should be properly aligned, use "justify-between items-center" when necessary.
