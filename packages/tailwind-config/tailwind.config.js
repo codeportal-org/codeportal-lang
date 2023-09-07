@@ -17,11 +17,6 @@ module.exports = {
     "./lib/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: ["class"],
-  safelist: [
-    {
-      pattern: /(bg|text|border|m|mt|mb|ml|mr|mx|my|p|pt|pb|pl|pr|px|py|w|h|rounded)-./,
-    },
-  ],
   theme: {
     container: {
       center: true,

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import Script from "next/script"
 import React from "react"
 
-import { buildCode } from "@/core/codeRuntime"
+import { buildCode, getTailwindCode } from "@/core/codeRuntime"
 import prisma from "@/lib/prisma"
 
 import { ClientComp } from "./ClientComp"
@@ -76,10 +76,15 @@ export default SitePage
 async function portalServerRenderer({ mainModule }: { mainModule: any }) {
   return (
     <>
+      <Script src="https://unpkg.com/tailwindcss-jit-cdn@1.3.0"></Script>
       <div
         id="root"
         className={mainModule?.theme ? `${mainModule.theme.color}-theme` : "zinc-theme"}
       ></div>
+      <Script type="module" id="tailwind-module">
+        {getTailwindCode()}
+      </Script>
+      <Script type="tailwind-config">{`window.tailwindConfig`}</Script>
       <Script type="module" id="mainModule">
         {mainModule?.code ? buildCode(mainModule?.code) : ""}
       </Script>
