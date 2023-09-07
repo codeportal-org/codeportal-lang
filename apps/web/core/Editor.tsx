@@ -120,7 +120,6 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         <Panel defaultSize={40} minSize={30} className="pb-3 pr-2">
           <div className="h-full overflow-hidden rounded-xl border border-slate-300 shadow-md">
             <div className="flex h-8 items-center  justify-center bg-slate-300 pl-4">
-              <ThemePopover appId={appId} isLoading={codeQuery.isLoading} />
               <button
                 className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400"
                 onClick={() => {
@@ -138,6 +137,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
               >
                 <ArrowTopRightOnSquareIcon className="h-full" />
               </a>
+              <ThemePopover appId={appId} isLoading={codeQuery.isLoading} />
             </div>
             <iframe
               ref={iframeRef}
