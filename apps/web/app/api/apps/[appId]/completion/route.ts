@@ -189,6 +189,7 @@ Dismiss the toasts automatically after 5 seconds if the user does not dismiss it
 When creating lists:
 - The items should be properly aligned, use "justify-between items-center" when necessary.
 - If the item is using flex any Button directly inside should have the shrink-0 class.
+- Be sure to always get the list items from the backend using the fetch API and the '/api/data' endpoint.
 
 IMPORTANT - You don't include images in the app if the user does not require it explicitly.
 
