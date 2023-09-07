@@ -18,7 +18,7 @@ CodePortal is an open-source GUI-based, AI-first, web-based programming language
 This project has two main parts, the Portal Language (PortalLang) and the CodePortal Platform. Our goals are ambitious and bold! We want to make programming drastically better. This project is based on three core design choices:
 
 - ✨ Code can be read, modified and navigated in multiple ways. Some are: block-based view, graph view, canvas view, notebook view, and visual UI builder. Also, we offer ways to extend these views even further. This makes the system accessible to more people, and makes it easier to understand and to work with. Additionally, it enables new ways of working with code that are not possible with text-based programming. Imagine there is a different representation of the code depending on the task at hand or the person that is interacting with the system.
-- 🕸️ Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. We have seen this is a more natural medium for code that's easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, tooling and version control (AST-based). Also, every node is addressable by a unique ID (using `nanoid`).
+- 🕸️ Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. We have seen this is a more natural medium for code that's easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, tooling and version control (AST-based). Bye, bye, imports! Also, every node is addressable by a unique ID (using `nanoid`).
 - 🔍 There are no files and folders. Everything is interconnected by unique IDs and classified with metadata (tags, types, etc.). We think modern coding is better when it heavily relies on forward and back references, full-text/metadata/semantic search, and system views to explore and understand the code and to find the right code.
 
 Here is what we envision for PortalLang and CodePortal:
@@ -30,6 +30,7 @@ Here is what we envision for PortalLang and CodePortal:
 - Support for translations! The programming language and platform can be translated to any language. This is a big deal for accessibility! 🌎
 - A full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
 - A block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax, just UI).
+- Automatic import management. No need to import things, the system will do it for you. References are by ID not by name! ✨
 - Built-in code versioning and collaboration.
 - Package manager and marketplace for sharing and installing code.
 - Inferred incremental typing ala TypeScript. You can add types if you want, but you don't have to.
@@ -37,7 +38,7 @@ Here is what we envision for PortalLang and CodePortal:
 - Content-addressed code ala Unison, see [Unison: 💡 The big idea](https://www.unison-lang.org/learn/the-big-idea/).
 - For the server side, it uses an interpreter which allows for instant deployments and updates. No need to recompile or restart the server, [inspired by Darklang](https://blog.darklang.com/how-dark-deploys-code-in-50ms/).
 
-And two interesting points:
+And very interesting things:
 
 - PortalLang has names with spaces, which is the **only right way** to name things! 🌶️ 😉 No more camelCase, snake_case, kebab-case, etc. Inspired by [this Douglas Crockford talk](https://www.youtube.com/watch?v=99Zacm7SsWQ&t=2927s). So, you can name a function, variable or anything just as you would with natural language, no need to remember weird conventions or sacrifice readability.
 - PortalLang solved the tabs vs spaces debate! It uses UI space instead! 🤯 🌶️ No need to type it, and it is configurable!
