@@ -1,9 +1,7 @@
 import { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
-import Script from "next/script"
 import React from "react"
 
-import { buildCode, getTailwindCode } from "@/core/codeRuntime"
 import prisma from "@/lib/prisma"
 
 import { ClientComp } from "./ClientComp"
