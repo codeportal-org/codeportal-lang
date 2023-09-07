@@ -211,5 +211,5 @@ function getTailwindConfigCode() {
   plugins: []
 };
 
-window.tailwindCSS.refresh();`
+window.tailwindCSS?.refresh();`
 }
