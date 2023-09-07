@@ -134,7 +134,7 @@ ${getTailwindConfigCode()}`
 }
 
 function getTailwindImports() {
-  return `import defaultTheme from 'https://cdn.skypack.dev/tailwindcss@2.2.0/defaultTheme'`
+  return `import defaultTheme from 'https://esm.sh/tailwindcss@2.2.0/defaultTheme'`
 }
 
 function getTailwindConfigCode() {
