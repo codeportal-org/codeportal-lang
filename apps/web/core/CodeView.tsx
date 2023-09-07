@@ -28,14 +28,12 @@ const CodeContainer = React.forwardRef<HTMLDivElement, { code: string; isFinishe
 
     React.useEffect(() => {
       editorEmitter.on("refresh", () => {
-        console.log("----- refreshing!!!")
         broadcast({ type: "refresh" })
       })
     }, [])
 
     React.useEffect(() => {
       if (isFinished) {
-        console.log("----- refreshing!!!")
         broadcast({ type: "refresh" })
       }
     }, [code, isFinished])
