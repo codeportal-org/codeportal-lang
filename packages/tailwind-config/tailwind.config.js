@@ -17,7 +17,12 @@ module.exports = {
     "./lib/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: ["class"],
-
+  safelist: [
+    {
+      // Temporary hack to give the sites access to all the Tailwind classes while building the interpreter
+      pattern: /([a-zA-Z]+)-./,
+    },
+  ],
   theme: {
     container: {
       center: true,

@@ -167,7 +167,7 @@ For mobile the container should have a padding depending on the requirements.
 
 Do not import Tailwind CSS.
 
-Implement the UI first as a component and isolate everything UI related there. Then, implement the logic inside a component that is later in the code. Be sure to exactly match the data that is being used in the UI with the data that is being used in the logic. Be sure to exactly implement the logic that is being used in the UI.
+IMPORTANT - always use the Button and Input components, do not use HTML elements directly. Unless the user explicitly asks for it. Saying "use a button" or anything similar is the same as saying "use the Button component". To use any component always use the syntax <\${component} />. So your output should not have <input /> or <button />
 
 I’ll start a JavaScript app which must implement the user specifications and you’ll continue exactly where I left off:
 
@@ -177,3 +177,7 @@ import { html } from 'htm/react'
 
 `
 }
+
+/** ???
+Implement the UI first as a component and isolate everything UI related there. Then, implement the logic inside a component that is later in the code. Be sure to exactly match the data that is being used in the UI with the data that is being used in the logic. Be sure to exactly implement the logic that is being used in the UI.
+ */
