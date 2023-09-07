@@ -71,36 +71,6 @@ function createUserPrompt(userInput: string) {
 ${userInput}
 \`\`\`
 
-Keep titles short and catchy. Use at least a couple of sentences for all other text. Titles and subtitles
-should be bold and creative. Don’t repeat the user request verbatim in the content. Never use placeholder
-names like Jane Doe or Acme Inc., instead use real names and companies.
-
-Never use these characters:
-
-- \\'
-- \"
-
-Instead, always use these characters:
-
-- “
-- ”
-- ‘
-- ’
-
-So never write quotation marks and apostrophes like this:
-
-- \"This isn\\'t right\"
-- Andreas\\' ability
-- can\\'t, isn\\'t, won\\'t
-
-Instead, always write quotation marks and apostrophes like this:
-
-- “That’s better!”
-- Andreas’ ability
-- can’t, isn’t, won’t
-
-Never use the zero width space character (U+200B).
-
 In React when there is a derived value from two states, do not use another state, use a derived value instead.
 
 Carefully design what the user requests. Make sure the buttons and the main features work correctly. If there is a customizable list in the requirements, include a way to delete the items. If there are very common easy to implement features that are obvious, implement them. Style the container of the app so it is well aligned and well designed.
@@ -148,6 +118,36 @@ If there is an Input with a possible action when hitting enter, implement the ac
 
 Do not include the code for the Button or Input components in the app, it is already included in the app.
 
+Keep titles short and catchy. Use at least a couple of sentences for all other text. Titles and subtitles
+should be bold and creative. Don’t repeat the user request verbatim in the content. Never use placeholder
+names like Jane Doe or Acme Inc., instead use real names and companies.
+
+Never use these characters:
+
+- \\'
+- \"
+
+Instead, always use these characters:
+
+- “
+- ”
+- ‘
+- ’
+
+So never write quotation marks and apostrophes like this:
+
+- \"This isn\\'t right\"
+- Andreas\\' ability
+- can\\'t, isn\\'t, won\\'t
+
+Instead, always write quotation marks and apostrophes like this:
+
+- “That’s better!”
+- Andreas’ ability
+- can’t, isn’t, won’t
+
+Never use the zero width space character (U+200B).
+
 When creating lists:
 - The items should be properly aligned, use "justify-between items-center" when necessary.
 - Do not use the "destructive" variant if the item has a Button for deleting.
@@ -167,7 +167,7 @@ For mobile the container should have a padding depending on the requirements.
 
 Do not import Tailwind CSS.
 
-IMPORTANT - always use the Button and Input components, do not use HTML elements directly. Unless the user explicitly asks for it. Saying "use a button" or anything similar is the same as saying "use the Button component". To use any component always use the syntax <\${component} />. So your output should not have <input /> or <button />
+IMPORTANT - Always use the <\${Button} and <\${Input} components, do not use HTML input and button elements directly. DO NOT USE <input /> or <button />.
 
 I’ll start a JavaScript app which must implement the user specifications and you’ll continue exactly where I left off:
 

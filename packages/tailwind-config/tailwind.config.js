@@ -19,8 +19,7 @@ module.exports = {
   darkMode: ["class"],
   safelist: [
     {
-      // Temporary hack to give the sites access to all the Tailwind classes while building the interpreter
-      pattern: /([a-zA-Z]+)-./,
+      pattern: /(bg|text|border|m|mt|mb|ml|mr|mx|my|p|pt|pb|pl|pr|px|py|w|h|rounded)-./,
     },
   ],
   theme: {
