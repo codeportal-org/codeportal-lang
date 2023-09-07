@@ -248,7 +248,7 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
                     <SelectContent>
                       <SelectGroup>
                         <SelectItem value="zinc">
-                          <div className="flex items-center gap-2">
+                          <div className="flex w-20 items-center justify-between gap-2">
                             Zinc
                             <div
                               style={{
@@ -259,11 +259,33 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
                           </div>
                         </SelectItem>
                         <SelectItem value="blue">
-                          <div className="flex items-center gap-2">
+                          <div className="flex w-20 items-center justify-between gap-2">
                             Blue
                             <div
                               style={{
                                 backgroundColor: "hsl(221.2 83.2% 53.3%)",
+                              }}
+                              className="h-4 w-4 rounded"
+                            ></div>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="green">
+                          <div className="flex w-20 items-center justify-between gap-2">
+                            Green
+                            <div
+                              style={{
+                                backgroundColor: "hsl(142.1 76.2% 36.3%)",
+                              }}
+                              className="h-4 w-4 rounded"
+                            ></div>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="orange">
+                          <div className="flex w-20 items-center justify-between gap-2">
+                            Orange
+                            <div
+                              style={{
+                                backgroundColor: "hsl(20.5 90.2% 48.2%)",
                               }}
                               className="h-4 w-4 rounded"
                             ></div>
