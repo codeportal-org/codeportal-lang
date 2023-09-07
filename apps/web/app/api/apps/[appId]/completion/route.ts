@@ -41,7 +41,7 @@ export async function POST(req: Request, { params }: { params: { appId: string }
     stream: true,
     max_tokens: 4000,
     temperature: 0,
-    top_p: 0.1,
+    top_p: 0,
     messages: [
       {
         role: "system",
