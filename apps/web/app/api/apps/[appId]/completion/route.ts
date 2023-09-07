@@ -162,6 +162,8 @@ interface CheckboxProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 \`\`\`
 
+A <\${Checkbox /> cannot have children.
+
 If there is an Input with a possible action when hitting enter, implement the action on enter key functionality. If there is an Input, validate that it cannot be submitted empty.
 
 Do not include the code for the Button or Input components in the app, it is already included in the app.
