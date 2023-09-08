@@ -111,3 +111,12 @@ See [Local Development.md](./local-dev.md)
 ## Self Hosting
 
 See [Self Hosting.md](./self-hosting.md)
+
+## Tech
+
+CodePortal is built using:
+
+- Next.js
+- shadcn/ui.
+- Tailwind CSS.
+- TypeScript.
