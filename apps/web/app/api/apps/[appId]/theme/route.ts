@@ -1,7 +1,9 @@
 import { auth } from "@clerk/nextjs"
+import { and, eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
-import prisma from "@/lib/prisma"
+import { db, schema } from "@/db/index"
+import { ThemeConfig } from "@/db/schema"
 
 export async function GET(request: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
@@ -10,15 +12,18 @@ export async function GET(request: Request, { params }: { params: { appId: strin
     return
   }
 
-  const code = await prisma.application.findFirst({
-    where: { creatorId: userId, id: params.appId },
-  })
+  const rows = await db
+    .select({
+      theme: schema.apps.theme,
+    })
+    .from(schema.apps)
+    .where(and(eq(schema.apps.id, params.appId), eq(schema.apps.creatorId, userId)))
 
-  if (!code) {
+  if (!rows[0]) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  return NextResponse.json({ theme: (code.mainModuleCodeTree as any)?.theme || { color: "zinc" } })
+  return NextResponse.json({ theme: rows[0] || {} })
 }
 
 export async function PUT(request: Request, { params }: { params: { appId: string } }) {
@@ -28,22 +33,14 @@ export async function PUT(request: Request, { params }: { params: { appId: strin
     return
   }
 
-  const body: { theme: { color: "zinc" | "blue" } } = await request.json()
+  const body: { theme: ThemeConfig } = await request.json()
 
-  const code = await prisma.application.findFirst({
-    where: { creatorId: userId, id: params.appId },
-  })
-
-  if (!code) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  await prisma.application.update({
-    where: { creatorId: userId, id: params.appId },
-    data: {
-      mainModuleCodeTree: { ...(code.mainModuleCodeTree as any), theme: body.theme },
-    },
-  })
+  await db
+    .update(schema.apps)
+    .set({
+      theme: body.theme,
+    })
+    .where(and(eq(schema.apps.id, params.appId), eq(schema.apps.creatorId, userId)))
 
   return NextResponse.json({ success: true })
 }

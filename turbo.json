@@ -37,13 +37,7 @@
     "start": {
       "cache": false
     },
-    "prisma:generate": {
-      "cache": false
-    },
-    "prisma:push": {
-      "cache": false
-    },
-    "prisma:studio": {
+    "drizzle:push": {
       "cache": false
     }
   }

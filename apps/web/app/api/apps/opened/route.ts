@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs"
+import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
-import prisma from "@/lib/prisma"
+import { db, schema } from "@/db/index"
 
 export type AppOpenedRequest = {
   id: string
@@ -16,10 +17,12 @@ export async function POST(request: Request) {
 
   const body: AppOpenedRequest = await request.json()
 
-  const res = await prisma.application.update({
-    where: { id: body.id },
-    data: { lastOpenedAt: new Date() },
-  })
+  await db
+    .update(schema.apps)
+    .set({
+      lastOpenedAt: new Date(),
+    })
+    .where(eq(schema.apps.id, body.id))
 
-  return NextResponse.json({ appId: res.id })
+  return NextResponse.json({ success: true })
 }

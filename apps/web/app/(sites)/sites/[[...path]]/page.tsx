@@ -1,8 +1,9 @@
+import { desc, eq } from "drizzle-orm"
 import { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
 import React from "react"
 
-import prisma from "@/lib/prisma"
+import { db, schema } from "@/db/index"
 
 import { ClientComp } from "./ClientComp"
 
@@ -17,12 +18,10 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const path = params.path
 
-  // temporarily the appId will be the subdomain before we allow custom subdomains
-  const appId = path[0]
+  const appId = path[0]!
 
-  const app = await prisma.application.findFirst({
-    where: { id: appId },
-    orderBy: { lastOpenedAt: "desc" },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, appId),
   })
 
   if (!app) {
@@ -42,12 +41,10 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
 
   const path = params.path
 
-  // temporarily the appId will be the subdomain before we allow custom subdomains
-  const appId = path[0]
+  const appId = path[0]!
 
-  const app = await prisma.application.findFirst({
-    where: { id: appId },
-    orderBy: { lastOpenedAt: "desc" },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, appId),
   })
 
   if (!app) {
@@ -59,12 +56,12 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
   */
 
   // Interpreter runs and renders the site GG!
-  const siteRender = await portalServerRenderer({ mainModule: app.mainModuleCodeTree })
+  const siteRender = await portalServerRenderer({ mainModule: app.mainModule })
 
   return (
     <>
       {siteRender}
-      <ClientComp mainModule={app.mainModuleCodeTree} />
+      <ClientComp mainModule={app.mainModule} />
     </>
   )
 }

@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs"
 import { authorize } from "@liveblocks/node"
+import { and, eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
-import prisma from "@/lib/prisma"
+import { db, schema } from "@/db/index"
 
 const secret = process.env.LIVEBLOCKS_SECRET_KEY || ""
 
@@ -31,8 +32,8 @@ export async function POST(request: Request) {
     if (roomId === "xyz") {
       // :)
     } else {
-      const app = await prisma.application.findFirst({
-        where: { id: roomId, creatorId: userId },
+      const app = await db.query.apps.findFirst({
+        where: and(eq(schema.apps.id, roomId), eq(schema.apps.creatorId, userId)),
       })
 
       if (!app) {
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
     userInfo: {
       firstName: user?.firstName,
       lastName: user?.lastName,
-      profileImageUrl: user?.profileImageUrl,
+      profileImageUrl: user?.imageUrl,
     },
   })
 

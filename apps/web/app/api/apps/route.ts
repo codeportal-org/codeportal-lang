@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs"
 import { NextResponse } from "next/server"
 
+import { db, schema } from "@/db/index"
 import { nanoid } from "@/lib/nanoid"
-import prisma from "@/lib/prisma"
 
 import { NewAppFormData } from "./types"
 
@@ -13,9 +13,9 @@ export async function GET(request: Request) {
     return
   }
 
-  const apps = await await prisma.application.findMany({
-    where: { creatorId: userId },
-    orderBy: { lastOpenedAt: "desc" },
+  const apps = await db.query.apps.findMany({
+    where: (apps, { eq }) => eq(apps.creatorId, userId),
+    orderBy: (apps, { desc }) => desc(apps.lastOpenedAt),
   })
 
   return NextResponse.json(apps)
@@ -30,13 +30,14 @@ export async function POST(request: Request) {
 
   const body: NewAppFormData = await request.json()
 
-  const res = await prisma.application.create({
-    data: {
-      id: nanoid(),
-      name: body.name,
-      creatorId: userId,
-    },
+  // MySQL doesn't support returning values from insert statements
+  const id = (schema.apps.id.defaultFn || nanoid)()
+
+  await db.insert(schema.apps).values({
+    id,
+    name: body.name,
+    creatorId: userId,
   })
 
-  return NextResponse.json({ appId: res.id })
+  return NextResponse.json({ appId: id })
 }

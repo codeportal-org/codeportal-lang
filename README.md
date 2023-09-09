@@ -27,7 +27,7 @@ Here is what we envision for PortalLang and CodePortal:
 - AI-first, meaning that it includes code gen, code explain and other AI features.
 - An enriched UI with widgets for visualizing and working with data and for debugging it.
 - A language that resembles natural language, that's easy to read and to understand. It draws inspiration from Python 🐍.
-- Support for translations! The programming language and platform can be translated to any language. This is a big deal for accessibility! 🌎
+- Support for translations! The programming language and platform can be translated to any language. This is a big deal for accessibility! 🌎 Localized keywords!!! 🤯
 - A full-stack platform, not just a language. It is a complete solution for building web applications and APIs.
 - A block-based code editor, not text-based. This makes it easier to work with and more intuitive (no syntax, just UI).
 - Automatic import management. No need to import things, or maintain them, the system will do it for you. All of this is easier and automatic because references are by ID not by name! ✨

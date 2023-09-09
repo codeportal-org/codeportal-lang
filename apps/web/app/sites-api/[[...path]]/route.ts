@@ -1,19 +1,18 @@
+import { and, eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
-import prisma from "@/lib/prisma"
+import { db, schema } from "@/db/index"
 
 export async function GET(req: Request, { params }: { params: { path: string[] } }) {
   const path = params.path
 
-  // temporarily the appId will be the subdomain before we allow custom subdomains
-  const appId = path[0]
+  const appId = path[0]!
   const firstSegment = path[2]
   const secondSegment = path[3]
   const thirdSegment = path[4]
 
-  const app = await prisma.application.findFirst({
-    where: { id: appId },
-    orderBy: { lastOpenedAt: "desc" },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, appId),
   })
 
   if (!app || !appId) {
@@ -24,13 +23,14 @@ export async function GET(req: Request, { params }: { params: { path: string[] }
     return NextResponse.json({ message: `${app.name} API` })
   }
 
+  // like: GET APP_ID.codeportal.io/api/data/DATA_NAME/DATA_ID
   if (thirdSegment) {
-    const data = await prisma.applicationData.findFirst({
-      where: {
-        name: secondSegment,
-        applicationId: appId,
-        id: thirdSegment,
-      },
+    const data = await db.query.appData.findFirst({
+      where: and(
+        eq(schema.appData.name, secondSegment),
+        eq(schema.appData.applicationId, appId),
+        eq(schema.appData.id, thirdSegment),
+      ),
     })
 
     if (!data) {
@@ -40,12 +40,11 @@ export async function GET(req: Request, { params }: { params: { path: string[] }
     return NextResponse.json({ ...(data.data as any), id: data.id, createdAt: data.createdAt })
   }
 
-  const data = await prisma.applicationData.findMany({
-    where: {
-      name: secondSegment,
-      applicationId: appId,
-    },
-    orderBy: { createdAt: "asc" },
+  // like: GET APP_ID.codeportal.io/api/data/DATA_NAME/
+  // GET all data with name DATA_NAME
+  const data = await db.query.appData.findMany({
+    where: and(eq(schema.appData.name, secondSegment), eq(schema.appData.applicationId, appId)),
+    orderBy: (data, { asc }) => asc(data.createdAt),
   })
 
   if (!data) {
@@ -64,14 +63,12 @@ export async function GET(req: Request, { params }: { params: { path: string[] }
 export async function POST(req: Request, { params }: { params: { path: string[] } }) {
   const path = params.path
 
-  // temporarily the appId will be the subdomain before we allow custom subdomains
-  const appId = path[0]
+  const appId = path[0]!
   const firstSegment = path[2]
   const secondSegment = path[3]
 
-  const app = await prisma.application.findFirst({
-    where: { id: appId },
-    orderBy: { lastOpenedAt: "desc" },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, appId),
   })
 
   if (!app || !appId) {
@@ -91,46 +88,44 @@ export async function POST(req: Request, { params }: { params: { path: string[] 
     return NextResponse.json({ error: "Unsupported content-type" }, { status: 400 })
   }
 
-  const entry = await prisma.applicationData.create({
-    data: {
-      name: secondSegment,
-      applicationId: appId,
-      data,
-    },
+  await db.insert(schema.appData).values({
+    name: secondSegment,
+    applicationId: appId,
+    data,
   })
 
-  return NextResponse.json({ ...(entry.data as any), id: entry.id })
+  return NextResponse.json({ success: true })
 }
 
 export async function DELETE(req: Request, { params }: { params: { path: string[] } }) {
   const path = params.path
 
-  // temporarily the appId will be the subdomain before we allow custom subdomains
-  const appId = path[0]
+  const appId = path[0]!
   const firstSegment = path[2]
   const secondSegment = path[3]
   const thirdSegment = path[4]
 
-  const app = await prisma.application.findFirst({
-    where: { id: appId },
-    orderBy: { lastOpenedAt: "desc" },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, appId),
   })
 
   if (!app || !appId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  if (firstSegment !== "data" || !secondSegment) {
+  if (firstSegment !== "data" || !secondSegment || !thirdSegment) {
     return NextResponse.json({ error: "Unsupported path" }, { status: 400 })
   }
 
-  await prisma.applicationData.delete({
-    where: {
-      applicationId: appId,
-      name: secondSegment,
-      id: thirdSegment,
-    },
-  })
+  await db
+    .delete(schema.appData)
+    .where(
+      and(
+        eq(schema.appData.applicationId, appId),
+        eq(schema.appData.name, secondSegment),
+        eq(schema.appData.id, thirdSegment),
+      ),
+    )
 
   return NextResponse.json({ success: true })
 }
@@ -138,22 +133,20 @@ export async function DELETE(req: Request, { params }: { params: { path: string[
 export async function PUT(req: Request, { params }: { params: { path: string[] } }) {
   const path = params.path
 
-  // temporarily the appId will be the subdomain before we allow custom subdomains
-  const appId = path[0]
+  const appId = path[0]!
   const firstSegment = path[2]
   const secondSegment = path[3]
   const thirdSegment = path[4]
 
-  const app = await prisma.application.findFirst({
-    where: { id: appId },
-    orderBy: { lastOpenedAt: "desc" },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, appId),
   })
 
   if (!app || !appId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  if (firstSegment !== "data" || !secondSegment) {
+  if (firstSegment !== "data" || !secondSegment || !thirdSegment) {
     return NextResponse.json({ error: "Unsupported path" }, { status: 400 })
   }
 
@@ -170,16 +163,16 @@ export async function PUT(req: Request, { params }: { params: { path: string[] }
     return NextResponse.json({ error: "Unsupported content-type" }, { status: 400 })
   }
 
-  await prisma.applicationData.update({
-    where: {
-      applicationId: appId,
-      name: secondSegment,
-      id: thirdSegment,
-    },
-    data: {
-      data,
-    },
-  })
+  await db
+    .update(schema.appData)
+    .set({ data })
+    .where(
+      and(
+        eq(schema.appData.applicationId, appId),
+        eq(schema.appData.name, secondSegment),
+        eq(schema.appData.id, thirdSegment),
+      ),
+    )
 
   return NextResponse.json({ success: true })
 }
@@ -187,22 +180,20 @@ export async function PUT(req: Request, { params }: { params: { path: string[] }
 export async function PATCH(req: Request, { params }: { params: { path: string[] } }) {
   const path = params.path
 
-  // temporarily the appId will be the subdomain before we allow custom subdomains
-  const appId = path[0]
+  const appId = path[0]!
   const firstSegment = path[2]
   const secondSegment = path[3]
   const thirdSegment = path[4]
 
-  const app = await prisma.application.findFirst({
-    where: { id: appId },
-    orderBy: { lastOpenedAt: "desc" },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, appId),
   })
 
   if (!app || !appId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  if (firstSegment !== "data" || !secondSegment) {
+  if (firstSegment !== "data" || !secondSegment || !thirdSegment) {
     return NextResponse.json({ error: "Unsupported path" }, { status: 400 })
   }
 
@@ -219,31 +210,33 @@ export async function PATCH(req: Request, { params }: { params: { path: string[]
     return NextResponse.json({ error: "Unsupported content-type" }, { status: 400 })
   }
 
-  const existingData = await prisma.applicationData.findFirst({
-    where: {
-      applicationId: appId,
-      name: secondSegment,
-      id: thirdSegment,
-    },
+  const existingData = await db.query.appData.findFirst({
+    where: and(
+      eq(schema.appData.applicationId, appId),
+      eq(schema.appData.name, secondSegment),
+      eq(schema.appData.id, thirdSegment),
+    ),
   })
 
   if (!existingData) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 
-  await prisma.applicationData.update({
-    where: {
-      applicationId: appId,
-      name: secondSegment,
-      id: thirdSegment,
-    },
-    data: {
+  await db
+    .update(schema.appData)
+    .set({
       data: {
         ...(existingData.data as any),
         ...data,
       },
-    },
-  })
+    })
+    .where(
+      and(
+        eq(schema.appData.applicationId, appId),
+        eq(schema.appData.name, secondSegment),
+        eq(schema.appData.id, thirdSegment),
+      ),
+    )
 
   return NextResponse.json({ success: true })
 }

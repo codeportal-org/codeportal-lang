@@ -1,16 +1,15 @@
 import { auth } from "@clerk/nextjs"
 import { OpenAIStream, StreamingTextResponse } from "ai"
+import { and, eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
 
-// import prisma from "@/lib/prisma"
+import { db, schema } from "@/db/index"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-// Prisma doesn't support the edge runtime yet, if this becomes a problem we can
-// switch to Drizzle ORM
 export const runtime = "edge"
 
 export async function POST(req: Request, { params }: { params: { appId: string } }) {
@@ -22,14 +21,13 @@ export async function POST(req: Request, { params }: { params: { appId: string }
 
   const appId = params.appId
 
-  // const app = await prisma.application.findFirst({
-  //   where: { creatorId: userId, id: appId },
-  //   orderBy: { lastOpenedAt: "desc" },
-  // })
+  const app = await db.query.apps.findFirst({
+    where: and(eq(schema.apps.creatorId, userId), eq(schema.apps.id, appId)),
+  })
 
-  // if (!app) {
-  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  // }
+  if (!app) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
 
   const { prompt } = await req.json()
 

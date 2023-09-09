@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs"
+import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
-import prisma from "@/lib/prisma"
+import { db, schema } from "@/db/index"
 
 export async function GET(req: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
@@ -10,15 +11,15 @@ export async function GET(req: Request, { params }: { params: { appId: string } 
     return
   }
 
-  const app = await prisma.application.findFirst({
-    where: { id: params.appId },
+  const app = await db.query.apps.findFirst({
+    where: eq(schema.apps.id, params.appId),
   })
 
   if (!app) {
     return NextResponse.json({ error: "App not found" }, { status: 404 })
   }
 
-  return NextResponse.json(app.mainModuleCodeTree)
+  return NextResponse.json(app.mainModule)
 }
 
 export async function POST(request: Request, { params }: { params: { appId: string } }) {
@@ -30,12 +31,13 @@ export async function POST(request: Request, { params }: { params: { appId: stri
 
   const body = await request.json()
 
-  await prisma.application.update({
-    where: { id: params.appId },
-    data: {
-      mainModuleCodeTree: { code: body.code, prompt: body.prompt },
-    },
-  })
+  await db
+    .update(schema.apps)
+    .set({
+      prompt: body.prompt,
+      mainModule: { code: body.code },
+    })
+    .where(eq(schema.apps.id, params.appId))
 
   return NextResponse.json({ success: true })
 }

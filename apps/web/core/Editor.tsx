@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ThemeColor } from "@/db/schema"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
@@ -175,7 +176,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean }) {
   const [open, setOpen] = useState(false)
 
-  const [color, setColor] = useState<"zinc" | "blue">("zinc")
+  const [color, setColor] = useState<ThemeColor>("zinc")
   const [radius, setRadius] = useState<string>("0.75rem")
 
   const themeQuery = useGetTheme(appId)
@@ -183,7 +184,7 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
 
   const theme = themeQuery.data?.theme
 
-  const handleColorChanged = (color: "zinc" | "blue") => {
+  const handleColorChanged = (color: ThemeColor) => {
     if (color) {
       setColor(color)
     }

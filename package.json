@@ -10,11 +10,8 @@
     "clean": "turbo clean",
     "storybook:lang": "turbo storybook --filter @codeportal/lang-ui",
     "format": "prettier --write \"**/*.{css,js,json,jsx,ts,tsx,md}\"",
-    "dev:db": "pscale connect codeportal main --port 3309",
-    "db:generate": "turbo run prisma:generate --filter web",
-    "db:push": "turbo run prisma:push --filter web",
-    "db:studio": "turbo run prisma:studio --filter web",
-    "dev:all": "pnpm db:generate && concurrently \"pnpm dev\" \"pnpm dev:db\" --kill-others",
+    "db:push": "turbo run drizzle:push --filter web",
+    "dev:all": "pnpm dev",
     "changeset": "changeset",
     "version": "changeset version",
     "publish-packages": "turbo run build lint test && changeset version && changeset publish"

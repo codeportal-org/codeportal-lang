@@ -1,11 +1,8 @@
-import { type ThemeColor } from "@/core/codeRuntime"
+import { ThemeConfig } from "@/db/schema"
 import { useClerkSWR, useClerkSWRMutation } from "@/lib/swr"
 
 export const useUpdateTheme = (appId: string) =>
-  useClerkSWRMutation<void, { theme: { color: ThemeColor; radius: string } }>(
-    `/api/apps/${appId}/theme`,
-    "PUT",
-  )
+  useClerkSWRMutation<void, { theme: ThemeConfig }>(`/api/apps/${appId}/theme`, "PUT")
 
 export const useGetTheme = (appId: string) =>
-  useClerkSWR<{ theme: { color: ThemeColor; radius: string } }>(`/api/apps/${appId}/theme`)
+  useClerkSWR<{ theme: ThemeConfig }>(`/api/apps/${appId}/theme`)
