@@ -22,7 +22,7 @@ export function ClientComp({ mainModule }: { mainModule: any }) {
           ${getStyles(mainModule?.theme)}
         `}
       </style>
-      <Script id="tailwind-module" type="module">
+      <Script id="tailwind-module" type="module" defer>
         {getTailwindConfigCode()}
       </Script>
       <Script type="tailwind-config" id="tailwind-config">{`window.tailwindConfig`}</Script>
