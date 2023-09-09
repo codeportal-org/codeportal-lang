@@ -109,13 +109,40 @@ If the user is asking for an app to collect end user data, include all of it inc
 
 Evaluate the user requirements to infer the Backend Data Model, like saving lists or form entries. Give the field names meaningful names, add "id" as a field name, it is a special reserved field. The names of the fields should be names with spaces not camelCase. Take this into account to display the data in the html and components.
 
+If saving numbers or other raw data into the state as a list, wrap them in items so if the user wants them to be saved to the cloud it is easier to implement. For example:
+\`\`\`javascript
+const [items, setItems] = useState([
+  { id: "1", value: 1 },
+  { id: "2", value: 2 },
+])
+
+// or it could be numbers
+const [numbers, setNumbers] = useState([
+  { id: "1", value: 1 },
+  { id: "2", value: 2 },
+])
+
+// save to backend
+
+// response from backend, assume the backend returns the new item when creating it with POST
+const newItem = response1.json()
+const newNumber = response2.json()
+
+setItems((items) => [...items, newItem])
+setNumbers((numbers) => [...numbers, newNumber])
+
+// get from the backend
+const items = await fetch("/api/data/items")
+const numbers = await fetch("/api/data/numbers")
+setItems(items)
+setNumbers(numbers)
+\`\`\`
+
 If the user does not specify the endpoint where to send form data, submit all the data to this URL '/api/data/{form-name}' as a POST request form body. Take into account the Backend Data Model to know what to send in the form body. Give form-name a descriptive form name for the data. Take this into account if displaying the data in a list or in the UI later.
 
 When fetching data from an API using the fetch API take into account the response not OK cases such as 404, 400 and 500.
 
 When fetching a list of things from '/api/data' take into account that every item in the list has a unique id plus the body data you sent to the API.
-
-If the UI has a checkbox-like control, make it squared.
 
 Wrap HTTP requests (fetch) inside try-catch to account for errors.
 
@@ -161,6 +188,10 @@ interface CheckboxProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 \`\`\`
 
 A <\${Checkbox /> cannot have children.
+
+A <\${Checkbox /> should always have a label.
+
+If the UI has a checkbox-like control, make it squared.
 
 If there is an Input with a possible action when hitting enter, implement the action on enter key functionality. If there is an Input, validate that it cannot be submitted empty.
 
@@ -212,6 +243,8 @@ IMPORTANT - Always use the <\${Button} and <\${Input} components, do not use HTM
 Components should return string template literals, not JSX. Like this: return html\`<div className="mt-2">...</div>\`
 
 Use "className" to add classes. Like this: html\`<\${Button} className="mt-2">Add<//>\`
+
+Use \${} for interpolating variables. Like this: html\`<\${Button} className="mt-2">\${buttonText}<//>\`.
 
 I’ll start a component for an app which must implement the user specifications and you’ll continue exactly where I left off. Just create the component do not use it:
 function App() {`

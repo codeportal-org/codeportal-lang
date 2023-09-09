@@ -24,8 +24,8 @@ export async function GET(request: Request, { params }: { params: { appId: strin
   const rows = await db
     .select()
     .from(schema.appData)
-    .where(eq(schema.apps.id, appId))
-    .orderBy(asc(schema.apps.lastOpenedAt))
+    .where(eq(schema.appData.applicationId, appId))
+    .orderBy(asc(schema.appData.createdAt))
 
   const entries = rows || []
 

@@ -102,7 +102,11 @@ export async function POST(req: Request, { params }: { params: { path: string[] 
     where: eq(schema.appData.id, entryId),
   })
 
-  return NextResponse.json({ ...(entry!.data as any), id: entry!.id, createdAt: entry!.createdAt })
+  return NextResponse.json({
+    ...(entry!.data as any),
+    id: entry!.id,
+    "created at": entry!.createdAt,
+  })
 }
 
 export async function DELETE(req: Request, { params }: { params: { path: string[] } }) {
