@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs"
-import { and, eq } from "drizzle-orm"
+import { and, eq, sql } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
 import { db, schema } from "@/db/index"
@@ -39,6 +39,7 @@ export async function PUT(request: Request, { params }: { params: { appId: strin
     .update(schema.apps)
     .set({
       theme: body.theme,
+      updatedAt: sql`now()`,
     })
     .where(and(eq(schema.apps.id, params.appId), eq(schema.apps.creatorId, userId)))
 

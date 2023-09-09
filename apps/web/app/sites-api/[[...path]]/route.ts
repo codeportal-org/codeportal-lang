@@ -1,7 +1,8 @@
-import { and, eq } from "drizzle-orm"
+import { and, eq, sql } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
 import { db, schema } from "@/db/index"
+import { nanoid } from "@/lib/nanoid"
 
 export async function GET(req: Request, { params }: { params: { path: string[] } }) {
   const path = params.path
@@ -88,13 +89,20 @@ export async function POST(req: Request, { params }: { params: { path: string[] 
     return NextResponse.json({ error: "Unsupported content-type" }, { status: 400 })
   }
 
+  const entryId = (schema.appData.id.defaultFn || nanoid)()
+
   await db.insert(schema.appData).values({
+    id: entryId,
     name: secondSegment,
     applicationId: appId,
     data,
   })
 
-  return NextResponse.json({ success: true })
+  const entry = await db.query.appData.findFirst({
+    where: eq(schema.appData.id, entryId),
+  })
+
+  return NextResponse.json({ ...(entry!.data as any), id: entry!.id, createdAt: entry!.createdAt })
 }
 
 export async function DELETE(req: Request, { params }: { params: { path: string[] } }) {
@@ -165,7 +173,7 @@ export async function PUT(req: Request, { params }: { params: { path: string[] }
 
   await db
     .update(schema.appData)
-    .set({ data })
+    .set({ data, updatedAt: sql`now()` })
     .where(
       and(
         eq(schema.appData.applicationId, appId),
@@ -229,6 +237,7 @@ export async function PATCH(req: Request, { params }: { params: { path: string[]
         ...(existingData.data as any),
         ...data,
       },
+      updatedAt: sql`now()`,
     })
     .where(
       and(

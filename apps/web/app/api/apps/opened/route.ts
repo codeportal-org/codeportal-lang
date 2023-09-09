@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
 import { db, schema } from "@/db/index"
@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     .update(schema.apps)
     .set({
       lastOpenedAt: new Date(),
+      updatedAt: sql`now()`,
     })
     .where(eq(schema.apps.id, body.id))
 

@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
 import { db, schema } from "@/db/index"
@@ -36,6 +36,7 @@ export async function POST(request: Request, { params }: { params: { appId: stri
     .set({
       prompt: body.prompt,
       mainModule: { code: body.code },
+      updatedAt: sql`now()`,
     })
     .where(eq(schema.apps.id, params.appId))
 
