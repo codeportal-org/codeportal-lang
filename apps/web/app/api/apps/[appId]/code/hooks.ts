@@ -7,7 +7,7 @@ export const useSaveCode = (appId: string) =>
       code: string
       prompt: string
     }
-  >(`/api/apps/${appId}/code`)
+  >(`/api/apps/${appId}/code`, "PATCH")
 
 export const useGetCode = (appId: string) =>
   useClerkSWR<{

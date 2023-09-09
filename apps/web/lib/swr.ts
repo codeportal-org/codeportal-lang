@@ -14,7 +14,10 @@ export function useClerkSWR<T>(url: string) {
   return useSWR<T>(url, fetcher)
 }
 
-export function useClerkSWRMutation<T, K>(url: string, method: "POST" | "PUT" | "DELETE" = "POST") {
+export function useClerkSWRMutation<T, K>(
+  url: string,
+  method: "POST" | "PUT" | "DELETE" | "PATCH" = "POST",
+) {
   const { getToken } = useAuth()
 
   const mutate = async (url: string, { arg }: { arg: K }) => {

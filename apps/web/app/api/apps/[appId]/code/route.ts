@@ -19,10 +19,10 @@ export async function GET(req: Request, { params }: { params: { appId: string } 
     return NextResponse.json({ error: "App not found" }, { status: 404 })
   }
 
-  return NextResponse.json(app.mainModule)
+  return NextResponse.json({ code: app.mainModule?.code, prompt: app.prompt })
 }
 
-export async function POST(request: Request, { params }: { params: { appId: string } }) {
+export async function PATCH(request: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
   if (!userId) {
     NextResponse.json({ error: "Unauthorized" }, { status: 401 })
