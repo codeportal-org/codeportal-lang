@@ -61,7 +61,7 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
   return (
     <>
       {siteRender}
-      <ClientComp mainModule={app.mainModule} />
+      <ClientComp mainModule={app.mainModule} theme={app.theme} />
     </>
   )
 }

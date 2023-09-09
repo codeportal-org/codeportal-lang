@@ -23,7 +23,7 @@ export async function GET(request: Request, { params }: { params: { appId: strin
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  return NextResponse.json({ theme: rows[0] || {} })
+  return NextResponse.json({ theme: rows[0].theme || {} })
 }
 
 export async function PUT(request: Request, { params }: { params: { appId: string } }) {

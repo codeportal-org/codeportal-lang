@@ -4,8 +4,15 @@ import Script from "next/script"
 import React from "react"
 
 import { buildCode, getStyles, getTailwindConfigCode } from "@/core/codeRuntime"
+import { MainModule, ThemeConfig } from "@/db/schema"
 
-export function ClientComp({ mainModule }: { mainModule: any }) {
+export function ClientComp({
+  mainModule,
+  theme,
+}: {
+  mainModule: MainModule | null
+  theme: ThemeConfig | null
+}) {
   React.useEffect(() => {
     // console.log("---- client side code")
   }, [])
@@ -13,13 +20,10 @@ export function ClientComp({ mainModule }: { mainModule: any }) {
   return (
     <>
       <Script src="https://cdn.tailwindcss.com/3.3.3"></Script>
-      <div
-        id="root"
-        className={mainModule?.theme ? `${mainModule?.theme?.color}-theme` : "zinc-theme"}
-      ></div>
+      <div id="root" className={theme ? `${theme?.color}-theme` : "zinc-theme"}></div>
       <style jsx global id="main-styles">
         {`
-          ${getStyles(mainModule?.theme)}
+          ${getStyles(theme)}
         `}
       </style>
       <Script id="tailwind-module" type="module" defer>

@@ -1,6 +1,6 @@
 import css from "styled-jsx/css"
 
-import { type ThemeColor } from "@/db/schema"
+import { type ThemeConfig } from "@/db/schema"
 
 export function buildFullCode(completion: string) {
   return `
@@ -510,7 +510,7 @@ function getCheckboxCode() {
   Checkbox.displayName = CheckboxPrimitive.Root.displayName`
 }
 
-export function getStyles(theme: { color?: ThemeColor; radius?: string }) {
+export function getStyles(theme: ThemeConfig | null) {
   let themeClass: any
 
   const color = theme?.color || "zinc"
