@@ -247,5 +247,9 @@ Use "className" to add classes. Like this: html\`<\${Button} className="mt-2">Ad
 Use \${} for interpolating variables. Like this: html\`<\${Button} className="mt-2">\${buttonText}<//>\`.
 
 I’ll start a component for an app which must implement the user specifications and you’ll continue exactly where I left off. Just create the component do not use it:
+
+import React from "react"
+import { html } from "htm/react"
+
 function App() {`
 }
