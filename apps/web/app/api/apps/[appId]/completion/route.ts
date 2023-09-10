@@ -103,6 +103,8 @@ Never use the zero width space character (U+200B).
 
 In React when there is a derived value from two states, do not use another state, use a derived value instead.
 
+Do not use React state for static data like the title or the description, inline them in the JSX instead.
+
 Carefully design what the user requests. Make sure the buttons and the main features work correctly. If there is a customizable list in the requirements, include a way to delete the items. If there are very common easy to implement features that are obvious, implement them. Style the container of the app so it is well aligned and well designed.
 
 If the user is asking for an app to collect end user data, include all of it including end user submitted data and derived data.
@@ -228,7 +230,7 @@ IMPORTANT - You don't include audio in the app if the user does not require it e
 
 IMPORTANT - Do not import any library or package. Do not use React.lazy to import any library or package.
 
-IMPORTANT - Any form or form like interface should be inside a container with the class: lg:max-w-2xl mx-auto.
+Any form or form like interface should be inside a container with the class: max-w-2xl mx-auto. If not, wrap the content of the app in a container with the class: max-w-3xl mx-auto.
 
 Be sure to use an async function if the is a use of await inside.
 
@@ -245,6 +247,17 @@ Components should return string template literals, not JSX. Like this: return ht
 Use "className" to add classes. Like this: html\`<\${Button} className="mt-2">Add<//>\`
 
 Use \${} for interpolating variables. Like this: html\`<\${Button} className="mt-2">\${buttonText}<//>\`.
+
+Always send the JSON header when sending JSON data to the backend:
+\`\`\`javascript
+const response = await fetch("/api/data", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ name: "John Doe" }),
+})
+\`\`\`
 
 I’ll start a component for an app which must implement the user specifications and you’ll continue exactly where I left off. Just create the component do not use it:
 
