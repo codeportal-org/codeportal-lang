@@ -103,6 +103,8 @@ Never use the zero width space character (U+200B).
 
 Use the TypeScript interface to create the app as JSON. The interface is:
 \`\`\`ts
+type UINode = UIElementNode | UITextNode | UIFragmentNode
+
 type ComponentNode = {
   type: "component"
   name: string
@@ -110,35 +112,50 @@ type ComponentNode = {
 }
 
 type UIElementNode = {
-  type: "element"
+  type: "ui element"
   tag: string
-  /**
-   * The style object is a key-value map of CSS properties and values.
-   * For instance:
-   * {
-   *  color: "green",
-   *  fontSize: "20px",
-   * }
-   * /
   style?: Record<string, any>
   children?: UINode[]
 }
 
 type UITextNode = {
-  type: "text"
+  type: "ui text"
   text: string
 }
 
 type UIFragmentNode = {
-  type: "fragment"
+  type: "ui fragment"
   children?: UINode[]
 }
 
-type Statement = ReturnStatement
+type Statement = ReturnStatement | PrintStatement
 
 type ReturnStatement = {
   type: "return"
-  arg: UINode
+  arg: Expression
+}
+
+/** Print the expression to the console */
+type PrintStatement = {
+  type: "print"
+  arg: Expression
+}
+
+type Expression = StringLiteral | NumberLiteral | BooleanLiteral | UINode
+
+type StringLiteral = {
+  type: "string"
+  value: string
+}
+
+type NumberLiteral = {
+  type: "number"
+  value: number
+}
+
+type BooleanLiteral = {
+  type: "boolean"
+  value: boolean
 }
 \`\`\`
 
@@ -152,7 +169,7 @@ For instance:
     {
       type: "return",
       arg: {
-        type: "element",
+        type: "ui element",
         tag: "div",
         style: {
           color: "green",
@@ -160,7 +177,7 @@ For instance:
         },
         children: [
           {
-            type: "text",
+            type: "ui text",
             text: "Hello world!",
           },
         ],
@@ -174,6 +191,8 @@ Follow these rules to the letter:
 - An input element should never have children. Do not include a children property.
 - The body element is not allowed.
 - Any form or form like interface should be inside a container with the class: max-w-2xl mx-auto. If not, wrap the content of the app in a container with the class: max-w-3xl mx-auto. Transform those TailwindCSS classes to CSS styles and put them in the style property, use rem units and be careful with x and y axis. For instance: mx-auto becomes margin-left: auto; margin-right: auto;.
+
+In components the return statement is the end of the component. Do not include any other statements after the return.
 
 I’ll start a component for an app which must implement the user specifications in JSON and you’ll continue exactly where I left off:
 \`\`\`json

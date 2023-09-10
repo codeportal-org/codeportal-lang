@@ -9,33 +9,55 @@ export type ComponentNode = {
 }
 
 export type UIElementNode = {
-  type: "element"
+  type: "ui element"
   tag: string
   style?: Record<string, any>
   children?: UINode[]
 }
 
 export type UITextNode = {
-  type: "text"
+  type: "ui text"
   text: string
 }
 
 export type UIFragmentNode = {
-  type: "fragment"
+  type: "ui fragment"
   children?: UINode[]
 }
 
-export type Statement = ReturnStatement
+export type Statement = ReturnStatement | PrintStatement
 
 export type ReturnStatement = {
   type: "return"
-  arg: UINode
+  arg: Expression
+}
+
+export type PrintStatement = {
+  type: "print"
+  arg: Expression
+}
+
+export type Expression = StringLiteral | NumberLiteral | BooleanLiteral | UINode
+
+export type StringLiteral = {
+  type: "string"
+  value: string
+}
+
+export type NumberLiteral = {
+  type: "number"
+  value: number
+}
+
+export type BooleanLiteral = {
+  type: "boolean"
+  value: boolean
 }
 
 export const interpretUINode = (code: UINode): React.ReactNode => {
   let children: React.ReactNode[]
 
-  if (code.type === "text") {
+  if (code.type === "ui text") {
     return code.text
   }
 
@@ -47,7 +69,7 @@ export const interpretUINode = (code: UINode): React.ReactNode => {
     })
   }
 
-  if (code.type === "element") {
+  if (code.type === "ui element") {
     const TagName = code.tag
 
     if (!code.children || code.children.length === 0) {
@@ -55,7 +77,7 @@ export const interpretUINode = (code: UINode): React.ReactNode => {
     }
 
     return React.createElement(TagName, { style: code.style }, children)
-  } else if (code.type === "fragment") {
+  } else if (code.type === "ui fragment") {
     return React.createElement(React.Fragment, null, children)
   } else {
     return null
@@ -64,8 +86,30 @@ export const interpretUINode = (code: UINode): React.ReactNode => {
 
 export const interpretComponent = (code: ComponentNode): React.ReactNode => {
   for (const statement of code.statements) {
-    if (statement.type === "return") {
-      return interpretUINode(statement.arg)
+    const res = interpretStatement(statement)
+
+    if (res) {
+      return res
     }
+  }
+}
+
+export const interpretStatement = (code: Statement): any => {
+  if (code.type === "return") {
+    return interpretExpression(code.arg)
+  } else if (code.type === "print") {
+    console.log(interpretExpression(code.arg))
+  }
+}
+
+export const interpretExpression = (code: Expression): React.ReactNode => {
+  if (code.type === "string") {
+    return code.value
+  } else if (code.type === "number") {
+    return code.value
+  } else if (code.type === "boolean") {
+    return code.value
+  } else if (code.type === "ui element" || code.type === "ui fragment" || code.type === "ui text") {
+    return interpretUINode(code)
   }
 }
