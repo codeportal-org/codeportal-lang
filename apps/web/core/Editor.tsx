@@ -104,7 +104,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
               completion !== ""
                 ? completion
                 : codeQuery.data && codeQuery.data.code !== null
-                ? codeQuery.data.code
+                ? JSON.stringify(codeQuery.data.code, null, 2)
                 : ""
             }
           />

@@ -3,7 +3,9 @@ import { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
 import React from "react"
 
+import { ComponentNode, interpretComponent } from "@/core/interpreter"
 import { db, schema } from "@/db/index"
+import { MainModule } from "@/db/schema"
 
 import { ClientComp } from "./ClientComp"
 
@@ -55,19 +57,28 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
    Server side code
   */
 
-  // Interpreter runs and renders the site GG!
   const siteRender = await portalServerRenderer({ mainModule: app.mainModule })
 
   return (
     <>
       {siteRender}
-      <ClientComp mainModule={app.mainModule} theme={app.theme} />
+      {/* <ClientComp mainModule={app.mainModule} theme={app.theme} /> */}
     </>
   )
 }
 
 export default SitePage
 
-async function portalServerRenderer({ mainModule }: { mainModule: any }) {
-  return <></>
+async function portalServerRenderer({
+  mainModule,
+}: {
+  mainModule: MainModule | null
+}): Promise<React.ReactNode> {
+  if (!mainModule) {
+    return <></>
+  }
+
+  const code: ComponentNode = mainModule.code
+
+  return interpretComponent(code)
 }

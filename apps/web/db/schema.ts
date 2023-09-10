@@ -3,7 +3,7 @@ import { index, json, mysqlTable, text, timestamp, varchar } from "drizzle-orm/m
 import { maxIDLength, nanoid } from "@/lib/nanoid"
 
 export type MainModule = {
-  code: string
+  code: any
 }
 
 export type ThemeColor = "zinc" | "blue" | "green" | "orange"
