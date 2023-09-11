@@ -2,6 +2,8 @@
 
 import { ArrowPathIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline"
 import * as ToggleGroup from "@radix-ui/react-toggle-group"
+import { Parser } from "acorn"
+import { LooseParser } from "acorn-loose"
 import { useCompletion } from "ai/react"
 import { useGetCode, useSaveCode } from "app/api/apps/[appId]/code/hooks"
 import { useGetTheme, useUpdateTheme } from "app/api/apps/[appId]/theme/hooks"
@@ -30,12 +32,15 @@ import { editorEmitter } from "./editorSingleton"
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
   const iframeRef = React.useRef<HTMLIFrameElement>(null)
+  const lastProcessedCompletionLengthRef = React.useRef(0)
 
   const [isLeftResizing, setIsLeftResizing] = useState(false)
   const [isRightResizing, setRightIsResizing] = useState(false)
 
   const codeQuery = useGetCode(appId)
   const saveCode = useSaveCode(appId)
+
+  const [ast, setAst] = useState<string>("")
 
   const [isFinished, setIsFinished] = useState(false)
 
@@ -71,6 +76,32 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
     }
   }, [codeQuery.data?.prompt])
 
+  React.useEffect(() => {
+    if (completion.length <= lastProcessedCompletionLengthRef.current + 10) {
+      return
+    }
+
+    let ast: any
+
+    if (!isFinished) {
+      ast = LooseParser.parse(completion, { ecmaVersion: "latest" })
+    } else {
+      try {
+        ast = Parser.parse(completion, { ecmaVersion: "latest" })
+      } catch (e: any) {
+        if (e.name === "SyntaxError") {
+          ast = LooseParser.parse(completion, { ecmaVersion: "latest" })
+        }
+      }
+    }
+
+    if (ast) {
+      setAst(JSON.stringify(ast))
+    }
+
+    lastProcessedCompletionLengthRef.current = completion.length
+  }, [completion, isFinished])
+
   return (
     <div className="overflow-hidden" style={{ height: "calc(100% - 32px)" }}>
       <PanelGroup direction="horizontal" disablePointerEventsDuringResize={true} className="h-full">
@@ -100,13 +131,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
             appId={appId}
             ref={completionContainerRef}
             isFinished={isFinished}
-            code={
-              completion !== ""
-                ? completion
-                : codeQuery.data && codeQuery.data.code !== null
-                ? JSON.stringify(codeQuery.data.code, null, 2)
-                : ""
-            }
+            code={completion}
           />
         </Panel>
         <PanelResizeHandle
