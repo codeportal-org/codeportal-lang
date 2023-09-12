@@ -1,9 +1,8 @@
 "use client"
 
+import { useClerk } from "@clerk/nextjs"
 import { ArrowPathIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline"
 import * as ToggleGroup from "@radix-ui/react-toggle-group"
-import { Parser } from "acorn"
-import { LooseParser } from "acorn-loose"
 import { useCompletion } from "ai/react"
 import { useGetCode, useSaveCode } from "app/api/apps/[appId]/code/hooks"
 import { useGetTheme, useUpdateTheme } from "app/api/apps/[appId]/theme/hooks"
@@ -27,20 +26,20 @@ import { ThemeColor } from "@/db/schema"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
+import { CodeProcessor } from "./codeProcessor"
 import { editorEmitter } from "./editorSingleton"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
+  const clerk = useClerk()
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
   const iframeRef = React.useRef<HTMLIFrameElement>(null)
-  const lastProcessedCompletionLengthRef = React.useRef(0)
+  const [codeProcessor] = React.useState(() => new CodeProcessor({ appId }))
 
   const [isLeftResizing, setIsLeftResizing] = useState(false)
   const [isRightResizing, setRightIsResizing] = useState(false)
 
   const codeQuery = useGetCode(appId)
   const saveCode = useSaveCode(appId)
-
-  const [ast, setAst] = useState<string>("")
 
   const [isFinished, setIsFinished] = useState(false)
 
@@ -50,6 +49,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
       onResponse: (response) => {
         if (response.ok) {
           setIsFinished(false)
+          codeProcessor.reset()
         }
       },
       onFinish: (prompt, completion) => {
@@ -76,31 +76,41 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
     }
   }, [codeQuery.data?.prompt])
 
+  const isCodeLoading = codeQuery.isLoading
+  const code = `function App(){${
+    isCodeLoading ? "}" : isLoading ? completion : codeQuery.data?.code
+  }`
+
   React.useEffect(() => {
-    if (completion.length <= lastProcessedCompletionLengthRef.current + 10) {
-      return
+    codeProcessor.setApiTokenFn(() => clerk.client.activeSessions[0]?.getToken() as any)
+
+    const removeListener = codeProcessor.onAST((ast) => {
+      console.log("AST emitted", ast)
+    })
+
+    return () => {
+      removeListener()
     }
+  }, [codeProcessor])
 
-    let ast: any
+  React.useEffect(() => {
+    async function processCode() {
+      if (isCodeLoading) {
+        return
+      }
 
-    if (!isFinished) {
-      ast = LooseParser.parse(completion, { ecmaVersion: "latest" })
-    } else {
-      try {
-        ast = Parser.parse(completion, { ecmaVersion: "latest" })
-      } catch (e: any) {
-        if (e.name === "SyntaxError") {
-          ast = LooseParser.parse(completion, { ecmaVersion: "latest" })
-        }
+      if (isLoading) {
+        await codeProcessor.processStep(code)
+      } else {
+        // in case processing was running, reset it
+        codeProcessor.reset()
+
+        const ast = codeProcessor.process(code)
+        console.log("FINAL --- ast", ast)
       }
     }
-
-    if (ast) {
-      setAst(JSON.stringify(ast))
-    }
-
-    lastProcessedCompletionLengthRef.current = completion.length
-  }, [completion, isFinished])
+    processCode()
+  }, [code, isFinished, isLoading, codeProcessor, isCodeLoading])
 
   return (
     <div className="overflow-hidden" style={{ height: "calc(100% - 32px)" }}>
@@ -131,7 +141,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
             appId={appId}
             ref={completionContainerRef}
             isFinished={isFinished}
-            code={completion}
+            code={code}
           />
         </Panel>
         <PanelResizeHandle

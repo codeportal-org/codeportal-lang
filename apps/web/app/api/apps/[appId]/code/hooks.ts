@@ -12,6 +12,6 @@ export const useSaveCode = (appId: string) =>
 
 export const useGetCode = (appId: string) =>
   useClerkSWR<{
-    code: ComponentNode
+    code: string
     prompt: string
   }>(`/api/apps/${appId}/code`)

@@ -33,13 +33,13 @@ export async function PATCH(request: Request, { params }: { params: { appId: str
 
   const completeCodeString = `{"type":"component","name":"App","statements":[${body.code}`
 
-  const code = JSON.parse(completeCodeString)
+  // const code = JSON.parse(completeCodeString)
 
   await db
     .update(schema.apps)
     .set({
       prompt: body.prompt,
-      mainModule: { code },
+      mainModule: { code: body.code },
       updatedAt: sql`now()`,
     })
     .where(eq(schema.apps.id, params.appId))

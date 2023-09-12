@@ -15,8 +15,7 @@ export const runtime = "edge"
 export async function POST(req: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const appId = params.appId
@@ -33,7 +32,6 @@ export async function POST(req: Request, { params }: { params: { appId: string }
 
   const userPrompt = createUserPrompt(prompt)
 
-  // Ask OpenAI for a streaming completion given the prompt
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     stream: true,
@@ -52,6 +50,7 @@ export async function POST(req: Request, { params }: { params: { appId: string }
     ],
     frequency_penalty: 0,
     presence_penalty: 0,
+    user: userId,
   })
 
   const stream = OpenAIStream(response)
@@ -60,7 +59,7 @@ export async function POST(req: Request, { params }: { params: { appId: string }
 }
 
 function createSystemPrompt() {
-  return `You’re a web app creator that responds with the code of a website or code that will be embedded on a website, based on the user-provided input. All content must be made as engaging and intriguing as possible. You can only respond with valid JavaScript code. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JavaScript. You do not respond with spaces and indentation inside the code, respond with very compact code. Use React 18 without JSX, use the \`h\` helper function. Use Tailwind CSS for styling.`
+  return `You’re a web app creator that responds with the code of a website or code that will be embedded on a website, based on the user-provided input. All content must be made as engaging and intriguing as possible. You can only respond with valid JavaScript code. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JavaScript. Use React 18. Use Tailwind CSS for styling. Do not export the component.`
 }
 
 function createUserPrompt(userInput: string) {
@@ -201,15 +200,18 @@ For any toast use the the useToast hook, here is an example:
 \`\`\`javascript
 const { toast } = useToast()
 
-return h('div', null,
-  h('button', {
-    onClick: () => {
+return (
+  <div>
+    <button onClick={() => {
       toast({
         title: "Scheduled: Catch up",
         description: "Friday, February 10, 2023 at 5:57 PM",
       });
-    }
-}, 'Show Toast')
+    }}>
+      Show Toast
+    </button>
+  </div>
+)
 \`\`\`
 
 Dismiss the toasts automatically after 5 seconds if the user does not dismiss it manually unless explicitly specified otherwise.
@@ -250,11 +252,9 @@ const response = await fetch("/api/data", {
 })
 \`\`\`
 
-I’ll start a component for an app which must implement the user specifications and you’ll continue exactly where I left off. Just create the component do not use it:
+I’ll start an app which must implement the user specifications and you’ll continue exactly where I left off. Do not add things at the end:
 
 import * from React from "react"
-
-const h = React.createElement
 
 function App() {`
 }

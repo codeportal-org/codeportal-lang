@@ -57,12 +57,12 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
    Server side code
   */
 
-  const siteRender = await portalServerRenderer({ mainModule: app.mainModule })
+  // const siteRender = await portalServerRenderer({ mainModule: app.mainModule })
 
   return (
     <>
-      {siteRender}
-      <ClientComp mainModule={app.mainModule} theme={app.theme} />
+      {/* {siteRender} */}
+      {/* <ClientComp mainModule={app.mainModule} theme={app.theme} /> */}
     </>
   )
 }

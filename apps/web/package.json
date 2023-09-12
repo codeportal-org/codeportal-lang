@@ -28,6 +28,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@vercel/analytics": "^1.0.1",
     "acorn": "^8.10.0",
+    "acorn-jsx": "^5.3.2",
     "acorn-loose": "^8.3.0",
     "ai": "^2.2.11",
     "carloslfu-cmdk-internal": "^0.3.0",
