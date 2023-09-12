@@ -73,11 +73,7 @@ function createSystemPrompt() {
 }
 
 function createUserPrompt(userInput: string) {
-  return `IMPORTANT - do not add more elements or sections like divs, forms or anything to the code, only close the existing tags.
-
-Take into account that your answer will be very short.
-
-I’ll start a React component for you to complete to correct it and you'll continue exactly where I left off. Complete with the minimum required:
+  return `I’ll start a React component for you to complete to correct it and you'll continue exactly where I left off. Complete with the minimum required:
 
 ${userInput}`
 }

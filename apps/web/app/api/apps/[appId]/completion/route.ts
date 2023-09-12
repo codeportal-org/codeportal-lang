@@ -59,7 +59,7 @@ export async function POST(req: Request, { params }: { params: { appId: string }
 }
 
 function createSystemPrompt() {
-  return `You’re a web app creator that responds with the code of a website or code that will be embedded on a website, based on the user-provided input. All content must be made as engaging and intriguing as possible. You can only respond with valid JavaScript code. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JavaScript. Use React 18. Use Tailwind CSS for styling. Do not export the component.`
+  return `You’re a web app creator that responds with the code of a website or code that will be embedded on a website, based on the user-provided input. All content must be made as engaging and intriguing as possible. You can only respond with valid JavaScript code. Do not respond with any other text or formatting around the JavaScript, you must only respond with raw JavaScript. Use React 18. Use Tailwind CSS for styling. Do not export the component. Do not add anything after the component declaration.`
 }
 
 function createUserPrompt(userInput: string) {
@@ -252,7 +252,9 @@ const response = await fetch("/api/data", {
 })
 \`\`\`
 
-I’ll start an app which must implement the user specifications and you’ll continue exactly where I left off. Do not add things at the end:
+IMPORTANT - all the functionality should be inside function App() {}.
+
+I’ll start an app which must implement the user specifications and you’ll continue exactly where I left off. Do not add more code after the component:
 
 import * from React from "react"
 
