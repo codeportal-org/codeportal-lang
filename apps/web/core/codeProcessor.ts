@@ -108,7 +108,9 @@ export class CodeProcessor {
       const functionStatements = ast?.body[0].body.body
       const returnStatement = functionStatements.find(
         (statement: any) =>
-          statement.type === "ReturnStatement" && statement.argument.type === "BinaryExpression",
+          statement.type === "ReturnStatement" &&
+          statement.argument &&
+          statement.argument.type === "BinaryExpression",
       )
 
       if (returnStatement) {
