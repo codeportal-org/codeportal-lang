@@ -6,102 +6,135 @@ import { ComponentNode, FunctionNode, ProgramNode, Statement } from "./interpret
  * Transforms the JS AST (ESTree) format into Portal Code Tree format.
  */
 export class ASTtoCTTransformer {
-  transform(ast: any) {
-    if (ast.type === "Program") {
-      return this.transformProgram(ast)
+  componentMode = false
+
+  transform(node: any) {
+    this.componentMode = false
+
+    if (node.type === "Program") {
+      return this.transformProgram(node)
     }
   }
 
-  transformProgram(ast: any): ProgramNode {
+  transformProgram(node: any): ProgramNode {
     const programNode: ProgramNode = {
       type: "program",
       body: [],
     }
 
-    for (const statement of ast.body) {
-      if (statement.type === "FunctionDeclaration" && statement.id.name === "App") {
-        programNode.body.push(this.transformAppFunction(statement))
+    for (const statement of node.body) {
+      if (statement.type === "FunctionDeclaration") {
+        // see if it is a React component
+        const statements = statement.body.body
+        const lastStatement = statements[statements.length - 1]
+        if (
+          lastStatement.type === "ReturnStatement" &&
+          lastStatement.argument.type === "JSXElement"
+        ) {
+          programNode.body.push(this.transformComponent(statement))
+        } else {
+          programNode.body.push(this.transformFunctionDeclaration(statement))
+        }
       }
     }
 
     return programNode
   }
 
-  transformAppFunction(ast: any): ComponentNode {
+  transformComponent(node: any): ComponentNode {
     let componentNode: ComponentNode = {
       type: "component",
       name: "App",
       body: [],
     }
 
-    for (const statement of ast.body.body) {
+    this.componentMode = true
+
+    for (const statement of node.body.body) {
       componentNode.body.push(this.transformStatement(statement))
     }
 
     return componentNode
   }
 
-  transformFunctionDeclaration(ast: any): FunctionNode {
+  transformFunctionDeclaration(node: any): FunctionNode {
     const functionNode: FunctionNode = {
       type: "function",
-      name: ast.id.name,
-      params: ast.params.map((param: any) => param.name),
+      name: node.id.name,
+      params: node.params.map((param: any) => param.name),
       body: [],
     }
 
-    for (const statement of ast.body.body) {
+    for (const statement of node.body.body) {
       functionNode.body.push(this.transformStatement(statement))
     }
 
     return functionNode
   }
 
-  transformStatement(ast: any): Statement {
-    if (ast.type === "VariableDeclaration") {
-      return this.transformVariableDeclaration(ast)
-    } else if (ast.type === "ReturnStatement") {
-      return this.transformReturnStatement(ast)
+  transformStatement(node: any): Statement {
+    if (node.type === "VariableDeclaration") {
+      return this.transformVariableDeclaration(node)
+    } else if (node.type === "ReturnStatement") {
+      return this.transformReturnStatement(node)
     } else {
-      throw new Error(`Unknown statement type: ${ast.type}`)
+      throw new Error(`Unknown statement type: ${node.type}`)
     }
   }
 
-  transformVariableDeclaration(ast: any): any {
+  transformVariableDeclaration(node: any): any {
+    // pattern matching React state
+    if (this.componentMode) {
+      if (
+        node.declarations[0].init.type === "CallExpression" &&
+        node.declarations[0].init.callee.object?.name === "React" &&
+        node.declarations[0].init.callee.property?.name === "useState"
+      ) {
+        return {
+          type: "state",
+          name: this.transformExpression(node.declarations[0].id.properties[0].value),
+          value: this.transformExpression(node.declarations[0].init),
+        }
+      }
+    }
+
     return {
       type: "var",
-      name: ast.declarations[0].id.name,
-      value: ast.declarations[0].init.value,
+      name: this.transformExpression(node.declarations[0].id),
+      value: this.transformExpression(node.declarations[0].init),
     }
   }
 
-  transformReturnStatement(ast: any): any {
+  transformReturnStatement(node: any): any {
     return {
       type: "return",
-      arg: this.transformExpression(ast.argument),
+      arg: this.transformExpression(node.argument),
     }
   }
 
-  transformExpression(ast: any) {
-    if (ast.type === "BinaryExpression") {
-      return this.transformBinaryExpression(ast)
-    } else if (ast.type === "Literal") {
-      return this.transformLiteral(ast)
+  transformExpression(node: any) {
+    if (node.type === "Identifier") {
+      return node.name
+    } else if (node.type === "BinaryExpression") {
+      return this.transformBinaryExpression(node)
+    } else if (node.type === "Literal") {
+      return this.transformLiteral(node)
     }
   }
 
-  transformLiteral(ast: any): any {
+  transformLiteral(node: any): any {
     return {
-      type: typeof ast.value,
-      value: ast.value,
+      type: typeof node.value,
+      value: node.value,
     }
   }
 
-  transformBinaryExpression(ast: any): any {
+  transformBinaryExpression(node: any): any {
     return {
       type: "binary expression",
-      operator: ast.operator,
-      left: this.transformExpression(ast.left),
-      right: this.transformExpression(ast.right),
+      operator: node.operator,
+      left: this.transformExpression(node.left),
+      right: this.transformExpression(node.right),
     }
   }
 }

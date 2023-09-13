@@ -38,7 +38,7 @@ export type UIFragmentNode = {
   children?: UINode[]
 }
 
-export type Statement = ReturnStatement | PrintStatement | ComponentNode
+export type Statement = ReturnStatement | PrintStatement | ComponentNode | FunctionNode
 
 export type ReturnStatement = {
   type: "return"
