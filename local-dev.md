@@ -11,6 +11,10 @@ Run:
 
 - pnpm dev:all
 
+Run web tests:
+
+- pnpm web:test
+
 Push db changes:
 
 - pnpm db:push
