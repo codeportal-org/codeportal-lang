@@ -1,9 +1,11 @@
 import {
-  CallExpressionNode,
+  AssignmentStatement,
   ComponentNode,
   Expression,
+  FunctionCallNode,
   FunctionNode,
   ParamDeclaration,
+  PathAccessNode,
   ProgramNode,
   ReferenceNode,
   Statement,
@@ -102,8 +104,10 @@ export class ASTtoCTTransformer {
       return this.transformVariableDeclaration(node)
     } else if (node.type === "ReturnStatement") {
       return this.transformReturnStatement(node)
+    } else if (node.type === "ExpressionStatement") {
+      return this.transformExpressionStatement(node)
     } else {
-      // throw new Error(`Unknown statement type: ${node.type}`)
+      throw new Error(`Unknown statement type: ${node.type}`)
     }
   }
 
@@ -168,6 +172,8 @@ export class ASTtoCTTransformer {
       return this.transformJSXElement(node)
     } else if (node.type === "CallExpression") {
       return this.transformCallExpression(node)
+    } else if (node.type === "MemberExpression") {
+      return this.transformMemberExpression(node)
     }
 
     throw new Error(`Unknown expression type: ${node.type}`)
@@ -238,11 +244,68 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformCallExpression(node: any): CallExpressionNode {
+  transformCallExpression(node: any): FunctionCallNode {
+    let callee: ReferenceNode | PathAccessNode
+
+    if (node.callee.type === "MemberExpression") {
+      callee = this.transformMemberExpression(node.callee)
+    } else if (node.callee.type === "Identifier") {
+      callee = this.transformIdentifier(node.callee)
+    } else {
+      throw new Error(`Unknown call expression callee type: ${node.callee.type}`)
+    }
+
     return {
-      type: "call expression",
-      callee: this.transformExpression(node.callee),
+      type: "function call",
+      callee,
       args: node.arguments.map((argument: any) => this.transformExpression(argument)),
+    }
+  }
+
+  transformExpressionStatement(node: any): any {
+    if (node.expression.type === "AssignmentExpression") {
+      return this.transformAssignmentExpression(node.expression)
+    } else if (node.expression.type === "CallExpression") {
+      return this.transformCallExpression(node.expression)
+    }
+
+    throw new Error(`Unknown expression statement type: ${node.expression.type}`)
+  }
+
+  transformAssignmentExpression(node: any): any {
+    const left = node.left
+
+    let leftNode: ReferenceNode | PathAccessNode
+    if (left.type === "MemberExpression") {
+      leftNode = this.transformMemberExpression(left)
+    } else if (left.type === "Identifier") {
+      leftNode = this.transformIdentifier(left)
+    } else {
+      throw new Error(`Unknown assignment left type: ${left.type}`)
+    }
+
+    return {
+      type: "assignment",
+      operator: node.operator,
+      left: leftNode,
+      right: this.transformExpression(node.right),
+    } satisfies AssignmentStatement
+  }
+
+  transformMemberExpression(node: any): PathAccessNode {
+    let path: any[] = []
+
+    let current = node
+    while (current.type === "MemberExpression") {
+      path.push(this.transformExpression(current.property))
+      current = current.object
+    }
+
+    path.push(this.transformExpression(current))
+
+    return {
+      type: "path access",
+      path: path.reverse(),
     }
   }
 }

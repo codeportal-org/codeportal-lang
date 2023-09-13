@@ -326,6 +326,48 @@ describe("astTransformer", () => {
     }).toThrow()
   })
 
+  it("should transform a program with MemberExpression like obj.value", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          obj.value = 0
+        `,
+        { ecmaVersion: "latest" },
+      ),
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      body: [
+        {
+          type: "assignment",
+          operator: "=",
+          left: {
+            type: "path access",
+            path: [
+              {
+                type: "ref",
+                name: "obj",
+              },
+              {
+                type: "ref",
+                name: "value",
+              },
+            ],
+          },
+          right: {
+            type: "number",
+            value: 0,
+          },
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
+  return
+
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
     const transformer = new ASTtoCTTransformer()
 

@@ -67,10 +67,25 @@ export type Statement =
   | VarStatement
   | StateStatement
   | FunctionCallNode
+  | AssignmentStatement
 
 export type ReturnStatement = {
   type: "return"
   arg: Expression
+}
+
+export type AssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%="
+
+export type AssignmentStatement = {
+  type: "assignment"
+  operator: AssignmentOperator
+  left: ReferenceNode | PathAccessNode
+  right: Expression
+}
+
+export type PathAccessNode = {
+  type: "path access"
+  path: Expression[]
 }
 
 export type VarStatement = {
@@ -93,11 +108,10 @@ export type PrintStatement = {
 export type Expression =
   | Literal
   | UINode
-  | CallExpressionNode
   | ReferenceNode
   | InlineFunctionNode
-  | CallExpressionNode
   | FunctionCallNode
+  | PathAccessNode
 
 export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
 
@@ -136,18 +150,12 @@ export type ParamDeclaration = {
   name: string
 }
 
-export type CallExpressionNode = {
-  type: "call expression"
-  callee: Expression
-  args: Expression[]
-}
-
 /**
  * A function call can be both an expression and a statement. We avoid the use of a ExpressionStatement node.
  */
 export type FunctionCallNode = {
   type: "function call"
-  callee: Expression
+  callee: ReferenceNode | PathAccessNode
   args: Expression[]
 }
 
