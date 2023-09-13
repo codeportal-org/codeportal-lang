@@ -44,7 +44,7 @@ export class ASTtoCTTransformer {
   transformComponent(node: any): ComponentNode {
     let componentNode: ComponentNode = {
       type: "component",
-      name: "App",
+      name: node.id.name,
       body: [],
     }
 
@@ -72,13 +72,13 @@ export class ASTtoCTTransformer {
     return functionNode
   }
 
-  transformStatement(node: any): Statement {
+  transformStatement(node: any): Statement | any {
     if (node.type === "VariableDeclaration") {
       return this.transformVariableDeclaration(node)
     } else if (node.type === "ReturnStatement") {
       return this.transformReturnStatement(node)
     } else {
-      throw new Error(`Unknown statement type: ${node.type}`)
+      // throw new Error(`Unknown statement type: ${node.type}`)
     }
   }
 
@@ -92,10 +92,26 @@ export class ASTtoCTTransformer {
       ) {
         return {
           type: "state",
-          name: this.transformExpression(node.declarations[0].id.properties[0].value),
-          value: this.transformExpression(node.declarations[0].init),
+          name: node.declarations[0].id.elements[0].name,
+          value: this.transformExpression(node.declarations[0].init.arguments[0]),
         }
       }
+    }
+
+    // transform arrow functions into regular functions
+    if (node.declarations[0].init.type === "ArrowFunctionExpression") {
+      const functionNode: FunctionNode = {
+        type: "function",
+        name: node.declarations[0].id.name,
+        params: node.declarations[0].init.params.map((param: any) => param.name),
+        body: [],
+      }
+
+      for (const statement of node.declarations[0].init.body.body) {
+        functionNode.body.push(this.transformStatement(statement))
+      }
+
+      return functionNode
     }
 
     return {

@@ -1,83 +1,79 @@
 import { cn } from "@/lib/utils"
 
-export const ASTView = ({ ast }: { ast: any }) => {
+import { Expression, ProgramNode, Statement } from "./interpreter"
+
+export const ASTView = ({ ast }: { ast: ProgramNode }) => {
   return (
-    <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2 text-lg">
-      {ast.type === "Program" &&
-        ast.body.map((node: any) => {
-          return <StatementView node={node} key={node.start} root={true} />
+    <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
+      {ast.type === "program" &&
+        ast.body.map((node, idx) => {
+          return <StatementView node={node} key={idx} />
         })}
     </div>
   )
 }
 
-export const StatementView = ({ node, root }: { node: any; root?: boolean }) => {
+export const StatementView = ({ node }: { node: Statement }) => {
+  if (!node) return null
+
   return (
     <>
-      {node.type === "FunctionDeclaration" && (
+      {node.type === "component" && (
         <div className="flex cursor-pointer flex-col rounded-xl px-2 py-1 hover:bg-gray-100">
           <div className="flex flex-row">
-            {root && <Keyword>component</Keyword>}
-            {!root && <Keyword>function</Keyword>}
-            <Callable> {node.id.name} </Callable>
+            <Keyword>component</Keyword>
+            <Callable> {node.name} </Callable>
             <div className="text-gray-500">
-              ({node.params.map((param: any) => param.name).join(", ")})
+              {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
             </div>
           </div>
           <StatementList>
-            {node.body.body.map((node: any) => {
-              // Display React.state as: state foo = 0
-              if (
-                node.type === "VariableDeclaration" &&
-                node.declarations[0].init.type === "CallExpression" &&
-                node.declarations[0].init.callee.object?.name === "React" &&
-                node.declarations[0].init.callee.property?.name === "useState"
-              ) {
-                return (
-                  <div className="flex flex-row">
-                    <Keyword className="mr-2">state</Keyword>
-                    <div className="text-gray-500">{node.declarations[0].id.elements[0].name}</div>
-                    <CodeSymbol className="mx-2">=</CodeSymbol>
-                    <ExpressionView node={node.declarations[0].init.arguments[0]} />
-                  </div>
-                )
-              }
-
-              return <StatementView node={node} key={node.start} />
+            {node.body.map((node, idx) => {
+              return <StatementView node={node} key={idx} />
             })}
           </StatementList>
         </div>
       )}
-      {node.type === "VariableDeclaration" && (
-        <>
+      {node.type === "function" && (
+        <div className="flex cursor-pointer flex-col rounded-xl px-2 py-1 hover:bg-gray-100">
           <div className="flex flex-row">
-            <Keyword>var</Keyword>
-            <div className="text-gray-500"> {node.declarations[0].id.name} </div>
-            <div className="text-gray-500">=</div>
-            {node.declarations[0].init.type !== "ArrowFunctionExpression" ||
-              (node.declarations[0].init.expression && (
-                <ExpressionView node={node.declarations[0].init} />
-              ))}
+            <Keyword>fun</Keyword>
+            <Callable> {node.name} </Callable>
+            <div className="text-gray-500">
+              {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
+            </div>
           </div>
-          <div className="ml-9">
-            {node.declarations[0].init.type === "ArrowFunctionExpression" &&
-              !node.declarations[0].init.expression && (
-                <ExpressionView node={node.declarations[0].init} />
-              )}
-          </div>
-        </>
+          <StatementList>
+            {node.body.map((node, idx) => {
+              return <StatementView node={node} key={idx} />
+            })}
+          </StatementList>
+        </div>
       )}
-      {node.type === "ExpressionStatement" && <ExpressionView node={node.expression} />}
+      {node.type === "var" && (
+        <div className="flex flex-row">
+          <Keyword>var</Keyword>
+          <div className="text-gray-500"> {node.name} </div>
+          <div className="text-gray-500">=</div>
+
+          <ExpressionView node={node.value} />
+        </div>
+      )}
+      {/* {node.type === "expression" && <ExpressionView node={node.expression} />} */}
     </>
   )
 }
 
-export const ExpressionView = ({ node }: { node: any }) => {
+export const ExpressionView = ({ node }: { node: Expression }) => {
+  if (!node) return null
+
   return (
     <>
-      {node.type === "Literal" && <div className="text-gray-500"> {node.value} </div>}
-      {node.type === "Identifier" && <div className="text-gray-500"> {node.name} </div>}
-      {node.type === "CallExpression" && (
+      {node.type === "string" && <div className="text-gray-500"> {node.value} </div>}
+      {node.type === "number" && <div className="text-gray-500"> {node.value} </div>}
+      {node.type === "boolean" && <div className="text-gray-500"> {node.value} </div>}
+      {/* {node.type === "Identifier" && <div className="text-gray-500"> {node.name} </div>} */}
+      {/* {node.type === "CallExpression" && (
         <div className="flex flex-row">
           <Callable> {node.callee.name} </Callable>
           <div className="text-gray-500"> (</div>
@@ -86,8 +82,8 @@ export const ExpressionView = ({ node }: { node: any }) => {
           ))}
           <div className="text-gray-500">) </div>
         </div>
-      )}
-      {node.type === "ArrowFunctionExpression" && (
+      )} */}
+      {/* {node.type === "ArrowFunctionExpression" && (
         <>
           <div className="flex flex-row">
             <Keyword>function (</Keyword>
@@ -105,8 +101,8 @@ export const ExpressionView = ({ node }: { node: any }) => {
             </StatementList>
           )}
         </>
-      )}
-      {node.type === "CallExpression" && (
+      )} */}
+      {/* {node.type === "CallExpression" && (
         <div className="flex flex-row">
           <div className="text-gray-500"> {node.callee.name} </div>
           <div className="text-gray-500"> (</div>
@@ -122,7 +118,7 @@ export const ExpressionView = ({ node }: { node: any }) => {
           <div className="text-gray-500">.</div>
           <div className="text-gray-500"> {node.property.name} </div>
         </div>
-      )}
+      )} */}
     </>
   )
 }

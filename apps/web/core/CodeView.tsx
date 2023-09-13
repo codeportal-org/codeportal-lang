@@ -41,9 +41,9 @@ const CodeContainer = React.forwardRef<
     }
   }, [code, isFinished])
 
-  // if (ast) {
-  //   return <ASTView ast={ast} />
-  // }
+  if (ast) {
+    return <ASTView ast={ast} />
+  }
 
   return (
     <div

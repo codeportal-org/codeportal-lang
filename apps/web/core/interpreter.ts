@@ -38,11 +38,22 @@ export type UIFragmentNode = {
   children?: UINode[]
 }
 
-export type Statement = ReturnStatement | PrintStatement | ComponentNode | FunctionNode
+export type Statement =
+  | ReturnStatement
+  | PrintStatement
+  | ComponentNode
+  | FunctionNode
+  | VarStatement
 
 export type ReturnStatement = {
   type: "return"
   arg: Expression
+}
+
+export type VarStatement = {
+  type: "var"
+  name: string
+  value: Expression
 }
 
 export type PrintStatement = {
