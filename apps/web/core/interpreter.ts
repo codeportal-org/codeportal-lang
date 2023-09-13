@@ -23,7 +23,8 @@ export type FunctionNode = {
 
 export type UIElementNode = {
   type: "ui element"
-  tag: string
+  name: string
+  attributes: Record<string, any>
   style?: Record<string, any>
   children?: UINode[]
 }
@@ -94,7 +95,7 @@ export const interpretUINode = (code: UINode): React.ReactNode => {
   }
 
   if (code.type === "ui element") {
-    const TagName = code.tag
+    const TagName = code.name
 
     if (!code.children || code.children.length === 0) {
       return React.createElement(TagName, { style: code.style })

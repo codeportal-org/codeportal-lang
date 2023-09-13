@@ -1,0 +1,100 @@
+{
+  "type": "program",
+  "body": [
+    {
+      "type": "component",
+      "name": "App",
+      "body": [
+        {
+          "type": "var"
+        },
+        {
+          "type": "function",
+          "name": "handleSubmit",
+          "params": [
+            "event"
+          ],
+          "body": [
+            null,
+            null
+          ]
+        },
+        {
+          "type": "return",
+          "arg": {
+            "type": "ui element",
+            "name": "div",
+            "attributes": [],
+            "children": [
+              {
+                "type": "ui element",
+                "name": "h1",
+                "attributes": [],
+                "children": [
+                  {
+                    "type": "ui text",
+                    "text": "Hello, "
+                  },
+                  null,
+                  {
+                    "type": "ui text",
+                    "text": "!"
+                  }
+                ]
+              },
+              {
+                "type": "ui element",
+                "name": "form",
+                "attributes": [
+                  {
+                    "type": "attribute",
+                    "name": "onSubmit"
+                  }
+                ],
+                "children": [
+                  {
+                    "type": "ui element",
+                    "name": "input",
+                    "attributes": [
+                      {
+                        "type": "attribute",
+                        "name": "type",
+                        "value": "text"
+                      },
+                      {
+                        "type": "attribute",
+                        "name": "value"
+                      },
+                      {
+                        "type": "attribute",
+                        "name": "onChange"
+                      }
+                    ],
+                    "children": []
+                  },
+                  {
+                    "type": "ui element",
+                    "name": "button",
+                    "attributes": [
+                      {
+                        "type": "attribute",
+                        "name": "type",
+                        "value": "submit"
+                      }
+                    ],
+                    "children": [
+                      {
+                        "type": "ui text",
+                        "text": "Submit"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

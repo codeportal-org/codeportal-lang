@@ -1,6 +1,13 @@
 import acorn from "acorn"
 
-import { ComponentNode, FunctionNode, ProgramNode, Statement } from "./interpreter"
+import {
+  ComponentNode,
+  FunctionNode,
+  ProgramNode,
+  Statement,
+  UIElementNode,
+  UITextNode,
+} from "./interpreter"
 
 /**
  * Transforms the JS AST (ESTree) format into Portal Code Tree format.
@@ -27,12 +34,17 @@ export class ASTtoCTTransformer {
         // see if it is a React component
         const statements = statement.body.body
         const lastStatement = statements[statements.length - 1]
+
+        console.log("---- lastStatement", lastStatement.type, lastStatement.argument.type)
         if (
+          lastStatement &&
           lastStatement.type === "ReturnStatement" &&
           lastStatement.argument.type === "JSXElement"
         ) {
+          console.log("---- component")
           programNode.body.push(this.transformComponent(statement))
         } else {
+          console.log("---- function")
           programNode.body.push(this.transformFunctionDeclaration(statement))
         }
       }
@@ -42,13 +54,13 @@ export class ASTtoCTTransformer {
   }
 
   transformComponent(node: any): ComponentNode {
+    this.componentMode = true
+
     let componentNode: ComponentNode = {
       type: "component",
       name: node.id.name,
       body: [],
     }
-
-    this.componentMode = true
 
     for (const statement of node.body.body) {
       componentNode.body.push(this.transformStatement(statement))
@@ -61,7 +73,7 @@ export class ASTtoCTTransformer {
     const functionNode: FunctionNode = {
       type: "function",
       name: node.id.name,
-      params: node.params.map((param: any) => param.name),
+      params: node.params?.map((param: any) => param.name) || [],
       body: [],
     }
 
@@ -83,7 +95,7 @@ export class ASTtoCTTransformer {
   }
 
   transformVariableDeclaration(node: any): any {
-    // pattern matching React state
+    // pattern matching React state, it detects `React.useState`
     if (this.componentMode) {
       if (
         node.declarations[0].init.type === "CallExpression" &&
@@ -135,6 +147,8 @@ export class ASTtoCTTransformer {
       return this.transformBinaryExpression(node)
     } else if (node.type === "Literal") {
       return this.transformLiteral(node)
+    } else if (node.type === "JSXElement") {
+      return this.transformJSXElement(node)
     }
   }
 
@@ -151,6 +165,37 @@ export class ASTtoCTTransformer {
       operator: node.operator,
       left: this.transformExpression(node.left),
       right: this.transformExpression(node.right),
+    }
+  }
+
+  transformJSXElement(node: any): UIElementNode {
+    return {
+      type: "ui element",
+      name: node.openingElement.name.name,
+      attributes: node.openingElement.attributes.map((attribute: any) => {
+        return {
+          type: "attribute",
+          name: attribute.name.name,
+          value: attribute.value.value,
+        }
+      }),
+      children: node.children
+        .map((child: any) => {
+          if (child.type === "JSXElement") {
+            return this.transformJSXElement(child)
+          } else if (child.type === "JSXText") {
+            // ignore whitespace like JSX with value "\n   " that is just indentation
+            if (child.value.trim() === "") {
+              return null
+            }
+
+            return {
+              type: "ui text",
+              text: child.value,
+            } as UITextNode
+          }
+        })
+        .filter((child: any) => child !== null),
     }
   }
 }
