@@ -14,10 +14,10 @@ export function ClientComp({
   theme: ThemeConfig | null
 }) {
   React.useEffect(() => {
-    console.log("---- client side code")
+    // console.log("---- client side code")
   }, [])
 
-  console.log("ClientComp---->")
+  // console.log("ClientComp---->")
 
   return <></>
 }

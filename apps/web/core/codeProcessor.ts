@@ -23,11 +23,20 @@ export class CodeProcessor {
   private maxApiCalls = 1
   private numApiCalls = 0
 
+  private middlewareFn: ((ast: any) => any) | null = null
+
   lastAPICallTimestamp = 0
 
   private events = createNanoEvents()
 
   constructor(public options: { appId: string }) {}
+
+  /**
+   * This is used to modify the AST before it is emitted.
+   */
+  extend(middlewareFn: (ast: any) => any) {
+    this.middlewareFn = middlewareFn
+  }
 
   setApiTokenFn(apiTokenFn: () => string | null) {
     this.apiTokenFn = apiTokenFn
@@ -48,24 +57,16 @@ export class CodeProcessor {
     }
     this.lastProcessedCodeLength = code.length
 
-    console.log("---- processStep -- PASSED")
-
     if (this.jsxMode) {
-      console.log("---- processStep -- JSX MODE")
-
       if (this.numApiCalls >= this.maxApiCalls) {
-        console.log("---- processStep -- TOO MANY API CALLS")
         return
       }
 
       if (Date.now() - this.lastAPICallTimestamp < this.minAPICallInterval) {
-        console.log("---- processStep -- TOO SOON")
         return
       }
 
       const token = await this.apiTokenFn()
-
-      console.log("---- processStep -- CALLING API", token)
 
       const returnCodeSection = code.slice(this.returnStatement.start)
 
@@ -85,8 +86,6 @@ export class CodeProcessor {
       this.characterLengthStep = 1000
 
       const data: JSXSyntaxCompletionResponse = await res.json()
-
-      console.log("---- data", data.completion)
 
       if (data.completion === "") {
         return
@@ -119,12 +118,8 @@ export class CodeProcessor {
 
         // JSX is more verbose so we will add a larger step
         this.characterLengthStep = 600
-
-        console.log("---- processStep -- ACTIVATED JSX MODE")
       }
     }
-
-    console.log("---- processStep -- RETURNED AST", ast)
 
     this.emitAST(ast)
   }
@@ -137,6 +132,10 @@ export class CodeProcessor {
       console.log(e)
     }
 
+    if (this.middlewareFn) {
+      ast = this.middlewareFn(ast)
+    }
+
     return ast
   }
 
@@ -145,6 +144,10 @@ export class CodeProcessor {
   }
 
   private emitAST(ast: any) {
-    this.events.emit("ast", ast)
+    let newAst = ast
+    if (this.middlewareFn) {
+      newAst = this.middlewareFn(ast)
+    }
+    this.events.emit("ast", newAst)
   }
 }

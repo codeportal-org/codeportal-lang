@@ -12,6 +12,7 @@
     "format": "prettier --write \"**/*.{css,js,json,jsx,ts,tsx,md}\"",
     "db:push": "turbo run drizzle:push --filter web",
     "dev:all": "pnpm dev",
+    "web:test": "turbo test --filter web",
     "changeset": "changeset",
     "version": "changeset version",
     "publish-packages": "turbo run build lint test && changeset version && changeset publish"

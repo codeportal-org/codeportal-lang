@@ -1,11 +1,24 @@
 import React from "react"
 
+export type ProgramNode = {
+  type: "program"
+  body: Statement[]
+}
+
 export type UINode = UIElementNode | UITextNode | UIFragmentNode
 
 export type ComponentNode = {
   type: "component"
   name: string
-  statements: Statement[]
+  props?: Record<string, any>
+  body: Statement[]
+}
+
+export type FunctionNode = {
+  type: "function"
+  name: string
+  params: string[]
+  body: Statement[]
 }
 
 export type UIElementNode = {
@@ -25,7 +38,7 @@ export type UIFragmentNode = {
   children?: UINode[]
 }
 
-export type Statement = ReturnStatement | PrintStatement
+export type Statement = ReturnStatement | PrintStatement | ComponentNode
 
 export type ReturnStatement = {
   type: "return"
@@ -85,7 +98,7 @@ export const interpretUINode = (code: UINode): React.ReactNode => {
 }
 
 export const interpretComponent = (code: ComponentNode): React.ReactNode => {
-  for (const statement of code.statements) {
+  for (const statement of code.body) {
     const res = interpretStatement(statement)
 
     if (res) {

@@ -26,6 +26,7 @@ import { ThemeColor } from "@/db/schema"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
+import { ASTtoCTTransformer } from "./astTransformer"
 import { CodeProcessor } from "./codeProcessor"
 import { editorEmitter } from "./editorSingleton"
 
@@ -33,7 +34,10 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
   const clerk = useClerk()
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
   const iframeRef = React.useRef<HTMLIFrameElement>(null)
+
+  const [astTransformer] = React.useState(() => new ASTtoCTTransformer())
   const [codeProcessor] = React.useState(() => new CodeProcessor({ appId }))
+  const [ast, setAst] = React.useState<any>(null)
 
   const [isLeftResizing, setIsLeftResizing] = useState(false)
   const [isRightResizing, setRightIsResizing] = useState(false)
@@ -84,14 +88,17 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
   React.useEffect(() => {
     codeProcessor.setApiTokenFn(() => clerk.client.activeSessions[0]?.getToken() as any)
 
+    codeProcessor.extend((ast) => astTransformer.transform(ast))
+
     const removeListener = codeProcessor.onAST((ast) => {
       console.log("AST emitted", ast)
+      setAst(ast)
     })
 
     return () => {
       removeListener()
     }
-  }, [codeProcessor])
+  }, [codeProcessor, astTransformer])
 
   React.useEffect(() => {
     async function processCode() {
@@ -107,6 +114,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 
         const ast = codeProcessor.process(code)
         console.log("FINAL --- ast", ast)
+        setAst(ast)
       }
     }
     processCode()
@@ -142,6 +150,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
             ref={completionContainerRef}
             isFinished={isFinished}
             code={code}
+            ast={ast}
           />
         </Panel>
         <PanelResizeHandle
