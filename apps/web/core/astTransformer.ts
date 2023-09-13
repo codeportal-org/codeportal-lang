@@ -9,6 +9,7 @@ import {
   Statement,
   UIElementNode,
   UIExpressionNode,
+  UIPropNode,
   UITextNode,
 } from "./interpreter"
 
@@ -199,12 +200,12 @@ export class ASTtoCTTransformer {
     return {
       type: "ui element",
       name: node.openingElement.name.name,
-      attributes: node.openingElement.attributes.map((attribute: any) => {
+      props: node.openingElement.attributes.map((attribute: any) => {
         return {
-          type: "attribute",
+          type: "ui prop",
           name: attribute.name.name,
           value: attribute.value.value,
-        }
+        } satisfies UIPropNode
       }),
       children: node.children
         .map((child: any) => {

@@ -15,21 +15,25 @@ export type ComponentNode = {
 }
 
 export type UIPropDeclaration = {
-  type: "ui prop"
+  type: "ui prop declaration"
   name: string
   value: Expression
 }
 
+/**
+ * Can be a React component use or an html element use.
+ * The difference is that a React component use has a capital letter.
+ */
 export type UIElementNode = {
   type: "ui element"
   name: string
-  attributes: UIAttributeNode[]
+  props?: UIPropNode[]
   style?: UIStyleNode[]
   children?: UINode[]
 }
 
-export type UIAttributeNode = {
-  type: "ui attribute"
+export type UIPropNode = {
+  type: "ui prop"
   name: string
   value: Expression
 }
@@ -62,6 +66,7 @@ export type Statement =
   | FunctionNode
   | VarStatement
   | StateStatement
+  | FunctionCallNode
 
 export type ReturnStatement = {
   type: "return"
@@ -85,7 +90,14 @@ export type PrintStatement = {
   arg: Expression
 }
 
-export type Expression = Literal | UINode | CallExpressionNode | ReferenceNode
+export type Expression =
+  | Literal
+  | UINode
+  | CallExpressionNode
+  | ReferenceNode
+  | InlineFunctionNode
+  | CallExpressionNode
+  | FunctionCallNode
 
 export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
 
@@ -115,7 +127,7 @@ export type BooleanLiteral = {
 export type FunctionNode = {
   type: "function"
   name: string
-  params: ParamDeclaration[]
+  params?: ParamDeclaration[]
   body: Statement[]
 }
 
@@ -128,6 +140,21 @@ export type CallExpressionNode = {
   type: "call expression"
   callee: Expression
   args: Expression[]
+}
+
+/**
+ * A function call can be both an expression and a statement. We avoid the use of a ExpressionStatement node.
+ */
+export type FunctionCallNode = {
+  type: "function call"
+  callee: Expression
+  args: Expression[]
+}
+
+export type InlineFunctionNode = {
+  type: "inline function"
+  params: ParamDeclaration[]
+  body: Statement[]
 }
 
 export const interpretUINode = (code: UINode): React.ReactNode => {

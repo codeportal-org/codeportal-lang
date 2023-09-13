@@ -46,7 +46,7 @@ describe("astTransformer", () => {
               arg: {
                 type: "ui element",
                 name: "div",
-                attributes: [],
+                props: [],
                 children: [],
               },
             },
@@ -125,12 +125,12 @@ describe("astTransformer", () => {
               arg: {
                 type: "ui element",
                 name: "div",
-                attributes: [],
+                props: [],
                 children: [
                   {
                     type: "ui element",
                     name: "h1",
-                    attributes: [],
+                    props: [],
                     children: [
                       {
                         type: "ui text",
@@ -141,7 +141,7 @@ describe("astTransformer", () => {
                   {
                     type: "ui element",
                     name: "p",
-                    attributes: [],
+                    props: [],
                     children: [
                       {
                         type: "ui text",
@@ -152,12 +152,12 @@ describe("astTransformer", () => {
                   {
                     type: "ui element",
                     name: "ul",
-                    attributes: [],
+                    props: [],
                     children: [
                       {
                         type: "ui element",
                         name: "li",
-                        attributes: [],
+                        props: [],
                         children: [
                           {
                             type: "ui text",
@@ -216,12 +216,12 @@ describe("astTransformer", () => {
               arg: {
                 type: "ui element",
                 name: "div",
-                attributes: [],
+                props: [],
                 children: [
                   {
                     type: "ui element",
                     name: "h1",
-                    attributes: [],
+                    props: [],
                     children: [
                       {
                         type: "ui text",
@@ -278,12 +278,12 @@ describe("astTransformer", () => {
               arg: {
                 type: "ui element",
                 name: "div",
-                attributes: [],
+                props: [],
                 children: [
                   {
                     type: "ui element",
                     name: "h1",
-                    attributes: [],
+                    props: [],
                     children: [
                       {
                         type: "ui expression",
@@ -325,8 +325,6 @@ describe("astTransformer", () => {
       )
     }).toThrow()
   })
-
-  return
 
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
     const transformer = new ASTtoCTTransformer()
@@ -384,10 +382,7 @@ describe("astTransformer", () => {
           body: [
             {
               type: "state",
-              name: {
-                type: "identifier",
-                name: "name",
-              },
+              name: "name",
               value: {
                 type: "string",
                 value: "",
@@ -395,10 +390,7 @@ describe("astTransformer", () => {
             },
             {
               type: "function",
-              name: {
-                type: "identifier",
-                name: "handleSubmit",
-              },
+              name: "handleSubmit",
               body: [
                 // {
                 //   type: "try",
@@ -436,12 +428,12 @@ describe("astTransformer", () => {
               arg: {
                 type: "ui element",
                 name: "div",
-                attributes: [],
+                props: [],
                 children: [
                   {
                     type: "ui element",
                     name: "h1",
-                    attributes: [],
+                    props: [],
                     children: [
                       {
                         type: "ui text",
@@ -452,44 +444,78 @@ describe("astTransformer", () => {
                   {
                     type: "ui element",
                     name: "form",
-                    attributes: [
+                    props: [
                       {
-                        type: "attribute",
+                        type: "ui prop",
                         name: "onSubmit",
-                        value: "handleSubmit",
+                        value: {
+                          type: "ref",
+                          name: "handleSubmit",
+                        },
                       },
                     ],
                     children: [
                       {
                         type: "ui element",
                         name: "input",
-                        attributes: [
+                        props: [
                           {
-                            type: "attribute",
+                            type: "ui prop",
                             name: "type",
-                            value: "text",
+                            value: {
+                              type: "string",
+                              value: "text",
+                            },
                           },
                           {
-                            type: "attribute",
+                            type: "ui prop",
                             name: "value",
-                            value: "name",
+                            value: {
+                              type: "string",
+                              value: "name",
+                            },
                           },
                           {
-                            type: "attribute",
+                            type: "ui prop",
                             name: "onChange",
-                            // TODO: implement this
-                            value: "(event) => setName(event.target.value)",
+                            value: {
+                              type: "inline function",
+                              params: [
+                                {
+                                  type: "param",
+                                  name: "event",
+                                },
+                              ],
+                              body: [
+                                {
+                                  type: "function call",
+                                  callee: {
+                                    type: "ref",
+                                    name: "setName",
+                                  },
+                                  args: [
+                                    {
+                                      type: "ref",
+                                      name: "event.target.value",
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
                           },
                         ],
                       },
                       {
                         type: "ui element",
                         name: "button",
-                        attributes: [
+                        props: [
                           {
-                            type: "attribute",
+                            type: "ui prop",
                             name: "type",
-                            value: "submit",
+                            value: {
+                              type: "string",
+                              value: "submit",
+                            },
                           },
                         ],
                         children: [
