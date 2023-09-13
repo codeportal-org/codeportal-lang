@@ -21,6 +21,8 @@ This project has two main parts, the Portal Language (PortalLang) and the CodePo
 - 🕸️ Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. We see this as a more natural medium for code that's easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, tooling and version control (AST-based). Bye, bye, imports! Also, every node is addressable by a unique ID (using `nanoid`).
 - 🔍 There are no files and folders. Everything is interconnected by unique IDs and classified with metadata (tags, types, etc.). We think modern coding is better when it heavily relies on forward and back references, full-text/metadata/semantic search, and system views to explore and understand the code and to find the right code.
 
+The work for the Portal language is happening [here](apps/web/core/PortalLang.md).
+
 Here is what we envision for PortalLang and CodePortal:
 
 - An intuitive and extensible UI for code with support for themes, and plugins ✨.
@@ -54,6 +56,8 @@ There is so much clutter in programming right now. And, I don't want to settle w
 Go to [codeportal.io](https://codeportal.io), create an account and start using it. It's free to start and then usage based. You can also host it yourself, I will add instructions on how to do that soon. In the meantime, you can check out the code, run it locally, and read how it works below. Also, you can join the [Discord](https://codeportal.io/discord) to get help and chat with other users.
 
 ## How does it work?
+
+DISCLAIMER: This is a work in progress, so, things are changing fast and some things are not implemented yet. This is a high level overview of the system. For more details, check out the code.
 
 ### The Portal Language
 
