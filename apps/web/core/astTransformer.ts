@@ -1,11 +1,14 @@
-import acorn from "acorn"
-
 import {
+  CallExpressionNode,
   ComponentNode,
+  Expression,
   FunctionNode,
+  ParamDeclaration,
   ProgramNode,
+  ReferenceNode,
   Statement,
   UIElementNode,
+  UIExpressionNode,
   UITextNode,
 } from "./interpreter"
 
@@ -47,6 +50,8 @@ export class ASTtoCTTransformer {
           console.log("---- function")
           programNode.body.push(this.transformFunctionDeclaration(statement))
         }
+      } else {
+        programNode.body.push(this.transformStatement(statement))
       }
     }
 
@@ -73,7 +78,14 @@ export class ASTtoCTTransformer {
     const functionNode: FunctionNode = {
       type: "function",
       name: node.id.name,
-      params: node.params?.map((param: any) => param.name) || [],
+      params:
+        node.params?.map(
+          (param: any) =>
+            ({
+              type: "param",
+              name: param.name,
+            } satisfies ParamDeclaration),
+        ) || [],
       body: [],
     }
 
@@ -95,6 +107,10 @@ export class ASTtoCTTransformer {
   }
 
   transformVariableDeclaration(node: any): any {
+    if (node.declarations.length > 1) {
+      throw new Error("Multiple variable declarators in a declaration is not supported")
+    }
+
     // pattern matching React state, it detects `React.useState`
     if (this.componentMode) {
       if (
@@ -128,7 +144,7 @@ export class ASTtoCTTransformer {
 
     return {
       type: "var",
-      name: this.transformExpression(node.declarations[0].id),
+      name: node.declarations[0].id.name,
       value: this.transformExpression(node.declarations[0].init),
     }
   }
@@ -140,15 +156,26 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformExpression(node: any) {
+  transformExpression(node: any): Expression {
     if (node.type === "Identifier") {
-      return node.name
+      return this.transformIdentifier(node)
     } else if (node.type === "BinaryExpression") {
       return this.transformBinaryExpression(node)
     } else if (node.type === "Literal") {
       return this.transformLiteral(node)
     } else if (node.type === "JSXElement") {
       return this.transformJSXElement(node)
+    } else if (node.type === "CallExpression") {
+      return this.transformCallExpression(node)
+    }
+
+    throw new Error(`Unknown expression type: ${node.type}`)
+  }
+
+  transformIdentifier(node: any): ReferenceNode {
+    return {
+      type: "ref",
+      name: node.name,
     }
   }
 
@@ -192,10 +219,29 @@ export class ASTtoCTTransformer {
             return {
               type: "ui text",
               text: child.value,
-            } as UITextNode
+            } satisfies UITextNode
+          } else if (child.type === "JSXExpressionContainer") {
+            return this.transformUIExpression(child.expression)
+          } else {
+            throw new Error(`Unknown JSX child type: ${child.type}`)
           }
         })
         .filter((child: any) => child !== null),
+    }
+  }
+
+  transformUIExpression(node: any): UIExpressionNode {
+    return {
+      type: "ui expression",
+      expression: this.transformExpression(node),
+    }
+  }
+
+  transformCallExpression(node: any): CallExpressionNode {
+    return {
+      type: "call expression",
+      callee: this.transformExpression(node.callee),
+      args: node.arguments.map((argument: any) => this.transformExpression(argument)),
     }
   }
 }

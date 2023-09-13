@@ -5,28 +5,39 @@ export type ProgramNode = {
   body: Statement[]
 }
 
-export type UINode = UIElementNode | UITextNode | UIFragmentNode
+export type UINode = UIElementNode | UITextNode | UIFragmentNode | UIExpressionNode
 
 export type ComponentNode = {
   type: "component"
   name: string
-  props?: Record<string, any>
+  props?: UIPropDeclaration[]
   body: Statement[]
 }
 
-export type FunctionNode = {
-  type: "function"
+export type UIPropDeclaration = {
+  type: "ui prop"
   name: string
-  params: string[]
-  body: Statement[]
+  value: Expression
 }
 
 export type UIElementNode = {
   type: "ui element"
   name: string
-  attributes: Record<string, any>
-  style?: Record<string, any>
+  attributes: UIAttributeNode[]
+  style?: UIStyleNode[]
   children?: UINode[]
+}
+
+export type UIAttributeNode = {
+  type: "ui attribute"
+  name: string
+  value: Expression
+}
+
+export type UIStyleNode = {
+  type: "ui style"
+  name: string
+  value: Expression
 }
 
 export type UITextNode = {
@@ -39,12 +50,18 @@ export type UIFragmentNode = {
   children?: UINode[]
 }
 
+export type UIExpressionNode = {
+  type: "ui expression"
+  expression: Expression
+}
+
 export type Statement =
   | ReturnStatement
   | PrintStatement
   | ComponentNode
   | FunctionNode
   | VarStatement
+  | StateStatement
 
 export type ReturnStatement = {
   type: "return"
@@ -57,12 +74,28 @@ export type VarStatement = {
   value: Expression
 }
 
+export type StateStatement = {
+  type: "state"
+  name: string
+  value: Expression
+}
+
 export type PrintStatement = {
   type: "print"
   arg: Expression
 }
 
-export type Expression = StringLiteral | NumberLiteral | BooleanLiteral | UINode
+export type Expression = Literal | UINode | CallExpressionNode | ReferenceNode
+
+export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
+
+/**
+ * A reference to a variable or function.
+ */
+export type ReferenceNode = {
+  type: "ref"
+  name: string
+}
 
 export type StringLiteral = {
   type: "string"
@@ -79,11 +112,33 @@ export type BooleanLiteral = {
   value: boolean
 }
 
+export type FunctionNode = {
+  type: "function"
+  name: string
+  params: ParamDeclaration[]
+  body: Statement[]
+}
+
+export type ParamDeclaration = {
+  type: "param"
+  name: string
+}
+
+export type CallExpressionNode = {
+  type: "call expression"
+  callee: Expression
+  args: Expression[]
+}
+
 export const interpretUINode = (code: UINode): React.ReactNode => {
   let children: React.ReactNode[]
 
   if (code.type === "ui text") {
     return code.text
+  }
+
+  if (code.type === "ui expression") {
+    return interpretExpression(code.expression)
   }
 
   if (!code.children || code.children.length === 0) {

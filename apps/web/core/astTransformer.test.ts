@@ -17,7 +17,7 @@ describe("astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       body: [],
-    } as ProgramNode)
+    } satisfies ProgramNode)
   })
 
   it("should transform a program with a React component declaration", () => {
@@ -53,7 +53,7 @@ describe("astTransformer", () => {
           ],
         },
       ],
-    } as ProgramNode)
+    } satisfies ProgramNode)
   })
 
   it("should transform a program with a function declaration with a return statement", () => {
@@ -88,7 +88,7 @@ describe("astTransformer", () => {
           ],
         },
       ],
-    } as ProgramNode)
+    } satisfies ProgramNode)
   })
 
   it("should transform a program with a React component and a lot of JSX", () => {
@@ -173,7 +173,7 @@ describe("astTransformer", () => {
           ],
         },
       ],
-    } as ProgramNode)
+    } satisfies ProgramNode)
   })
 
   it("should detect and transform the use of React.useState", () => {
@@ -235,179 +235,278 @@ describe("astTransformer", () => {
           ],
         },
       ],
-    } as ProgramNode)
+    } satisfies ProgramNode)
   })
 
-  // it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
-  //   const transformer = new ASTtoCTTransformer()
+  it("should transform the use of JSX expressions", () => {
+    const transformer = new ASTtoCTTransformer()
 
-  //   const codeTree = transformer.transform(
-  //     Parser.extend(acornJSXParser()).parse(
-  //       `
-  //         function App() {
-  //           const [name, setName] = React.useState("")
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          function App() {
+            const message = "Hello, World!"
 
-  //           const handleSubmit = async (event) => {
-  //             event.preventDefault()
-  //             try {
-  //               const response =  await fetch("/api/data/form-submission", {
-  //                 method: "POST",
-  //                 body: JSON.stringify({ name }),
-  //               })
+            return (
+              <div>
+                <h1>{message}</h1>
+              </div>
+            );
+          }
+        `,
+        { ecmaVersion: "latest" },
+      ),
+    )
 
-  //               const data = await response.json()
-  //               setName(data.name)
-  //             } catch (error) {
-  //               console.error(error)
-  //             }
-  //           }
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      body: [
+        {
+          type: "component",
+          name: "App",
+          body: [
+            {
+              type: "var",
+              name: "message",
+              value: {
+                type: "string",
+                value: "Hello, World!",
+              },
+            },
+            {
+              type: "return",
+              arg: {
+                type: "ui element",
+                name: "div",
+                attributes: [],
+                children: [
+                  {
+                    type: "ui element",
+                    name: "h1",
+                    attributes: [],
+                    children: [
+                      {
+                        type: "ui expression",
+                        expression: {
+                          type: "ref",
+                          name: "message",
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
 
-  //           return (
-  //             <div>
-  //               <h1>Hello, {name}!</h1>
-  //               <form
-  //                 onSubmit={handleSubmit}
-  //               >
-  //                 <input
-  //                   type="text"
-  //                   value={name}
-  //                   onChange={(event) => setName(event.target.value)}
-  //                 />
-  //                 <button type="submit">Submit</button>
-  //               </form>
-  //             </div>
-  //           )
-  //         }
-  //       `,
-  //       { ecmaVersion: "latest" },
-  //     ),
-  //   )
+  it("should throw an error if a variable declaration has multiple declarators", () => {
+    const transformer = new ASTtoCTTransformer()
 
-  //   fs.writeFileSync("./codeTree.json", JSON.stringify(codeTree, null, 2))
+    expect(() => {
+      transformer.transform(
+        Parser.extend(acornJSXParser()).parse(
+          `
+            function App() {
+              const message = "Hello, World!", name = "John Doe"
 
-  //   expect(codeTree).toBe({
-  //     type: "program",
-  //     body: [
-  //       {
-  //         type: "component",
-  //         name: "App",
-  //         body: [
-  //           {
-  //             type: "state",
-  //             name: "name",
-  //             value: "",
-  //           },
-  //           {
-  //             type: "function",
-  //             name: "handleSubmit",
-  //             body: [
-  //               {
-  //                 type: "try",
-  //                 body: [
-  //                   {
-  //                     type: "fetch",
-  //                     url: "/api/data/form-submission",
-  //                     method: "POST",
-  //                     body: {
-  //                       type: "json",
-  //                       value: { name: "name" },
-  //                     },
-  //                   },
-  //                   {
-  //                     type: "json",
-  //                     name: "data",
-  //                     value: "response",
-  //                   },
-  //                   {
-  //                     type: "state update",
-  //                     name: "setName",
-  //                     value: "data.name",
-  //                   },
-  //                 ],
-  //                 catch: {
-  //                   type: "console",
-  //                   method: "error",
-  //                   value: "error",
-  //                 },
-  //               },
-  //             ],
-  //           },
-  //           {
-  //             type: "return",
-  //             arg: {
-  //               type: "ui element",
-  //               name: "div",
-  //               attributes: [],
-  //               children: [
-  //                 {
-  //                   type: "ui element",
-  //                   name: "h1",
-  //                   attributes: [],
-  //                   children: [
-  //                     {
-  //                       type: "ui text",
-  //                       text: "Hello, {name}!",
-  //                     },
-  //                   ],
-  //                 },
-  //                 {
-  //                   type: "ui element",
-  //                   name: "form",
-  //                   attributes: [
-  //                     {
-  //                       type: "attribute",
-  //                       name: "onSubmit",
-  //                       value: "handleSubmit",
-  //                     },
-  //                   ],
-  //                   children: [
-  //                     {
-  //                       type: "ui element",
-  //                       name: "input",
-  //                       attributes: [
-  //                         {
-  //                           type: "attribute",
-  //                           name: "type",
-  //                           value: "text",
-  //                         },
-  //                         {
-  //                           type: "attribute",
-  //                           name: "value",
-  //                           value: "name",
-  //                         },
-  //                         {
-  //                           type: "attribute",
-  //                           name: "onChange",
-  //                           // TODO: implement this
-  //                           value: "(event) => setName(event.target.value)",
-  //                         },
-  //                       ],
-  //                     },
-  //                     {
-  //                       type: "ui element",
-  //                       name: "button",
-  //                       attributes: [
-  //                         {
-  //                           type: "attribute",
-  //                           name: "type",
-  //                           value: "submit",
-  //                         },
-  //                       ],
-  //                       children: [
-  //                         {
-  //                           type: "ui text",
-  //                           text: "Submit",
-  //                         },
-  //                       ],
-  //                     },
-  //                   ],
-  //                 },
-  //               ],
-  //             },
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   } as ProgramNode)
-  // })
+              return (
+                <div>
+                  <h1>{message}</h1>
+                </div>
+              );
+            }
+          `,
+          { ecmaVersion: "latest" },
+        ),
+      )
+    }).toThrow()
+  })
+
+  return
+
+  it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          function App() {
+            const [name, setName] = React.useState("")
+
+            const handleSubmit = async (event) => {
+              event.preventDefault()
+              try {
+                const response =  await fetch("/api/data/form-submission", {
+                  method: "POST",
+                  body: JSON.stringify({ name }),
+                })
+
+                const data = await response.json()
+                setName(data.name)
+              } catch (error) {
+                console.error(error)
+              }
+            }
+
+            return (
+              <div>
+                <h1>Hello, {name}!</h1>
+                <form
+                  onSubmit={handleSubmit}
+                >
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                  <button type="submit">Submit</button>
+                </form>
+              </div>
+            )
+          }
+        `,
+        { ecmaVersion: "latest" },
+      ),
+    )
+
+    // fs.writeFileSync("./codeTree.json", JSON.stringify(codeTree, null, 2))
+
+    expect(codeTree).toBe({
+      type: "program",
+      body: [
+        {
+          type: "component",
+          name: "App",
+          body: [
+            {
+              type: "state",
+              name: {
+                type: "identifier",
+                name: "name",
+              },
+              value: {
+                type: "string",
+                value: "",
+              },
+            },
+            {
+              type: "function",
+              name: {
+                type: "identifier",
+                name: "handleSubmit",
+              },
+              body: [
+                // {
+                //   type: "try",
+                //   body: [
+                //     {
+                //       type: "fetch",
+                //       url: "/api/data/form-submission",
+                //       method: "POST",
+                //       body: {
+                //         type: "json",
+                //         value: { name: "name" },
+                //       },
+                //     },
+                //     {
+                //       type: "json",
+                //       name: "data",
+                //       value: "response",
+                //     },
+                //     {
+                //       type: "state update",
+                //       name: "setName",
+                //       value: "data.name",
+                //     },
+                //   ],
+                //   catch: {
+                //     type: "console",
+                //     method: "error",
+                //     value: "error",
+                //   },
+                // },
+              ],
+            },
+            {
+              type: "return",
+              arg: {
+                type: "ui element",
+                name: "div",
+                attributes: [],
+                children: [
+                  {
+                    type: "ui element",
+                    name: "h1",
+                    attributes: [],
+                    children: [
+                      {
+                        type: "ui text",
+                        text: "Hello, {name}!",
+                      },
+                    ],
+                  },
+                  {
+                    type: "ui element",
+                    name: "form",
+                    attributes: [
+                      {
+                        type: "attribute",
+                        name: "onSubmit",
+                        value: "handleSubmit",
+                      },
+                    ],
+                    children: [
+                      {
+                        type: "ui element",
+                        name: "input",
+                        attributes: [
+                          {
+                            type: "attribute",
+                            name: "type",
+                            value: "text",
+                          },
+                          {
+                            type: "attribute",
+                            name: "value",
+                            value: "name",
+                          },
+                          {
+                            type: "attribute",
+                            name: "onChange",
+                            // TODO: implement this
+                            value: "(event) => setName(event.target.value)",
+                          },
+                        ],
+                      },
+                      {
+                        type: "ui element",
+                        name: "button",
+                        attributes: [
+                          {
+                            type: "attribute",
+                            name: "type",
+                            value: "submit",
+                          },
+                        ],
+                        children: [
+                          {
+                            type: "ui text",
+                            text: "Submit",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
 })

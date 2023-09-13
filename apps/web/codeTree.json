@@ -6,7 +6,12 @@
       "name": "App",
       "body": [
         {
-          "type": "var"
+          "type": "state",
+          "name": "name",
+          "value": {
+            "type": "string",
+            "value": ""
+          }
         },
         {
           "type": "function",
@@ -35,7 +40,13 @@
                     "type": "ui text",
                     "text": "Hello, "
                   },
-                  null,
+                  {
+                    "type": "ui expression",
+                    "expression": {
+                      "type": "identifier",
+                      "name": "name"
+                    }
+                  },
                   {
                     "type": "ui text",
                     "text": "!"
