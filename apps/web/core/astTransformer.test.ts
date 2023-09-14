@@ -366,7 +366,44 @@ describe("astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  return
+  it("should transform a program with an ObjectExpression like { value: 0 }", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          const obj = { value: 0 }
+        `,
+        { ecmaVersion: "latest" },
+      ),
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      body: [
+        {
+          type: "var",
+          name: "obj",
+          value: {
+            type: "object",
+            properties: [
+              {
+                type: "property",
+                name: {
+                  type: "ref",
+                  name: "value",
+                },
+                value: {
+                  type: "number",
+                  value: 0,
+                },
+              },
+            ],
+          },
+        },
+      ],
+    } satisfies ProgramNode)
+  })
 
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
     const transformer = new ASTtoCTTransformer()

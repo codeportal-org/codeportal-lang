@@ -112,6 +112,7 @@ export type Expression =
   | InlineFunctionNode
   | FunctionCallNode
   | PathAccessNode
+  | ObjectNode
 
 export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
 
@@ -163,6 +164,17 @@ export type InlineFunctionNode = {
   type: "inline function"
   params: ParamDeclaration[]
   body: Statement[]
+}
+
+export type ObjectNode = {
+  type: "object"
+  properties: ObjectProperty[]
+}
+
+export type ObjectProperty = {
+  type: "property"
+  name: Expression
+  value: Expression
 }
 
 export const interpretUINode = (code: UINode): React.ReactNode => {

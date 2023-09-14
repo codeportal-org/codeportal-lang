@@ -4,6 +4,7 @@ import {
   Expression,
   FunctionCallNode,
   FunctionNode,
+  ObjectNode,
   ParamDeclaration,
   PathAccessNode,
   ProgramNode,
@@ -174,6 +175,8 @@ export class ASTtoCTTransformer {
       return this.transformCallExpression(node)
     } else if (node.type === "MemberExpression") {
       return this.transformMemberExpression(node)
+    } else if (node.type === "ObjectExpression") {
+      return this.transformObjectExpression(node)
     }
 
     throw new Error(`Unknown expression type: ${node.type}`)
@@ -307,5 +310,22 @@ export class ASTtoCTTransformer {
       type: "path access",
       path: path.reverse(),
     }
+  }
+
+  transformObjectExpression(node: any): ObjectNode {
+    const object: ObjectNode = {
+      type: "object",
+      properties: [],
+    }
+
+    for (const property of node.properties) {
+      object.properties.push({
+        type: "property",
+        name: this.transformExpression(property.key),
+        value: this.transformExpression(property.value),
+      })
+    }
+
+    return object
   }
 }
