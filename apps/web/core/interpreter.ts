@@ -20,10 +20,11 @@ export type Expression =
   | Literal
   | UINode
   | ReferenceNode
-  | InlineFunctionNode
+  | FunctionNode
   | FunctionCallNode
   | PathAccessNode
   | ObjectNode
+  | NAryExpression
 
 export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
 
@@ -147,9 +148,39 @@ export type BooleanLiteral = {
   value: boolean
 }
 
+export type NAryExpression = {
+  type: "nary"
+  operator: NAryOperator
+  args: Expression[]
+}
+
+export const NAryOperators = {
+  "+": "Addition",
+  "-": "Subtraction",
+  "*": "Multiplication",
+  "/": "Division",
+  "%": "Modulus",
+  "==": "Equal to",
+  "!=": "Not equal to",
+  ">": "Greater than",
+  "<": "Less than",
+  ">=": "Greater than or equal to",
+  "<=": "Less than or equal to",
+  "&&": "Logical AND",
+  "||": "Logical OR",
+}
+
+export const NAryOperatorSymbols = Object.keys(NAryOperators) as NAryOperator[]
+
+export type NAryOperator = keyof typeof NAryOperators
+
+/**
+ * A function declaration can be both an expression and a statement.
+ */
 export type FunctionNode = {
   type: "function"
-  name: string
+  name?: string
+  inline?: boolean
   params?: ParamDeclaration[]
   body: StatementNode[]
 }
@@ -166,12 +197,6 @@ export type FunctionCallNode = {
   type: "function call"
   callee: ReferenceNode | PathAccessNode
   args: Expression[]
-}
-
-export type InlineFunctionNode = {
-  type: "inline function"
-  params: ParamDeclaration[]
-  body: StatementNode[]
 }
 
 export type ObjectNode = {

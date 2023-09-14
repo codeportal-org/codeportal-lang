@@ -465,6 +465,108 @@ describe("astTransformer", () => {
     } satisfies ProgramNode)
   })
 
+  it("should transform arrow functions", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          setFn((a, b) => b)
+        `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      body: [
+        {
+          type: "function call",
+          callee: {
+            type: "ref",
+            name: "setFn",
+          },
+          args: [
+            {
+              type: "function",
+              params: [
+                {
+                  type: "param",
+                  name: "a",
+                },
+                {
+                  type: "param",
+                  name: "b",
+                },
+              ],
+              body: [
+                {
+                  type: "return",
+                  arg: {
+                    type: "ref",
+                    name: "b",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
+  it("should transform arrow functions with a variable declaration into named functions", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          const myFunc = (a, b) => a + b
+        `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      body: [
+        {
+          type: "function",
+          name: "myFunc",
+          params: [
+            {
+              type: "param",
+              name: "a",
+            },
+            {
+              type: "param",
+              name: "b",
+            },
+          ],
+          body: [
+            {
+              type: "return",
+              arg: {
+                type: "nary",
+                operator: "+",
+                args: [
+                  {
+                    type: "ref",
+                    name: "a",
+                  },
+                  {
+                    type: "ref",
+                    name: "b",
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
   return
 
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {

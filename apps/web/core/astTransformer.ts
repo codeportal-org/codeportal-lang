@@ -1,4 +1,11 @@
-import { FunctionDeclaration, Program, Statement, TryStatement } from "estree-jsx"
+import {
+  ArrowFunctionExpression,
+  BinaryExpression,
+  FunctionDeclaration,
+  Program,
+  Statement,
+  TryStatement,
+} from "estree-jsx"
 
 import {
   AssignmentStatement,
@@ -6,6 +13,8 @@ import {
   Expression,
   FunctionCallNode,
   FunctionNode,
+  NAryExpression,
+  NAryOperatorSymbols,
   ObjectNode,
   ParamDeclaration,
   PathAccessNode,
@@ -155,12 +164,25 @@ export class ASTtoCTTransformer {
       const functionNode: FunctionNode = {
         type: "function",
         name: node.declarations[0].id.name,
-        params: node.declarations[0].init.params.map((param: any) => param.name),
+        params: node.declarations[0].init.params.map(
+          (param: any) =>
+            ({
+              type: "param",
+              name: param.name,
+            } satisfies ParamDeclaration),
+        ),
         body: [],
       }
 
-      for (const statement of node.declarations[0].init.body.body) {
-        functionNode.body.push(this.transformStatement(statement))
+      if (node.declarations[0].init.expression) {
+        functionNode.body.push({
+          type: "return",
+          arg: this.transformExpression(node.declarations[0].init.body),
+        })
+      } else {
+        for (const statement of node.declarations[0].init.body.body) {
+          functionNode.body.push(this.transformStatement(statement))
+        }
       }
 
       return functionNode
@@ -195,6 +217,8 @@ export class ASTtoCTTransformer {
       return this.transformMemberExpression(node)
     } else if (node.type === "ObjectExpression") {
       return this.transformObjectExpression(node)
+    } else if (node.type === "ArrowFunctionExpression") {
+      return this.transformArrowFunctionExpression(node)
     }
 
     throw new Error(`Unknown expression type: ${node.type}`)
@@ -214,12 +238,31 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformBinaryExpression(node: any): any {
+  transformBinaryExpression(node: BinaryExpression): NAryExpression {
+    const args: Expression[] = []
+
+    let operator = node.operator
+
+    if (operator === "===") {
+      operator = "=="
+    }
+
+    if (NAryOperatorSymbols.indexOf(operator as any) === -1) {
+      throw new Error(`Unknown binary operator: ${node.operator}`)
+    }
+
+    let current: any = node
+    while (current.type === "BinaryExpression" && node.operator === current.operator) {
+      args.push(this.transformExpression(current.right))
+      current = current.left
+    }
+
+    args.push(this.transformExpression(current))
+
     return {
-      type: "binary expression",
-      operator: node.operator,
-      left: this.transformExpression(node.left),
-      right: this.transformExpression(node.right),
+      type: "nary",
+      operator: operator as any,
+      args: args.reverse(),
     }
   }
 
@@ -373,5 +416,36 @@ export class ASTtoCTTransformer {
     }
 
     return tryStatement
+  }
+
+  transformArrowFunctionExpression(node: ArrowFunctionExpression): FunctionNode {
+    const functionNode: FunctionNode = {
+      type: "function",
+      params: node.params.map(
+        (param: any) =>
+          ({
+            type: "param",
+            name: param.name,
+          } satisfies ParamDeclaration),
+      ),
+      body: [],
+    }
+
+    if (node.expression) {
+      functionNode.body.push({
+        type: "return",
+        arg: this.transformExpression(node.body),
+      })
+    } else {
+      if (node.body.type !== "BlockStatement") {
+        throw new Error("Arrow function with expression false should have a block statement body")
+      }
+
+      for (const statement of node.body!.body) {
+        functionNode.body.push(this.transformStatement(statement))
+      }
+    }
+
+    return functionNode
   }
 }
