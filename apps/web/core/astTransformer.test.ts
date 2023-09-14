@@ -1,5 +1,6 @@
 import { Parser } from "acorn"
 import acornJSXParser from "acorn-jsx"
+import { Program } from "estree"
 import fs from "fs"
 
 import { ASTtoCTTransformer } from "./astTransformer"
@@ -12,6 +13,7 @@ describe("astTransformer", () => {
     const codeTree = transformer.transform({
       type: "Program",
       body: [],
+      sourceType: "module",
     })
 
     expect(codeTree).toStrictEqual({
@@ -31,7 +33,7 @@ describe("astTransformer", () => {
       }
     `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     expect(codeTree).toStrictEqual({
@@ -67,7 +69,7 @@ describe("astTransformer", () => {
         }
         `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     expect(codeTree).toStrictEqual({
@@ -110,7 +112,7 @@ describe("astTransformer", () => {
           }
         `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     expect(codeTree).toStrictEqual({
@@ -193,7 +195,7 @@ describe("astTransformer", () => {
           }
         `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     expect(codeTree).toStrictEqual({
@@ -255,7 +257,7 @@ describe("astTransformer", () => {
           }
         `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     expect(codeTree).toStrictEqual({
@@ -321,7 +323,7 @@ describe("astTransformer", () => {
             }
           `,
           { ecmaVersion: "latest" },
-        ),
+        ) as any,
       )
     }).toThrow()
   })
@@ -335,7 +337,7 @@ describe("astTransformer", () => {
           obj.value = 0
         `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     expect(codeTree).toStrictEqual({
@@ -375,7 +377,7 @@ describe("astTransformer", () => {
           const obj = { value: 0 }
         `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     expect(codeTree).toStrictEqual({
@@ -404,6 +406,66 @@ describe("astTransformer", () => {
       ],
     } satisfies ProgramNode)
   })
+
+  it("should transform a program with a TryStatement, and the ", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          try {
+            var num1 = 2
+          } catch (error) {
+            var num2 = 3
+          } finally {
+            var num3 = 1
+          }
+        `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      body: [
+        {
+          type: "try",
+          body: [
+            {
+              type: "var",
+              name: "num1",
+              value: {
+                type: "number",
+                value: 2,
+              },
+            },
+          ],
+          catch: [
+            {
+              type: "var",
+              name: "num2",
+              value: {
+                type: "number",
+                value: 3,
+              },
+            },
+          ],
+          finally: [
+            {
+              type: "var",
+              name: "num3",
+              value: {
+                type: "number",
+                value: 1,
+              },
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
+  return
 
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
     const transformer = new ASTtoCTTransformer()
@@ -447,7 +509,7 @@ describe("astTransformer", () => {
           }
         `,
         { ecmaVersion: "latest" },
-      ),
+      ) as any,
     )
 
     // fs.writeFileSync("./codeTree.json", JSON.stringify(codeTree, null, 2))

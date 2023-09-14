@@ -2,8 +2,30 @@ import React from "react"
 
 export type ProgramNode = {
   type: "program"
-  body: Statement[]
+  body: StatementNode[]
 }
+
+export type StatementNode =
+  | ReturnStatement
+  | PrintStatement
+  | ComponentNode
+  | FunctionNode
+  | VarStatement
+  | StateStatement
+  | FunctionCallNode
+  | AssignmentStatement
+  | TryStatementNode
+
+export type Expression =
+  | Literal
+  | UINode
+  | ReferenceNode
+  | InlineFunctionNode
+  | FunctionCallNode
+  | PathAccessNode
+  | ObjectNode
+
+export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
 
 export type UINode = UIElementNode | UITextNode | UIFragmentNode | UIExpressionNode
 
@@ -11,7 +33,7 @@ export type ComponentNode = {
   type: "component"
   name: string
   props?: UIPropDeclaration[]
-  body: Statement[]
+  body: StatementNode[]
 }
 
 export type UIPropDeclaration = {
@@ -59,16 +81,6 @@ export type UIExpressionNode = {
   expression: Expression
 }
 
-export type Statement =
-  | ReturnStatement
-  | PrintStatement
-  | ComponentNode
-  | FunctionNode
-  | VarStatement
-  | StateStatement
-  | FunctionCallNode
-  | AssignmentStatement
-
 export type ReturnStatement = {
   type: "return"
   arg: Expression
@@ -105,16 +117,12 @@ export type PrintStatement = {
   arg: Expression
 }
 
-export type Expression =
-  | Literal
-  | UINode
-  | ReferenceNode
-  | InlineFunctionNode
-  | FunctionCallNode
-  | PathAccessNode
-  | ObjectNode
-
-export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
+export type TryStatementNode = {
+  type: "try"
+  body: StatementNode[]
+  catch: StatementNode[]
+  finally?: StatementNode[]
+}
 
 /**
  * A reference to a variable or function.
@@ -143,7 +151,7 @@ export type FunctionNode = {
   type: "function"
   name: string
   params?: ParamDeclaration[]
-  body: Statement[]
+  body: StatementNode[]
 }
 
 export type ParamDeclaration = {
@@ -163,7 +171,7 @@ export type FunctionCallNode = {
 export type InlineFunctionNode = {
   type: "inline function"
   params: ParamDeclaration[]
-  body: Statement[]
+  body: StatementNode[]
 }
 
 export type ObjectNode = {
@@ -221,7 +229,7 @@ export const interpretComponent = (code: ComponentNode): React.ReactNode => {
   }
 }
 
-export const interpretStatement = (code: Statement): any => {
+export const interpretStatement = (code: StatementNode): any => {
   if (code.type === "return") {
     return interpretExpression(code.arg)
   } else if (code.type === "print") {
