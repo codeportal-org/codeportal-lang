@@ -11,7 +11,7 @@ export const useTrackAppOpened = (appId: string) => {
     fetch("/api/apps/opened", {
       method: "POST",
       headers: { Authorization: `Bearer ${await getToken()}` },
-      body: JSON.stringify({ id: appId, cc: 100 }),
+      body: JSON.stringify({ id: appId }),
     }).then(() => {
       mutate("/api/apps")
     })
