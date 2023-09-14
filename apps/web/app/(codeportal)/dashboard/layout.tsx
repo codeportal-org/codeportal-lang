@@ -25,7 +25,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="h-screen">
-      {false || !user ? (
+      {isInvited || !user ? (
         children
       ) : (
         <PageContainer>
