@@ -120,7 +120,13 @@ See [Self Hosting.md](./self-hosting.md)
 
 CodePortal is built using:
 
-- Next.js
+- Next.js / React
 - shadcn/ui.
 - Tailwind CSS.
-- TypeScript.
+- TypeScript / Node.js
+- [Turborepo](https://turbo.build/repo)
+- [Pnpm](https://pnpm.io/)
+
+## Contributing
+
+Work in progress. I will add more details soon.
