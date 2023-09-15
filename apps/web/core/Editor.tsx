@@ -29,15 +29,16 @@ import { CodeView } from "./CodeView"
 import { ASTtoCTTransformer } from "./astTransformer"
 import { CodeProcessor } from "./codeProcessor"
 import { editorEmitter } from "./editorSingleton"
+import { ProgramNode } from "./interpreter"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const clerk = useClerk()
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
   const iframeRef = React.useRef<HTMLIFrameElement>(null)
 
-  const [astTransformer] = React.useState(() => new ASTtoCTTransformer())
+  const [astTransformer] = React.useState(() => new ASTtoCTTransformer({ topLevelComponent: true }))
   const [codeProcessor] = React.useState(() => new CodeProcessor({ appId }))
-  const [ast, setAst] = React.useState<any>(null)
+  const [codeTree, setCodeTree] = React.useState<ProgramNode | null>(null)
 
   const [isLeftResizing, setIsLeftResizing] = useState(false)
   const [isRightResizing, setRightIsResizing] = useState(false)
@@ -90,9 +91,9 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 
     codeProcessor.extend((ast) => astTransformer.transform(ast))
 
-    const removeListener = codeProcessor.onAST((ast) => {
-      console.log("AST emitted", ast)
-      setAst(ast)
+    const removeListener = codeProcessor.onAST((codeTree) => {
+      console.log("codeTree emitted", codeTree)
+      setCodeTree(codeTree)
     })
 
     return () => {
@@ -113,8 +114,8 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         codeProcessor.reset()
 
         const ast = codeProcessor.process(code)
-        console.log("FINAL --- ast", ast)
-        setAst(ast)
+        console.log("FINAL --- codeTree", codeTree)
+        setCodeTree(codeTree)
       }
     }
     processCode()
@@ -150,7 +151,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
             ref={completionContainerRef}
             isFinished={isFinished}
             code={code}
-            ast={ast}
+            codeTree={codeTree}
           />
         </Panel>
         <PanelResizeHandle

@@ -1,19 +1,19 @@
 import { cn } from "@/lib/utils"
 
-import { Expression, ProgramNode, Statement } from "./interpreter"
+import { Expression, ProgramNode, StatementNode } from "./interpreter"
 
-export const ASTView = ({ ast }: { ast: ProgramNode }) => {
+export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode }) => {
   return (
     <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
-      {ast.type === "program" &&
-        ast.body.map((node, idx) => {
+      {codeTree.type === "program" &&
+        codeTree.body.map((node, idx) => {
           return <StatementView node={node} key={idx} />
         })}
     </div>
   )
 }
 
-export const StatementView = ({ node }: { node: Statement }) => {
+export const StatementView = ({ node }: { node: StatementNode }) => {
   if (!node) return null
 
   return (

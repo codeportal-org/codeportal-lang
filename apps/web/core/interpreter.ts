@@ -6,7 +6,7 @@ export type ProgramNode = {
 }
 
 export type StatementNode =
-  | ReturnStatement
+  | ReturnStatementNode
   | PrintStatement
   | ComponentNode
   | FunctionNode
@@ -82,7 +82,7 @@ export type UIExpressionNode = {
   expression: Expression
 }
 
-export type ReturnStatement = {
+export type ReturnStatementNode = {
   type: "return"
   arg: Expression
 }

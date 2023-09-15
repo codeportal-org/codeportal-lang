@@ -5,18 +5,21 @@ import React from "react"
 
 import { PrivateRoomProvider, privateLiveRoomContext } from "@/lib/liveblocks.config"
 
-import { ASTView } from "./ASTView"
+import { CodeTreeView } from "./CodeTreeView"
 import { editorEmitter } from "./editorSingleton"
+import { ProgramNode } from "./interpreter"
 
 export const CodeView = React.forwardRef<
   HTMLDivElement,
-  { appId: string; code: string; isFinished: boolean; ast: any }
->(({ appId, code, isFinished, ast }, ref) => {
+  { appId: string; code: string; isFinished: boolean; codeTree: ProgramNode | null }
+>(({ appId, code, isFinished, codeTree }, ref) => {
   return (
     <div className="h-full">
       <PrivateRoomProvider id={`editor-${appId}`} initialPresence={{}}>
         <ClientSideSuspense fallback={<div>Loading...</div>}>
-          {() => <CodeContainer ref={ref} code={code} isFinished={isFinished} ast={ast} />}
+          {() => (
+            <CodeContainer ref={ref} code={code} isFinished={isFinished} codeTree={codeTree} />
+          )}
         </ClientSideSuspense>
       </PrivateRoomProvider>
     </div>
@@ -25,8 +28,8 @@ export const CodeView = React.forwardRef<
 
 const CodeContainer = React.forwardRef<
   HTMLDivElement,
-  { code: string; isFinished: boolean; ast: any }
->(({ code, isFinished, ast }, ref) => {
+  { code: string; isFinished: boolean; codeTree: ProgramNode | null }
+>(({ code, isFinished, codeTree }, ref) => {
   const broadcast: any = privateLiveRoomContext.useBroadcastEvent()
 
   React.useEffect(() => {
@@ -41,8 +44,8 @@ const CodeContainer = React.forwardRef<
     }
   }, [code, isFinished])
 
-  if (ast) {
-    return <ASTView ast={ast} />
+  if (codeTree) {
+    return <CodeTreeView codeTree={codeTree} />
   }
 
   return (
