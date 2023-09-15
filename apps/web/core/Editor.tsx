@@ -243,7 +243,7 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
 
   const handleSave = () => {
     updateTheme.trigger({ theme: { color, radius } }).then(() => {
-      editorEmitter.emit("refresh")
+      editorEmitter.refresh()
     })
     setOpen(false)
   }

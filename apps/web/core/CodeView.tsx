@@ -33,9 +33,13 @@ const CodeContainer = React.forwardRef<
   const broadcast: any = privateLiveRoomContext.useBroadcastEvent()
 
   React.useEffect(() => {
-    editorEmitter.on("refresh", () => {
+    const unsubscribe = editorEmitter.onRefresh(() => {
       broadcast({ type: "refresh" })
     })
+
+    return () => {
+      unsubscribe()
+    }
   }, [])
 
   React.useEffect(() => {
