@@ -1,8 +1,23 @@
 import React from "react"
 
+export type CodeNode = ProgramNode | StatementNode | ExpressionNode | SpecialNodes
+
+export type SpecialNodes =
+  | UIPropDeclaration
+  | UIPropNode
+  | UIStyleNode
+  | ParamDeclaration
+  | ObjectProperty
+
+export type CodeMeta = {
+  parent?: CodeNode
+  extras?: Record<string, any>
+}
+
 export type ProgramNode = {
   type: "program"
   body: StatementNode[]
+  meta?: CodeMeta
 }
 
 export type StatementNode =
@@ -16,8 +31,8 @@ export type StatementNode =
   | AssignmentStatement
   | TryStatementNode
 
-export type Expression =
-  | Literal
+export type ExpressionNode =
+  | LiteralNode
   | UINode
   | ReferenceNode
   | FunctionNode
@@ -26,7 +41,7 @@ export type Expression =
   | ObjectNode
   | NAryExpression
 
-export type Literal = StringLiteral | NumberLiteral | BooleanLiteral
+export type LiteralNode = StringLiteral | NumberLiteral | BooleanLiteral
 
 export type UINode = UIElementNode | UITextNode | UIFragmentNode | UIExpressionNode
 
@@ -35,12 +50,14 @@ export type ComponentNode = {
   name: string
   props?: UIPropDeclaration[]
   body: StatementNode[]
+  meta?: CodeMeta
 }
 
 export type UIPropDeclaration = {
   type: "ui prop declaration"
   name: string
-  value: Expression
+  value: ExpressionNode
+  meta?: CodeMeta
 }
 
 /**
@@ -53,38 +70,45 @@ export type UIElementNode = {
   props?: UIPropNode[]
   style?: UIStyleNode[]
   children?: UINode[]
+  meta?: CodeMeta
 }
 
 export type UIPropNode = {
   type: "ui prop"
   name: string
-  value: Expression
+  value: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type UIStyleNode = {
   type: "ui style"
   name: string
-  value: Expression
+  value: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type UITextNode = {
   type: "ui text"
   text: string
+  meta?: CodeMeta
 }
 
 export type UIFragmentNode = {
   type: "ui fragment"
   children?: UINode[]
+  meta?: CodeMeta
 }
 
 export type UIExpressionNode = {
   type: "ui expression"
-  expression: Expression
+  expression: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type ReturnStatementNode = {
   type: "return"
-  arg: Expression
+  arg: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type AssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%="
@@ -93,29 +117,34 @@ export type AssignmentStatement = {
   type: "assignment"
   operator: AssignmentOperator
   left: ReferenceNode | PathAccessNode
-  right: Expression
+  right: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type PathAccessNode = {
   type: "path access"
-  path: Expression[]
+  path: ExpressionNode[]
+  meta?: CodeMeta
 }
 
 export type VarStatement = {
   type: "var"
   name: string
-  value: Expression
+  value: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type StateStatement = {
   type: "state"
   name: string
-  value: Expression
+  value: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type PrintStatement = {
   type: "print"
-  arg: Expression
+  arg: ExpressionNode
+  meta?: CodeMeta
 }
 
 export type TryStatementNode = {
@@ -123,6 +152,7 @@ export type TryStatementNode = {
   body: StatementNode[]
   catch: StatementNode[]
   finally?: StatementNode[]
+  meta?: CodeMeta
 }
 
 /**
@@ -131,27 +161,32 @@ export type TryStatementNode = {
 export type ReferenceNode = {
   type: "ref"
   name: string
+  meta?: CodeMeta
 }
 
 export type StringLiteral = {
   type: "string"
   value: string
+  meta?: CodeMeta
 }
 
 export type NumberLiteral = {
   type: "number"
   value: number
+  meta?: CodeMeta
 }
 
 export type BooleanLiteral = {
   type: "boolean"
   value: boolean
+  meta?: CodeMeta
 }
 
 export type NAryExpression = {
   type: "nary"
   operator: NAryOperator
-  args: Expression[]
+  args: ExpressionNode[]
+  meta?: CodeMeta
 }
 
 export const NAryOperators = {
@@ -183,11 +218,13 @@ export type FunctionNode = {
   inline?: boolean
   params?: ParamDeclaration[]
   body: StatementNode[]
+  meta?: CodeMeta
 }
 
 export type ParamDeclaration = {
   type: "param"
   name: string
+  meta?: CodeMeta
 }
 
 /**
@@ -196,18 +233,21 @@ export type ParamDeclaration = {
 export type FunctionCallNode = {
   type: "function call"
   callee: ReferenceNode | PathAccessNode
-  args: Expression[]
+  args: ExpressionNode[]
+  meta?: CodeMeta
 }
 
 export type ObjectNode = {
   type: "object"
   properties: ObjectProperty[]
+  meta?: CodeMeta
 }
 
 export type ObjectProperty = {
   type: "property"
-  name: Expression
-  value: Expression
+  name: ExpressionNode
+  value: ExpressionNode
+  meta?: CodeMeta
 }
 
 export const interpretUINode = (code: UINode): React.ReactNode => {
@@ -262,7 +302,7 @@ export const interpretStatement = (code: StatementNode): any => {
   }
 }
 
-export const interpretExpression = (code: Expression): React.ReactNode => {
+export const interpretExpression = (code: ExpressionNode): React.ReactNode => {
   if (code.type === "string") {
     return code.value
   } else if (code.type === "number") {

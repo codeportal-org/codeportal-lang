@@ -48,6 +48,7 @@ const CodeContainer = React.forwardRef<
     return <CodeTreeView codeTree={codeTree} />
   }
 
+  // at this point this is just for debugging purposes
   return (
     <div
       ref={ref}

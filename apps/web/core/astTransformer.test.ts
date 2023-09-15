@@ -6,7 +6,7 @@ import fs from "fs"
 import { ASTtoCTTransformer } from "./astTransformer"
 import { ProgramNode } from "./interpreter"
 
-describe("astTransformer", () => {
+describe("ASTtoCTTransformer - astTransformer", () => {
   it("should transform a program", () => {
     const transformer = new ASTtoCTTransformer()
 

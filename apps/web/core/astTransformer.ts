@@ -10,7 +10,7 @@ import {
 import {
   AssignmentStatement,
   ComponentNode,
-  Expression,
+  ExpressionNode,
   FunctionCallNode,
   FunctionNode,
   NAryExpression,
@@ -146,6 +146,8 @@ export class ASTtoCTTransformer {
       return this.transformExpressionStatement(node)
     } else if (node.type === "TryStatement") {
       return this.transformTryStatement(node)
+    } else if (node.type === "FunctionDeclaration") {
+      return this.transformFunctionDeclaration(node)
     } else {
       throw new Error(`Unknown statement type: ${node.type}`)
     }
@@ -214,7 +216,7 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformExpression(node: any): Expression {
+  transformExpression(node: any): ExpressionNode {
     if (node.type === "Identifier") {
       return this.transformIdentifier(node)
     } else if (node.type === "BinaryExpression") {
@@ -251,7 +253,7 @@ export class ASTtoCTTransformer {
   }
 
   transformBinaryExpression(node: BinaryExpression): NAryExpression {
-    const args: Expression[] = []
+    const args: ExpressionNode[] = []
 
     let operator = node.operator
 
