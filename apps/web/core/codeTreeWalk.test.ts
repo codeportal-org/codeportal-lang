@@ -14,6 +14,8 @@ describe("CodeTreeWalk", () => {
       Parser.extend(acornJSXParser()).parse(
         `
       function App() {
+        let x = 0
+
         return <div></div>
       }
     `,
@@ -37,12 +39,22 @@ describe("CodeTreeWalk", () => {
           meta: { extras: { counter: 1 } },
           body: [
             {
-              type: "return",
+              type: "var",
               meta: { extras: { counter: 2 } },
+              name: "x",
+              value: {
+                type: "number",
+                meta: { extras: { counter: 3 } },
+                value: 0,
+              },
+            },
+            {
+              type: "return",
+              meta: { extras: { counter: 4 } },
               arg: {
                 type: "ui element",
                 name: "div",
-                meta: { extras: { counter: 3 } },
+                meta: { extras: { counter: 5 } },
                 props: [],
                 children: [],
               },
