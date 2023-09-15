@@ -2,7 +2,7 @@ import { Square, Text } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-import { Expression, ProgramNode, StatementNode } from "./interpreter"
+import { ExpressionNode, ProgramNode, StatementNode } from "./lang/interpreter"
 
 export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode }) => {
   return (
@@ -72,7 +72,7 @@ export const StatementView = ({ node }: { node: StatementNode }) => {
   )
 }
 
-export const ExpressionView = ({ node }: { node: Expression }) => {
+export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
   if (!node) return null
 
   return (

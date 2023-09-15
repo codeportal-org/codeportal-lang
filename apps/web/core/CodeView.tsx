@@ -7,7 +7,7 @@ import { PrivateRoomProvider, privateLiveRoomContext } from "@/lib/liveblocks.co
 
 import { CodeTreeView } from "./CodeTreeView"
 import { editorEmitter } from "./editorSingleton"
-import { ProgramNode } from "./interpreter"
+import { ProgramNode } from "./lang/interpreter"
 
 export const CodeView = React.forwardRef<
   HTMLDivElement,

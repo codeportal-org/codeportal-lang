@@ -26,10 +26,10 @@ import { ThemeColor } from "@/db/schema"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
-import { ASTtoCTTransformer } from "./astTransformer"
-import { CodeProcessor } from "./codeProcessor"
 import { editorEmitter } from "./editorSingleton"
-import { ProgramNode } from "./interpreter"
+import { ASTtoCTTransformer } from "./lang/astTransformer"
+import { CodeProcessor } from "./lang/codeProcessor"
+import { ProgramNode } from "./lang/interpreter"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const clerk = useClerk()
