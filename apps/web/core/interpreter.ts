@@ -10,6 +10,7 @@ export type SpecialNodes =
   | ObjectProperty
 
 export type CodeMeta = {
+  id?: string
   parent?: CodeNode
   extras?: Record<string, any>
 }
@@ -19,6 +20,18 @@ export type ProgramNode = {
   body: StatementNode[]
   meta?: CodeMeta
 }
+
+export const statementTypes = [
+  "return",
+  "print",
+  "component",
+  "function",
+  "var",
+  "state",
+  "function call",
+  "assignment",
+  "try",
+] as const
 
 export type StatementNode =
   | ReturnStatementNode
@@ -80,6 +93,9 @@ export type UIPropNode = {
   meta?: CodeMeta
 }
 
+/**
+ * This node does not have an id because its name is what defines its semantics (functionality) like CSS props.
+ */
 export type UIStyleNode = {
   type: "ui style"
   name: string

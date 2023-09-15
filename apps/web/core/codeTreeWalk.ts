@@ -19,10 +19,10 @@ import {
 } from "./interpreter"
 
 export class CodeTreeWalk {
-  currentNode: CodeNode | null = null
-  callback: (node: CodeNode, parent: CodeNode | null) => void = () => {}
+  currentNode: CodeNode | undefined = undefined
+  callback: (node: CodeNode, parent: CodeNode | undefined) => void = () => {}
 
-  full(code: ProgramNode, callback: (node: CodeNode, parent: CodeNode | null) => void) {
+  full(code: ProgramNode, callback: (node: CodeNode, parent: CodeNode | undefined) => void) {
     this.callback = callback
     if (code.type === "program") {
       this.walkProgram(code)
@@ -30,7 +30,7 @@ export class CodeTreeWalk {
   }
 
   private walkProgram(code: ProgramNode) {
-    this.callback(code, null)
+    this.callback(code, undefined)
     this.currentNode = code
 
     code.body.forEach((child) => {
