@@ -113,7 +113,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
         // in case processing was running, reset it
         codeProcessor.reset()
 
-        const ast = codeProcessor.process(code)
+        const codeTree = codeProcessor.process(code)
         console.log("FINAL --- codeTree", codeTree)
         setCodeTree(codeTree)
       }
