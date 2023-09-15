@@ -98,6 +98,8 @@ module.exports = {
           types: "#953800",
           "empty-expression": "rgb(233, 233, 233)",
           "empty-expression-hover": "rgb(221, 221, 221)",
+          //---
+          "ui-element-name": "#116329",
         },
         // ---
       },

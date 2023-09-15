@@ -1,3 +1,5 @@
+import { Square, Text } from "lucide-react"
+
 import { cn } from "@/lib/utils"
 
 import { Expression, ProgramNode, StatementNode } from "./interpreter"
@@ -19,7 +21,7 @@ export const StatementView = ({ node }: { node: StatementNode }) => {
   return (
     <>
       {node.type === "component" && (
-        <div className="flex cursor-pointer flex-col rounded-xl px-2 py-1 hover:bg-gray-100">
+        <div className="flex cursor-pointer flex-col rounded-xl px-2 py-1">
           <div className="flex flex-row">
             <Keyword>component</Keyword>
             <Callable> {node.name} </Callable>
@@ -35,7 +37,7 @@ export const StatementView = ({ node }: { node: StatementNode }) => {
         </div>
       )}
       {node.type === "function" && (
-        <div className="flex cursor-pointer flex-col rounded-xl px-2 py-1 hover:bg-gray-100">
+        <div className="flex cursor-pointer flex-col rounded-xl px-2 py-1">
           <div className="flex flex-row">
             <Keyword>fun</Keyword>
             <Callable> {node.name} </Callable>
@@ -51,15 +53,21 @@ export const StatementView = ({ node }: { node: StatementNode }) => {
         </div>
       )}
       {node.type === "var" && (
-        <div className="flex flex-row">
+        <div className="flex flex-row gap-1.5">
           <Keyword>var</Keyword>
-          <div className="text-gray-500"> {node.name} </div>
-          <div className="text-gray-500">=</div>
+          <CodeName>{node.name}</CodeName>
+          <CodeSymbol>=</CodeSymbol>
 
           <ExpressionView node={node.value} />
         </div>
       )}
       {/* {node.type === "expression" && <ExpressionView node={node.expression} />} */}
+      {node.type === "return" && (
+        <div className="flex flex-row gap-1.5">
+          <Keyword>return</Keyword>
+          <ExpressionView node={node.arg} />
+        </div>
+      )}
     </>
   )
 }
@@ -69,58 +77,61 @@ export const ExpressionView = ({ node }: { node: Expression }) => {
 
   return (
     <>
-      {node.type === "string" && <div className="text-gray-500"> {node.value} </div>}
-      {node.type === "number" && <div className="text-gray-500"> {node.value} </div>}
-      {node.type === "boolean" && <div className="text-gray-500"> {node.value} </div>}
-      {/* {node.type === "Identifier" && <div className="text-gray-500"> {node.name} </div>} */}
-      {/* {node.type === "CallExpression" && (
-        <div className="flex flex-row">
-          <Callable> {node.callee.name} </Callable>
-          <div className="text-gray-500"> (</div>
-          {node.arguments.map((arg: any) => (
-            <ExpressionView node={arg} key={arg.start} />
-          ))}
-          <div className="text-gray-500">) </div>
-        </div>
-      )} */}
-      {/* {node.type === "ArrowFunctionExpression" && (
-        <>
-          <div className="flex flex-row">
-            <Keyword>function (</Keyword>
-            {node.params.map((param: any) => (
-              <ExpressionView node={param} key={param.start} />
-            ))}
-            <Keyword>)</Keyword>
-            {node.expression && <ExpressionView node={node.body} />}
+      {node.type === "string" && <div className="text-code-string"> {node.value} </div>}
+      {node.type === "number" && <div className="text-code-number"> {node.value} </div>}
+      {node.type === "boolean" && <div className="text-code-boolean"> {node.value} </div>}
+      {node.type === "ref" && <CodeName>{node.name}</CodeName>}
+      {node.type === "ui text" && node.text}
+      {node.type === "ui element" && (
+        <div className="flex flex-col">
+          <div className="text-code-ui-element-name flex items-center gap-1.5">
+            {node.name === "div" ? (
+              <>
+                <Square size={16} className="text-code-name" />
+                Box
+              </>
+            ) : node.name === "p" ? (
+              <>
+                <Text size={16} className="text-code-name" />
+                Text
+              </>
+            ) : node.name === "h1" ? (
+              <>
+                <div className="text-code-ui-element-name">Heading 1</div>
+              </>
+            ) : node.name === "h2" ? (
+              <>
+                <div className="text-code-ui-element-name">Heading 2</div>
+              </>
+            ) : (
+              node.name
+            )}
+            <div className="text-gray-500">
+              {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
+            </div>
           </div>
-          {!node.expression && (
-            <StatementList>
-              {node.body.body.map((node: any) => (
-                <StatementView node={node} key={node.start} />
-              ))}
-            </StatementList>
+          {node.children && (
+            <div className="flex flex-col gap-1.5 pl-9">
+              {node.children.map((node, idx) => {
+                return <ExpressionView node={node} key={idx} />
+              })}
+            </div>
           )}
-        </>
-      )} */}
-      {/* {node.type === "CallExpression" && (
-        <div className="flex flex-row">
-          <div className="text-gray-500"> {node.callee.name} </div>
-          <div className="text-gray-500"> (</div>
-          {node.arguments.map((arg: any) => (
-            <ExpressionView node={arg} key={arg.start} />
-          ))}
-          <div className="text-gray-500">) </div>
         </div>
       )}
-      {node.type === "MemberExpression" && (
-        <div className="flex flex-row">
-          <div className="text-gray-500"> {node.object.name} </div>
-          <div className="text-gray-500">.</div>
-          <div className="text-gray-500"> {node.property.name} </div>
+      {node.type === "ui expression" && (
+        <div className="flex flex-row gap-1.5">
+          {"{"}
+          <ExpressionView node={node.expression} />
+          {"}"}
         </div>
-      )} */}
+      )}
     </>
   )
+}
+
+function CodeName({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <span className={cn("text-code-name", className)}>{children}</span>
 }
 
 function Callable({ children, className }: { children: React.ReactNode; className?: string }) {
