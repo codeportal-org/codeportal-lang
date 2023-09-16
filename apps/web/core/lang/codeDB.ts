@@ -1,11 +1,9 @@
-import { PrimitiveAtom, atom, createStore } from "jotai"
+import { createNanoEvents } from "nanoevents"
 
 import { nanoid } from "@/lib/nanoid"
 
 import { CodeTreeWalk } from "./codeTreeWalk"
 import { CodeNode, FunctionNode, ProgramNode, StatementNode, statementTypes } from "./interpreter"
-
-export type CodeNodeAtom = PrimitiveAtom<CodeNode>
 
 /**
  * CodeDB indexes the Code Tree and stores it in useful data structures to be used by the Editor.
@@ -14,34 +12,88 @@ export type CodeNodeAtom = PrimitiveAtom<CodeNode>
 export class CodeDB {
   codeTree: ProgramNode | undefined = undefined
 
+  isCodeLoaded = false
+
   codeTreeWalker = new CodeTreeWalk()
 
-  /**
-   * Jotai atoms for each node in the Code Tree. Used for Editor's reactivity.
-   */
-  nodeAtomMap = new Map<string, CodeNodeAtom>()
+  nodeMap = new Map<string, CodeNode>()
 
-  atomStore = createStore()
+  private events = createNanoEvents()
+
+  reset() {
+    this.codeTree = undefined
+    this.nodeMap.clear()
+    this.events = createNanoEvents()
+    this.isCodeLoaded = false
+    this.codeTreeWalker.reset()
+  }
 
   /**
    * Loads the code tree into the CodeDB.
    */
   load(code: ProgramNode) {
-    // attach parent to all nodes
     this.codeTreeWalker.full(code, (node, parent) => {
       if (!node.meta) {
         node.meta = {}
       }
 
+      // attach parent to all nodes
       node.meta.parent = parent
+
+      // add id to all nodes
       const nodeId = nanoid()
       node.meta.id = nodeId
 
-      const nodeAtom = atom(node)
-      this.nodeAtomMap.set(nodeId, { ...nodeAtom })
+      // add nodes to map
+      this.nodeMap.set(nodeId, node)
     })
 
     this.codeTree = code
+    this.isCodeLoaded = true
+
+    this.notifyCodeLoaded()
+  }
+
+  notifyCodeLoaded() {
+    console.log("--- notifyCodeLoaded")
+    this.events.emit("code-loaded")
+  }
+
+  onCodeLoaded(callback: () => void) {
+    console.log("--- onCodeLoaded")
+    return this.events.on("code-loaded", callback)
+  }
+
+  notifyNodeChange(nodeId: string) {
+    this.events.emit("node-change", { nodeId })
+  }
+
+  onNodeChange(callback: (data: { nodeId: string }) => void) {
+    return this.events.on("node-change", callback)
+  }
+
+  partialLoad(node: ProgramNode) {
+    this.codeTree = node
+  }
+
+  getCodeTree() {
+    return this.codeTree
+  }
+
+  getByID(id: string) {
+    return this.nodeMap.get(id)
+  }
+
+  isDescendantOf(node: CodeNode, target: CodeNode): boolean {
+    if (node === target) {
+      return true
+    }
+
+    if (!node.meta?.parent) {
+      return false
+    }
+
+    return this.isDescendantOf(node.meta.parent, target)
   }
 
   moveStatementNode(node: StatementNode, target: StatementNode) {
@@ -77,15 +129,15 @@ export class CodeDB {
       target.meta.parent = nodeParent
 
       // update atoms for reactivity in the editor
-      const nodeAtom = this.nodeAtomMap.get(node.meta?.id!)!
-      const targetAtom = this.nodeAtomMap.get(target.meta?.id!)!
-      const parentAtom = this.nodeAtomMap.get(nodeParent.meta?.id!)!
-      const targetParentAtom = this.nodeAtomMap.get(targetParent.meta?.id!)!
+      const nodeId = node.meta?.id!
+      const targetId = target.meta?.id!
+      const parentId = nodeParent.meta?.id!
+      const targetParentId = targetParent.meta?.id!
 
-      this.atomStore.set(nodeAtom, { ...node })
-      this.atomStore.set(targetAtom, { ...target })
-      this.atomStore.set(parentAtom, { ...nodeParent })
-      this.atomStore.set(targetParentAtom, { ...targetParent })
+      this.notifyNodeChange(nodeId)
+      this.notifyNodeChange(targetId)
+      this.notifyNodeChange(parentId)
+      this.notifyNodeChange(targetParentId)
     }
   }
 }

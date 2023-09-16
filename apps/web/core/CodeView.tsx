@@ -7,20 +7,35 @@ import { PrivateRoomProvider, privateLiveRoomContext } from "@/lib/liveblocks.co
 
 import { CodeTreeView } from "./CodeTreeView"
 import { editorEmitter } from "./editorSingleton"
+import { CodeDBProvider, useCodeDB } from "./lang/codeDBContext"
 import { ProgramNode } from "./lang/interpreter"
 
 export const CodeView = React.forwardRef<
   HTMLDivElement,
-  { appId: string; code: string; isFinished: boolean; codeTree: ProgramNode | null }
->(({ appId, code, isFinished, codeTree }, ref) => {
+  {
+    appId: string
+    code: string
+    isFinished: boolean
+    codeTree: ProgramNode | null
+    isLoading: boolean
+  }
+>(({ appId, code, isFinished, codeTree, isLoading }, ref) => {
   return (
     <div className="h-full">
       <PrivateRoomProvider id={`editor-${appId}`} initialPresence={{}}>
-        <ClientSideSuspense fallback={<div>Loading...</div>}>
-          {() => (
-            <CodeContainer ref={ref} code={code} isFinished={isFinished} codeTree={codeTree} />
-          )}
-        </ClientSideSuspense>
+        <CodeDBProvider>
+          <ClientSideSuspense fallback={<div>Loading...</div>}>
+            {() => (
+              <CodeContainer
+                ref={ref}
+                code={code}
+                isFinished={isFinished}
+                codeTree={codeTree}
+                isLoading={isLoading}
+              />
+            )}
+          </ClientSideSuspense>
+        </CodeDBProvider>
       </PrivateRoomProvider>
     </div>
   )
@@ -28,9 +43,10 @@ export const CodeView = React.forwardRef<
 
 const CodeContainer = React.forwardRef<
   HTMLDivElement,
-  { code: string; isFinished: boolean; codeTree: ProgramNode | null }
->(({ code, isFinished, codeTree }, ref) => {
+  { code: string; isFinished: boolean; codeTree: ProgramNode | null; isLoading: boolean }
+>(({ code, isFinished, codeTree, isLoading }, ref) => {
   const broadcast: any = privateLiveRoomContext.useBroadcastEvent()
+  const codeDB = useCodeDB()
 
   React.useEffect(() => {
     const unsubscribe = editorEmitter.onRefresh(() => {
@@ -47,6 +63,22 @@ const CodeContainer = React.forwardRef<
       broadcast({ type: "refresh" })
     }
   }, [code, isFinished])
+
+  React.useEffect(() => {
+    if (!codeTree) {
+      return
+    }
+
+    if (isLoading) {
+      codeDB?.reset()
+      codeDB?.partialLoad(codeTree)
+    } else {
+      console.log("-----  load")
+      codeDB?.reset()
+      codeDB?.load(codeTree)
+      console.log("-----  loaded")
+    }
+  }, [codeTree, isLoading])
 
   if (codeTree) {
     return <CodeTreeView codeTree={codeTree} />

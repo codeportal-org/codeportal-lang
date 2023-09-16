@@ -22,11 +22,18 @@ export class CodeTreeWalk {
   currentNode: CodeNode | undefined = undefined
   callback: (node: CodeNode, parent: CodeNode | undefined) => void = () => {}
 
+  reset() {
+    this.currentNode = undefined
+    this.callback = () => {}
+  }
+
   full(code: ProgramNode, callback: (node: CodeNode, parent: CodeNode | undefined) => void) {
     this.callback = callback
     if (code.type === "program") {
       this.walkProgram(code)
     }
+
+    this.reset()
   }
 
   private walkProgram(code: ProgramNode) {

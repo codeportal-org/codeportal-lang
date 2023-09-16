@@ -150,6 +150,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
             appId={appId}
             ref={completionContainerRef}
             isFinished={isFinished}
+            isLoading={isLoading}
             code={code}
             codeTree={codeTree}
           />

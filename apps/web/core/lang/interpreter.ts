@@ -44,6 +44,20 @@ export type StatementNode =
   | AssignmentStatement
   | TryStatementNode
 
+export const expressionTypes = [
+  "string",
+  "number",
+  "boolean",
+  "ui element",
+  "ui fragment",
+  "ui text",
+  "ui expression",
+  "ref",
+  "path access",
+  "object",
+  "nary",
+] as const
+
 export type ExpressionNode =
   | LiteralNode
   | UINode

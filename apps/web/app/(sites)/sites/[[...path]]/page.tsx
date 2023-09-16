@@ -3,7 +3,7 @@ import { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
 import React from "react"
 
-import { ComponentNode, interpretComponent } from "@/core/interpreter"
+import { ComponentNode, interpretComponent } from "@/core/lang/interpreter"
 import { db, schema } from "@/db/index"
 import { MainModule } from "@/db/schema"
 
