@@ -1,4 +1,3 @@
-import { ComponentNode } from "@/core/interpreter"
 import { useClerkSWR, useClerkSWRMutation } from "@/lib/swr"
 
 export const useSaveCode = (appId: string) =>

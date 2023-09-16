@@ -69,16 +69,16 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
 
 export default SitePage
 
-async function portalServerRenderer({
-  mainModule,
-}: {
-  mainModule: MainModule | null
-}): Promise<React.ReactNode> {
-  if (!mainModule) {
-    return <></>
-  }
+// async function portalServerRenderer({
+//   mainModule,
+// }: {
+//   mainModule: MainModule | null
+// }): Promise<React.ReactNode> {
+//   if (!mainModule) {
+//     return <></>
+//   }
 
-  const code: ComponentNode = mainModule.code
+//   const code: ComponentNode = mainModule.code
 
-  return interpretComponent(code)
-}
+//   return interpretComponent(code)
+// }
