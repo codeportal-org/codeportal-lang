@@ -13,9 +13,13 @@
 
 ## Introduction
 
-CodePortal is an open-source GUI-based, AI-first, web-based programming language and platform with the primary goal of making systems and programming more accessible. We try to remove as much clutter and unnecessary complexity as possible out of programming. The editor is heavily focused on developer experience, and supporting multiple views of a system. It is thought from the ground up to be AI-first. CodePortal is currently in alpha, so, many of the features are being actively developed, and some are coming soon.
+CodePortal is an open-source full-stack, AI-first, web-based platform with the primary goal of making programming more accessible. With CodePortal you can create, edit and publish web-apps, widgets, and APIs in a simple and intuitive editor. All without installing or configuring anything.
 
-This project has two main parts, the Portal Language (PortalLang) and the CodePortal Platform. Our goals are ambitious and bold! We want to make programming drastically better. This project is based on three core design choices:
+Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and editor is heavily focused on developer experience, and supporting multiple views of a system. Additionally, it is thought from the ground up to work with generative AI.
+
+CodePortal is currently in alpha, so, many of the features are being actively developed, and some are coming soon.
+
+This project has two main parts, the Portal Language (PortalLang), a general purpose programming language, and the CodePortal Platform. Our goals are ambitious and bold! We want to make programming drastically better. This project is based on three core design choices:
 
 - ✨ We should be able to read, modify and navigate code in multiple ways. Like in a block-based UI, a graph view, in a canvas view, in a notebook, and in visual UI builder. Also, these there should be ways to extend these views even further. This makes the system accessible to more people, and makes it easier to understand and to work with. Additionally, it enables new ways of working with code that are not possible with text-based programming. Imagine there is a different representation of the code depending on the task at hand or the person that is interacting with the system.
 - 🕸️ Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. We see this as a more natural medium for code that's easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, tooling and version control (AST-based). Bye, bye, imports! Also, every node is addressable by a unique ID (using `nanoid`).
