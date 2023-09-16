@@ -13,7 +13,7 @@
 
 ## Introduction
 
-CodePortal is an open-source full-stack, AI-first, web-based platform with the primary goal of making programming more accessible. With CodePortal you can create, edit and publish web-apps, widgets, and APIs in a simple and intuitive editor. All without installing or configuring anything.
+CodePortal is an open-source full-stack, AI-first, web-based programming platform with the primary goal of improving the way in which we build software. With CodePortal you can create, edit and publish web-apps, widgets, and APIs in a simple and intuitive editor. All without installing or configuring anything.
 
 Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and editor are heavily focused on developer experience, and supporting multiple views of a program. Additionally, they are thought from the ground up to work hand in hand with generative AI.
 
