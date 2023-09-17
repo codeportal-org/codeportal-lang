@@ -5,6 +5,7 @@ export type CodeNode = ProgramNode | StatementNode | ExpressionNode | SpecialNod
 export type SpecialNodes =
   | UIPropDeclaration
   | UIPropNode
+  | UISpreadPropNode
   | UIStyleNode
   | ParamDeclaration
   | ObjectProperty
@@ -96,7 +97,7 @@ export type UIPropDeclaration = {
 export type UIElementNode = {
   type: "ui element"
   name: string
-  props?: UIPropNode[]
+  props?: (UIPropNode | UISpreadPropNode)[]
   style?: UIStyleNode[]
   children?: UINode[]
   meta?: CodeMeta
@@ -106,6 +107,12 @@ export type UIPropNode = {
   type: "ui prop"
   name: string
   value: ExpressionNode
+  meta?: CodeMeta
+}
+
+export type UISpreadPropNode = {
+  type: "ui spread prop"
+  arg: ExpressionNode
   meta?: CodeMeta
 }
 

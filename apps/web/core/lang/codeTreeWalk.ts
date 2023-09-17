@@ -12,10 +12,12 @@ import {
   StateStatement,
   StatementNode,
   UIElementNode,
+  UIExpressionNode,
   UIFragmentNode,
   UINode,
   UIPropDeclaration,
   UIPropNode,
+  UISpreadPropNode,
   UITextNode,
   VarStatement,
 } from "./interpreter"
@@ -72,10 +74,13 @@ export class CodeTreeWalk {
 
     if (node.type === "string" || node.type === "number" || node.type === "boolean") {
       this.walkLiteral(node)
+    } else if (node.type === "ref") {
+      this.walkRef(node)
     } else if (
       node.type === "ui element" ||
       node.type === "ui fragment" ||
-      node.type === "ui text"
+      node.type === "ui text" ||
+      node.type === "ui expression"
     ) {
       this.walkUI(node)
     } else {
@@ -92,7 +97,7 @@ export class CodeTreeWalk {
     // router function, do not call callback here
 
     if (node.type === "ui expression") {
-      this.walkExpression(node)
+      this.walkUIExpression(node)
     } else if (node.type === "ui element") {
       this.walkUIElement(node)
     } else if (node.type === "ui fragment") {
@@ -104,12 +109,23 @@ export class CodeTreeWalk {
     }
   }
 
+  private walkUIExpression(node: UIExpressionNode) {
+    this.callback(node, this.currentNode)
+    this.currentNode = node
+
+    this.walkExpression(node.expression)
+  }
+
   private walkUIElement(code: UIElementNode) {
     this.callback(code, this.currentNode)
     this.currentNode = code
 
     code.props?.forEach((child) => {
-      this.walkUIPropNode(child)
+      if (child.type === "ui prop") {
+        this.walkUIPropNode(child)
+      } else {
+        this.walkUISpreadPropNode(child)
+      }
     })
 
     code.children?.forEach((child) => {
@@ -122,6 +138,13 @@ export class CodeTreeWalk {
     this.currentNode = node
 
     this.walkExpression(node.value)
+  }
+
+  private walkUISpreadPropNode(node: UISpreadPropNode) {
+    this.callback(node, this.currentNode)
+    this.currentNode = node
+
+    this.walkExpression(node.arg)
   }
 
   private walkReturnStatement(code: ReturnStatementNode) {

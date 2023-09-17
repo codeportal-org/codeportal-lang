@@ -567,6 +567,58 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
+  it("should transform a component with JSX elements with props", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          function Comp() {
+            return (
+              <div className="class1 class2">Hello</div>
+            );
+          }
+        `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      body: [
+        {
+          type: "component",
+          name: "Comp",
+          body: [
+            {
+              type: "return",
+              arg: {
+                type: "ui element",
+                name: "div",
+                props: [
+                  {
+                    type: "ui prop",
+                    name: "className",
+                    value: {
+                      type: "string",
+                      value: "class1 class2",
+                    },
+                  },
+                ],
+                children: [
+                  {
+                    type: "ui text",
+                    text: "Hello",
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
   return
 
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {

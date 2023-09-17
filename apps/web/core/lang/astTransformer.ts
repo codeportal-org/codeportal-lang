@@ -31,6 +31,7 @@ import {
   UIFragmentNode,
   UINode,
   UIPropNode,
+  UISpreadPropNode,
   UITextNode,
 } from "./interpreter"
 
@@ -290,12 +291,17 @@ export class ASTtoCTTransformer {
     return {
       type: "ui element",
       name: (node.openingElement.name as JSXIdentifier).name,
-      props: node.openingElement.attributes.map((attribute: any) => {
-        return {
-          type: "ui prop",
-          name: attribute.name.name,
-          value: attribute.value.value,
-        } satisfies UIPropNode
+      props: node.openingElement.attributes.map((attribute) => {
+        return attribute.type === "JSXAttribute"
+          ? ({
+              type: "ui prop",
+              name: attribute.name.name as string,
+              value: this.transformExpression(attribute.value),
+            } satisfies UIPropNode)
+          : ({
+              type: "ui spread prop",
+              arg: this.transformExpression(attribute.argument),
+            } satisfies UISpreadPropNode)
       }),
       children: node.children
         .map((child: any) => {
