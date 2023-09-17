@@ -2,6 +2,10 @@ import {
   ArrowFunctionExpression,
   BinaryExpression,
   FunctionDeclaration,
+  JSXElement,
+  JSXFragment,
+  JSXIdentifier,
+  JSXText,
   Program,
   Statement,
   TryStatement,
@@ -24,6 +28,8 @@ import {
   TryStatementNode,
   UIElementNode,
   UIExpressionNode,
+  UIFragmentNode,
+  UINode,
   UIPropNode,
   UITextNode,
 } from "./interpreter"
@@ -280,10 +286,10 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformJSXElement(node: any): UIElementNode {
+  transformJSXElement(node: JSXElement): UIElementNode {
     return {
       type: "ui element",
-      name: node.openingElement.name.name,
+      name: (node.openingElement.name as JSXIdentifier).name,
       props: node.openingElement.attributes.map((attribute: any) => {
         return {
           type: "ui prop",
@@ -296,22 +302,49 @@ export class ASTtoCTTransformer {
           if (child.type === "JSXElement") {
             return this.transformJSXElement(child)
           } else if (child.type === "JSXText") {
-            // ignore whitespace like JSX with value "\n   " that is just indentation
-            if (child.value.trim() === "") {
-              return null
-            }
-
-            return {
-              type: "ui text",
-              text: child.value,
-            } satisfies UITextNode
+            return this.transformJSXText(child)
           } else if (child.type === "JSXExpressionContainer") {
             return this.transformUIExpression(child.expression)
+          } else if (child.type === "JSXFragment") {
+            return this.transformJSXFragment(child)
           } else {
             throw new Error(`Unknown JSX child type: ${child.type}`)
           }
         })
-        .filter((child: any) => child !== null),
+        .filter((child: any) => child !== null) as UINode[],
+    }
+  }
+
+  transformJSXText(node: JSXText): UITextNode | null {
+    // ignore whitespace like JSX with value "\n   " that is just indentation
+    if (node.value.trim() === "") {
+      return null
+    }
+
+    return {
+      type: "ui text",
+      text: node.value,
+    } satisfies UITextNode
+  }
+
+  transformJSXFragment(node: JSXFragment): UIFragmentNode {
+    return {
+      type: "ui fragment",
+      children: node.children
+        .map((child: any) => {
+          if (child.type === "JSXElement") {
+            return this.transformJSXElement(child)
+          } else if (child.type === "JSXText") {
+            return this.transformJSXText(child)
+          } else if (child.type === "JSXExpressionContainer") {
+            return this.transformUIExpression(child.expression)
+          } else if (child.type === "JSXFragment") {
+            return this.transformJSXFragment(child)
+          } else {
+            throw new Error(`Unknown JSX child type: ${child.type}`)
+          }
+        })
+        .filter((child) => child !== null) as UINode[],
     }
   }
 
