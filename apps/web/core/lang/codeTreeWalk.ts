@@ -12,9 +12,11 @@ import {
   StateStatement,
   StatementNode,
   UIElementNode,
+  UIFragmentNode,
   UINode,
   UIPropDeclaration,
   UIPropNode,
+  UITextNode,
   VarStatement,
 } from "./interpreter"
 
@@ -76,6 +78,8 @@ export class CodeTreeWalk {
       node.type === "ui text"
     ) {
       this.walkUI(node)
+    } else {
+      throw new Error(`Unknown expression type: ${node.type}`)
     }
   }
 
@@ -84,13 +88,19 @@ export class CodeTreeWalk {
     this.currentNode = node
   }
 
-  private walkUI(code: UINode) {
+  private walkUI(node: UINode) {
     // router function, do not call callback here
 
-    if (code.type === "ui expression") {
-      this.walkExpression(code)
-    } else if (code.type === "ui element") {
-      this.walkUIElement(code)
+    if (node.type === "ui expression") {
+      this.walkExpression(node)
+    } else if (node.type === "ui element") {
+      this.walkUIElement(node)
+    } else if (node.type === "ui fragment") {
+      this.walkUIFragment(node)
+    } else if (node.type === "ui text") {
+      this.walkUIText(node)
+    } else {
+      throw new Error(`Unknown UI type: ${(node as any).type}`)
     }
   }
 
@@ -191,5 +201,19 @@ export class CodeTreeWalk {
     this.currentNode = node
 
     this.walkExpression(node.value)
+  }
+
+  walkUIFragment(node: UIFragmentNode) {
+    this.callback(node, this.currentNode)
+    this.currentNode = node
+
+    node.children?.forEach((child) => {
+      this.walkUI(child)
+    })
+  }
+
+  walkUIText(node: UITextNode) {
+    this.callback(node, this.currentNode)
+    this.currentNode = node
   }
 }
