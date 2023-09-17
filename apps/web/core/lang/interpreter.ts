@@ -72,6 +72,8 @@ export type LiteralNode = StringLiteral | NumberLiteral | BooleanLiteral
 
 export type UINode = UIElementNode | UITextNode | UIFragmentNode | UIExpressionNode
 
+export const uiNodeTypes = ["ui element", "ui fragment", "ui text", "ui expression"]
+
 export type ComponentNode = {
   type: "component"
   name: string

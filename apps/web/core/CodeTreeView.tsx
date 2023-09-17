@@ -1,14 +1,11 @@
-import { useDraggable, useDroppable } from "@dnd-kit/core"
+import { DragStartEvent, closestCorners, useDraggable, useDroppable } from "@dnd-kit/core"
 import {
-  ClientRect,
-  CollisionDetection,
   DndContext,
   DragOverEvent,
   DragOverlay,
   MeasuringStrategy,
   Modifier,
   PointerSensor,
-  rectIntersection,
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
@@ -24,37 +21,49 @@ import { useCodeDB } from "./lang/codeDBContext"
 import {
   CodeNode,
   ExpressionNode,
+  NumberLiteral,
   ProgramNode,
   StatementNode,
+  StringLiteral,
+  UINode,
+  VarStatement,
   expressionTypes,
+  uiNodeTypes,
 } from "./lang/interpreter"
 
 const draggedNodeIdAtom = atom<string | null>(null)
+const droppedOnNodeIdAtom = atom<string | null>(null)
 
 export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => {
   const codeDB = useCodeDB()
   const sensors = useSensors(useSensor(PointerSensor))
-  const [draggedNodeId, setDraggedNodeId] = useAtom(draggedNodeIdAtom)
   const [isCodeLoadedInDB, setIsCodeLoadedInDB] = React.useState(() => codeDB?.isCodeLoaded)
+
+  const [draggedNodeId, setDraggedNodeId] = useAtom(draggedNodeIdAtom)
+  const [droppedOnNodeId, setDroppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
 
   const draggedNode = draggedNodeId ? codeDB?.getByID(draggedNodeId) : null
 
   console.log("--- draggedNode: ", draggedNode, draggedNodeId)
 
-  const handleDragStart = ({ active }: any) => {
-    console.log("drag start")
-    setDraggedNodeId(active.id)
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    console.log("drag start", active.id)
+    setDraggedNodeId(active.id as string)
+    setDroppedOnNodeId(null)
   }
-  const handleDragOver = () => {
-    console.log("drag over")
+  function handleDragOver({ active, over }: DragOverEvent) {
+    console.log("drag over", over?.id)
+    setDroppedOnNodeId(over?.id as string)
   }
   const handleDragEnd = () => {
     console.log("drag end")
     setDraggedNodeId(null)
+    setDroppedOnNodeId(null)
   }
   const handleDragCancel = () => {
     console.log("drag cancel")
     setDraggedNodeId(null)
+    setDroppedOnNodeId(null)
   }
 
   React.useEffect(() => {
@@ -93,7 +102,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={customCollisionDetectionAlgorithm(codeDB)}
+      collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
@@ -109,7 +118,11 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
       {createPortal(
         <DragOverlay>
           {draggedNode ? (
-            <StatementView node={draggedNode as StatementNode} isOverlay={true} />
+            uiNodeTypes.includes(draggedNode.type) ? (
+              <UINodeView node={draggedNode as UINode} isOverlay={true} />
+            ) : (
+              <StatementView node={draggedNode as StatementNode} isOverlay={true} />
+            )
           ) : null}
         </DragOverlay>,
         document.body,
@@ -126,12 +139,10 @@ export const StatementView = ({
   isOverlay?: boolean
 }) => {
   const nodeId = node.meta?.id!
-  // console.log("nodeId: ", nodeId)
   const hasParent = node.meta?.parent !== undefined
 
-  // console.log("hasParent: ", hasParent)
-
   const [draggedNodeId] = useAtom(draggedNodeIdAtom)
+  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
@@ -153,7 +164,8 @@ export const StatementView = ({
         "bg-code-bg flex cursor-pointer select-none flex-col rounded-xl border border-slate-400 px-2 py-1",
         {
           "border-destructive": !isOverlay && nodeId === draggedNodeId,
-          // "border-dashed opacity-90": isOverlay,
+          "ring-4 ring-lime-600": !isOverlay && nodeId === droppedOnNodeId,
+          "border-dashed opacity-90": isOverlay,
         },
       )}
       ref={(ref) => {
@@ -166,8 +178,9 @@ export const StatementView = ({
       {node.type === "component" && (
         <>
           <div className="flex flex-row">
-            <Keyword>component</Keyword>
-            <Callable> {node.name} </Callable>
+            <span className="text-code-keyword">component</span>
+            <span className="pl-1">{/* spacer */}</span>
+            <span className="text-code-callable"> {node.name} </span>
             <div className="text-gray-500">
               {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
             </div>
@@ -182,8 +195,8 @@ export const StatementView = ({
       {node.type === "function" && (
         <>
           <div className="flex flex-row">
-            <Keyword>fun</Keyword>
-            <Callable> {node.name} </Callable>
+            <span className="text-code-keyword">fun</span>
+            <span className="text-code-callable"> {node.name} </span>
             <div className="text-gray-500">
               {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
             </div>
@@ -195,22 +208,26 @@ export const StatementView = ({
           </StatementList>
         </>
       )}
-      {node.type === "var" && (
-        <div className="flex flex-row gap-1.5">
-          <Keyword>var</Keyword>
-          <CodeName>{node.name}</CodeName>
-          <CodeSymbol>=</CodeSymbol>
-
-          <ExpressionView node={node.value} />
-        </div>
-      )}
+      {node.type === "var" && <VariableStatementView node={node} />}
       {/* {node.type === "expression" && <ExpressionView node={node.expression} />} */}
       {node.type === "return" && (
         <div className="flex flex-row gap-1.5">
-          <Keyword>return</Keyword>
+          <span className="text-code-keyword">return</span>
           <ExpressionView node={node.arg} />
         </div>
       )}
+    </div>
+  )
+}
+
+export const VariableStatementView = ({ node }: { node: VarStatement }) => {
+  return (
+    <div className="flex flex-row gap-1.5">
+      <span className="text-code-keyword">var</span>
+      <span className="text-code-name">{node.name}</span>
+      <span className="text-code-symbol">=</span>
+
+      <ExpressionView node={node.value} />
     </div>
   )
 }
@@ -220,10 +237,51 @@ export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
 
   return (
     <>
-      {node.type === "string" && <div className="text-code-string"> {node.value} </div>}
-      {node.type === "number" && <div className="text-code-number"> {node.value} </div>}
-      {node.type === "boolean" && <div className="text-code-boolean"> {node.value} </div>}
-      {node.type === "ref" && <CodeName>{node.name}</CodeName>}
+      {node.type === "string" && <StringView node={node} />}
+      {node.type === "number" && <NumberView node={node} />}
+      {node.type === "boolean" && <BooleanView node={node} />}
+      {node.type === "ref" && <ReferenceView node={node} />}
+      {uiNodeTypes.includes(node.type) && <UINodeView node={node as UINode} />}
+    </>
+  )
+}
+
+export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: boolean }) => {
+  const nodeId = node.meta?.id!
+  const hasNonUIParent = uiNodeTypes.includes(node.meta?.parent?.type!)
+
+  const [draggedNodeId] = useAtom(draggedNodeIdAtom)
+  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
+
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: nodeId,
+    data: { type: node.type },
+    disabled: hasNonUIParent,
+  })
+
+  const droppable = useDroppable({
+    id: nodeId,
+    data: { type: node.type },
+    disabled: hasNonUIParent,
+  })
+
+  return (
+    <div
+      className={cn(
+        "bg-code-bg flex cursor-pointer select-none flex-col rounded-xl border border-slate-400 px-2 py-1",
+        {
+          "border-destructive": !isOverlay && nodeId === draggedNodeId,
+          "ring-4 ring-lime-600": !isOverlay && nodeId === droppedOnNodeId,
+          "border-dashed opacity-90": isOverlay,
+        },
+      )}
+      ref={(ref) => {
+        setNodeRef(ref)
+        droppable.setNodeRef(ref)
+      }}
+      {...listeners}
+      {...attributes}
+    >
       {node.type === "ui text" && node.text}
       {node.type === "ui element" && (
         <div className="flex flex-col">
@@ -269,24 +327,24 @@ export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
           {"}"}
         </div>
       )}
-    </>
+    </div>
   )
 }
 
-function CodeName({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn("text-code-name", className)}>{children}</span>
+export const StringView = ({ node }: { node: StringLiteral }) => {
+  return <div className="text-code-string"> {node.value} </div>
 }
 
-function Callable({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn("text-code-callable", className)}>{children}</span>
+export const NumberView = ({ node }: { node: NumberLiteral }) => {
+  return <div className="text-code-number"> {node.value} </div>
 }
 
-function Keyword({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn("text-code-keyword", className)}>{children}</span>
+export const BooleanView = ({ node }: { node: { value: boolean } }) => {
+  return <div className="text-code-boolean"> {node.value} </div>
 }
 
-function CodeSymbol({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn("text-code-symbol", className)}>{children}</span>
+export const ReferenceView = ({ node }: { node: { name: string } }) => {
+  return <span className="text-code-name">{node.name}</span>
 }
 
 function StatementList({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -295,94 +353,6 @@ function StatementList({ children, className }: { children: React.ReactNode; cla
       {children}
     </div>
   )
-}
-
-const customCollisionDetectionAlgorithm =
-  (codeDB: CodeDB | null): CollisionDetection =>
-  ({ collisionRect, droppableRects, droppableContainers, active, ...rest }) => {
-    if (!codeDB) {
-      return []
-    }
-
-    // console.log("collision calculation")
-
-    if (!active.rect.current.initial || !active.rect.current.translated) {
-      return []
-    }
-
-    // If the active block is not moved far enough, don't show any collision
-    if (Math.abs(active.rect.current.initial.top - active.rect.current.translated.top) < 10) {
-      // console.log(
-      //   "---- comparison []",
-      //   Math.abs(active.rect.current.initial.top - active.rect.current.translated.top),
-      // )
-      return []
-    }
-
-    const draggedNode = codeDB.getByID(active.id as string)
-
-    const filteredDroppableContainers = droppableContainers.filter((droppableContainer) => {
-      const { id } = droppableContainer
-      const node = codeDB.getByID(id as string)
-
-      if (draggedNode?.type !== node?.type) {
-        return false
-      }
-
-      if (node && draggedNode && codeDB.isDescendantOf(node, draggedNode)) {
-        return false
-      }
-
-      return true
-    })
-
-    if (expressionTypes.includes(draggedNode?.type as any)) {
-      const rectIntersectionCollisions = rectIntersection({
-        collisionRect,
-        droppableRects,
-        droppableContainers: filteredDroppableContainers,
-        active,
-        ...rest,
-      })
-
-      return rectIntersectionCollisions
-    }
-
-    const collisions = []
-
-    for (const droppableContainer of filteredDroppableContainers) {
-      const { id } = droppableContainer
-
-      const rect = droppableRects.get(id)
-
-      if (rect) {
-        const intersectionRatio = getIntersection(collisionRect, rect)
-
-        if (intersectionRatio > 0) {
-          collisions.push({
-            id,
-            data: { droppableContainer, value: intersectionRatio },
-          })
-        }
-      }
-    }
-
-    return collisions.sort(sortCollisionsDesc)
-  }
-
-/**
- * Sort collisions in descending order (from greatest to smallest value)
- */
-export function sortCollisionsDesc({ data: { value: a } }: any, { data: { value: b } }: any) {
-  return a - b
-}
-
-function getIntersection(reference: ClientRect, entry: ClientRect) {
-  if (reference.top < entry.top) {
-    return 0
-  }
-
-  return reference.top - entry.top
 }
 
 /**
