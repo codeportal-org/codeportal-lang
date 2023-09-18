@@ -329,7 +329,7 @@ export class ASTtoCTTransformer {
 
     return {
       type: "ui text",
-      text: node.value,
+      text: collapseWhitespace(node.value),
     } satisfies UITextNode
   }
 
@@ -501,4 +501,8 @@ export class ASTtoCTTransformer {
 
     return functionNode
   }
+}
+
+export function collapseWhitespace(str: string) {
+  return str.replace(/\s+/g, " ").trim()
 }

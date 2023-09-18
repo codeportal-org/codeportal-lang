@@ -3,8 +3,17 @@ import acornJSXParser from "acorn-jsx"
 import { Program } from "estree"
 import fs from "fs"
 
-import { ASTtoCTTransformer } from "./astTransformer"
+import { ASTtoCTTransformer, collapseWhitespace } from "./astTransformer"
 import { ProgramNode } from "./interpreter"
+
+describe("collapseWhitespace", () => {
+  it("should collapse whitespace", () => {
+    const withWhitespace = `\n     Text    with   \t \n\n whitespace \n\n\n`
+    const withoutWhitespace = `Text with whitespace`
+
+    expect(collapseWhitespace(withWhitespace)).toBe(withoutWhitespace)
+  })
+})
 
 describe("ASTtoCTTransformer - astTransformer", () => {
   it("should transform a program", () => {
@@ -64,7 +73,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     const codeTree = transformer.transform(
       Parser.extend(acornJSXParser()).parse(
         `
-        function App() {
+        function myFunc() {
           return "Hello, World!";
         }
         `,
@@ -77,7 +86,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       body: [
         {
           type: "function",
-          name: "App",
+          name: "myFunc",
           params: [],
           body: [
             {
@@ -93,7 +102,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  it("should transform a program with a React component and a lot of JSX", () => {
+  it("should transform a program with a React component and a lot of JSX and collapse whitespace", () => {
     const transformer = new ASTtoCTTransformer()
 
     const codeTree = transformer.transform(
@@ -105,7 +114,9 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                 <h1>Hello, World!</h1>
                 <p>This is a paragraph</p>
                 <ul>
-                  <li>This is a list item</li>
+                  <li>
+                    This   is a list item
+                  </li>
                 </ul>
               </div>
             );
