@@ -384,14 +384,23 @@ const euclideanDistance = (a: Point, b: Point) => {
 
 const closestTopRightCorner =
   (codeDB: CodeDB | null): CollisionDetection =>
-  ({ collisionRect, droppableRects, droppableContainers }) => {
+  ({ collisionRect, droppableRects, droppableContainers, active }) => {
     if (!codeDB) return []
+
+    const activeData: DropData = active.data.current as any
 
     const corner = { x: collisionRect.left, y: collisionRect.top }
     const collisions: CollisionDescriptor[] = []
 
     for (const droppableContainer of droppableContainers) {
       const { id } = droppableContainer
+
+      const droppableContainerData: DropData = droppableContainer.data.current as any
+
+      if (activeData.kind !== droppableContainerData.kind) {
+        continue
+      }
+
       const rect = droppableRects.get(id)
 
       if (rect) {
