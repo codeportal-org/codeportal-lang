@@ -45,7 +45,7 @@ export default function Home() {
               <li className="mb-4 flex text-lg leading-7">
                 <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
                 <span>
-                  Iterate faster! CodePortal shortens the feedback loop and let's you quickly
+                  Iterate faster! CodePortal shortens the feedback loop and let{"'"}s you quickly
                   prototype without the hassle.
                 </span>
               </li>
