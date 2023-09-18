@@ -1,4 +1,10 @@
-import { DragStartEvent, closestCorners, useDraggable, useDroppable } from "@dnd-kit/core"
+import {
+  CollisionDescriptor,
+  CollisionDetection,
+  DragStartEvent,
+  useDraggable,
+  useDroppable,
+} from "@dnd-kit/core"
 import {
   DndContext,
   DragOverEvent,
@@ -30,6 +36,8 @@ import {
   expressionTypes,
   uiNodeTypes,
 } from "./lang/interpreter"
+
+type DropData = { type: CodeNode["type"]; kind: "statement" | "ui node" }
 
 const draggedNodeIdAtom = atom<string | null>(null)
 const droppedOnNodeIdAtom = atom<string | null>(null)
@@ -102,7 +110,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCorners}
+      collisionDetection={closestTopRightCorner(codeDB)}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
@@ -146,13 +154,13 @@ export const StatementView = ({
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
-    data: { type: node.type },
+    data: { type: node.type, kind: "statement" } satisfies DropData,
     disabled: !hasParent,
   })
 
   const droppable = useDroppable({
     id: nodeId,
-    data: { type: node.type },
+    data: { type: node.type, kind: "statement" } satisfies DropData,
     disabled: !hasParent,
   })
 
@@ -255,13 +263,13 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
-    data: { type: node.type },
+    data: { type: node.type, kind: "ui node" } satisfies DropData,
     disabled: hasNonUIParent,
   })
 
   const droppable = useDroppable({
     id: nodeId,
-    data: { type: node.type },
+    data: { type: node.type, kind: "ui node" } satisfies DropData,
     disabled: hasNonUIParent,
   })
 
@@ -372,4 +380,37 @@ const euclideanDistance = (a: Point, b: Point) => {
   const x = a.x - b.x
   const y = a.y - b.y
   return Math.sqrt(x * x + y * y)
+}
+
+const closestTopRightCorner =
+  (codeDB: CodeDB | null): CollisionDetection =>
+  ({ collisionRect, droppableRects, droppableContainers }) => {
+    if (!codeDB) return []
+
+    const corner = { x: collisionRect.left, y: collisionRect.top }
+    const collisions: CollisionDescriptor[] = []
+
+    for (const droppableContainer of droppableContainers) {
+      const { id } = droppableContainer
+      const rect = droppableRects.get(id)
+
+      if (rect) {
+        const rectCorner = { x: rect.left, y: rect.top }
+        const distance = euclideanDistance(corner, rectCorner)
+
+        collisions.push({
+          id,
+          data: { droppableContainer, value: Number(distance.toFixed(4)) },
+        })
+      }
+    }
+
+    return collisions.sort(sortCollisionsAsc)
+  }
+
+function sortCollisionsAsc(
+  { data: { value: a } }: CollisionDescriptor,
+  { data: { value: b } }: CollisionDescriptor,
+) {
+  return a - b
 }
