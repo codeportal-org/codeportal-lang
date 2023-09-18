@@ -44,19 +44,32 @@ export default function Home() {
             <ul className="mb-8 list-none pl-4 sm:pl-5">
               <li className="mb-4 flex text-lg leading-7">
                 <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
-                <span>Faster prototyping and feedback loop!</span>
-              </li>
-              <li className="mb-4 flex text-lg leading-7">
-                <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
                 <span>
-                  AI-first. CodePortal is though from the ground up to integrate with LLMs.
+                  Iterate faster! CodePortal shortens the feedback loop and let's you quickly
+                  prototype without the hassle.
                 </span>
               </li>
               <li className="mb-4 flex text-lg leading-7">
                 <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
                 <span>
-                  Extensibility and flexibility. The full-power of code with the simplicity of
-                  no-code/low-code tools.
+                  Make your apps easier to build and to maintain. We focus on readability and
+                  simplicity to keep you focused on what matters.
+                </span>
+              </li>
+              <li className="mb-4 flex text-lg leading-7">
+                <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
+                <span>
+                  Harness the power of AI! CodePortal is thought from the ground up to integrate
+                  with LLMs.
+                </span>
+              </li>
+              <li className="mb-4 flex text-lg leading-7">
+                <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
+                <span>
+                  Include the whole team! CodePortal gives you the full-power of code with the
+                  simplicity of no-code/low-code tools. You can include your whole team in the
+                  development process. Designers, product managers, marketers and other people can
+                  contribute to the development process too.
                 </span>
               </li>
             </ul>
