@@ -8,6 +8,7 @@ Design principles:
 - Programming languages ARE for people PERIOD. At least, high-level languages. We optimize for people, not machines. However, this doesn't mean we don't care about performance. We do. But, we don't sacrifice simplicity for performance.
 - Minimalistic language. One or a couple of great way(s) to do something = ✨.Too many ways to do something = 🫠.
 - DX over perf. Kind of the same as the one below but we believe in repeating ourselves.
+- Things should work even in the presence of errors. We don't make your programs crash just because of dumb mistakes. Resilience is key. We give you hints and warn you about issues though.
 - It should just work. No need to think about it. No need to configure it. No need to install it. No need to import it. It should just work. If it doesn't, it's a bug or a missing feature.
 
 Language features:
