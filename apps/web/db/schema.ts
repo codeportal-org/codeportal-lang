@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm"
 import { index, json, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core"
 
 import { maxIDLength, nanoid } from "@/lib/nanoid"
@@ -20,14 +21,18 @@ export const apps = mysqlTable("apps", {
   name: varchar("name", { length: 100 }).notNull(),
   /** This ID comes from Clerk, it is Clerk's user ID */
   creatorId: varchar("creator_id", { length: maxIDLength }).notNull(),
-  lastOpenedAt: timestamp("last_opened_at"),
+  lastOpenedAt: timestamp("last_opened_at", { fsp: 2 }),
   mainModule: json("main_module").$type<MainModule>(),
   prompt: text("prompt"),
   theme: json("theme").$type<ThemeConfig>(),
 
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-  deletedAt: timestamp("deleted_at"),
+  createdAt: timestamp("created_at", { fsp: 2 })
+    .notNull()
+    .default(sql`now(2)`),
+  updatedAt: timestamp("updated_at", { fsp: 2 })
+    .notNull()
+    .default(sql`now(2)`),
+  deletedAt: timestamp("deleted_at", { fsp: 2 }),
 })
 
 export type App = typeof apps.$inferSelect
@@ -39,14 +44,16 @@ export const appModules = mysqlTable(
       .primaryKey()
       .$defaultFn(() => nanoid("strong")),
     name: varchar("name", { length: 100 }).notNull(),
-    applicationId: varchar("application_id", { length: maxIDLength })
-      .notNull()
-      .references(() => apps.id),
+    applicationId: varchar("application_id", { length: maxIDLength }).notNull(),
     codeTree: json("code_tree"),
 
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
-    deletedAt: timestamp("deleted_at"),
+    createdAt: timestamp("created_at", { fsp: 2 })
+      .notNull()
+      .default(sql`now(2)`),
+    updatedAt: timestamp("updated_at", { fsp: 2 })
+      .notNull()
+      .default(sql`now(2)`),
+    deletedAt: timestamp("deleted_at", { fsp: 2 }),
   },
   (table) => {
     return {
@@ -62,14 +69,16 @@ export const appData = mysqlTable(
       .primaryKey()
       .$defaultFn(() => nanoid("stronger")),
     name: varchar("name", { length: 100 }).notNull(),
-    applicationId: varchar("application_id", { length: maxIDLength })
-      .notNull()
-      .references(() => apps.id),
+    applicationId: varchar("application_id", { length: maxIDLength }).notNull(),
     data: json("data"),
 
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow(),
-    deletedAt: timestamp("deleted_at"),
+    createdAt: timestamp("created_at", { fsp: 2 })
+      .notNull()
+      .default(sql`now(2)`),
+    updatedAt: timestamp("updated_at", { fsp: 2 })
+      .notNull()
+      .default(sql`now(2)`),
+    deletedAt: timestamp("deleted_at", { fsp: 2 }),
   },
   (table) => {
     return {
