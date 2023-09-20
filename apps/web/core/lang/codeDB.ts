@@ -1,7 +1,5 @@
 import { createNanoEvents } from "nanoevents"
 
-import { nanoid } from "@/lib/nanoid"
-
 import { CodeTreeWalk } from "./codeTreeWalk"
 import { CodeNode, FunctionNode, ProgramNode, StatementNode, statementTypes } from "./interpreter"
 
@@ -13,6 +11,8 @@ export class CodeDB {
   codeTree: ProgramNode | undefined = undefined
 
   isCodeLoaded = false
+
+  idCounter = 0
 
   codeTreeWalker = new CodeTreeWalk()
 
@@ -31,8 +31,8 @@ export class CodeDB {
   /**
    * Loads the code tree into the CodeDB.
    */
-  load(code: ProgramNode) {
-    this.codeTreeWalker.full(code, (node, parent) => {
+  load(programNode: ProgramNode) {
+    this.codeTreeWalker.full(programNode, (node, parent) => {
       if (!node.meta) {
         node.meta = {}
       }
@@ -40,15 +40,19 @@ export class CodeDB {
       // attach parent to all nodes
       node.meta.parent = parent
 
-      // add id to all nodes
-      const nodeId = nanoid()
-      node.meta.id = nodeId
+      // add an id to all nodes
+      if (!node.id) {
+        node.id = this.idCounter.toString()
+        this.idCounter++
+      }
 
       // add nodes to map
-      this.nodeMap.set(nodeId, node)
+      this.nodeMap.set(node.id, node)
     })
 
-    this.codeTree = code
+    this.codeTree = programNode
+    this.codeTree.idCounter = this.idCounter
+
     this.isCodeLoaded = true
 
     this.notifyCodeLoaded()
@@ -80,7 +84,7 @@ export class CodeDB {
     return this.codeTree
   }
 
-  getByID(id: string) {
+  getNodeByID(id: string) {
     return this.nodeMap.get(id)
   }
 
@@ -128,16 +132,11 @@ export class CodeDB {
       node.meta!.parent = targetParent
       target.meta.parent = nodeParent
 
-      // update atoms for reactivity in the editor
-      const nodeId = node.meta?.id!
-      const targetId = target.meta?.id!
-      const parentId = nodeParent.meta?.id!
-      const targetParentId = targetParent.meta?.id!
-
-      this.notifyNodeChange(nodeId)
-      this.notifyNodeChange(targetId)
-      this.notifyNodeChange(parentId)
-      this.notifyNodeChange(targetParentId)
+      // notify changes
+      this.notifyNodeChange(node.id)
+      this.notifyNodeChange(target.id)
+      this.notifyNodeChange(nodeParent.id)
+      this.notifyNodeChange(targetParent.id)
     }
   }
 }
