@@ -1,4 +1,4 @@
-import { customAlphabet } from "nanoid"
+import { customAlphabet } from "./nanoid-lib"
 
 const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
 
