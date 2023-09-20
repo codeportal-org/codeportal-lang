@@ -32,18 +32,23 @@ describe("CodeTreeWalk", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       meta: { extras: { count: 0 } },
+      id: "0",
+      idCounter: 6,
       body: [
         {
           type: "component",
           name: "App",
+          id: "1",
           meta: { extras: { count: 1 } },
           body: [
             {
               type: "var",
+              id: "2",
               meta: { extras: { count: 2 } },
               name: "x",
               value: {
                 type: "number",
+                id: "3",
                 meta: { extras: { count: 3 } },
                 value: 0,
               },
@@ -51,8 +56,10 @@ describe("CodeTreeWalk", () => {
             {
               type: "return",
               meta: { extras: { count: 4 } },
+              id: "4",
               arg: {
                 type: "ui element",
+                id: "5",
                 name: "div",
                 meta: { extras: { count: 5 } },
                 props: [],
@@ -93,43 +100,53 @@ describe("CodeTreeWalk", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       meta: { extras: { count: 0, parentCount: null } },
+      id: "0",
+      idCounter: 10,
       body: [
         {
           type: "component",
           name: "App",
+          id: "1",
           meta: { extras: { count: 1, parentCount: 0 } },
           body: [
             {
               type: "var",
+              id: "2",
               meta: { extras: { count: 2, parentCount: 1 } },
               name: "x",
               value: {
                 type: "number",
+                id: "3",
                 meta: { extras: { count: 3, parentCount: 2 } },
                 value: 0,
               },
             },
             {
               type: "return",
+              id: "4",
               meta: { extras: { count: 4, parentCount: 1 } },
               arg: {
                 type: "ui element",
+                id: "5",
                 name: "div",
                 meta: { extras: { count: 5, parentCount: 4 } },
                 props: [],
                 children: [
                   {
                     type: "ui fragment",
+                    id: "6",
                     meta: { extras: { count: 6, parentCount: 5 } },
                     children: [
                       {
                         type: "ui element",
+                        id: "7",
                         name: "div",
                         meta: { extras: { count: 7, parentCount: 6 } },
                         props: [],
                         children: [
                           {
                             type: "ui text",
+                            id: "8",
                             meta: { extras: { count: 8, parentCount: 7 } },
                             text: "text 1",
                           },
@@ -137,6 +154,7 @@ describe("CodeTreeWalk", () => {
                       },
                       {
                         type: "ui text",
+                        id: "9",
                         meta: { extras: { count: 9, parentCount: 6 } },
                         text: "text 2",
                       },

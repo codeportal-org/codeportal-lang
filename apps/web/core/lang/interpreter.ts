@@ -11,12 +11,14 @@ export type SpecialNodes =
   | ObjectProperty
 
 export type CodeMeta = {
-  id?: string
   parent?: CodeNode
   extras?: Record<string, any>
 }
 
 export type ProgramNode = {
+  id: string
+  /** Next id to be used by a node */
+  idCounter: number
   type: "program"
   body: StatementNode[]
   meta?: CodeMeta
@@ -44,6 +46,7 @@ export type StatementNode =
   | FunctionCallNode
   | AssignmentStatement
   | TryStatementNode
+  | IfStatementNode
 
 export const expressionTypes = [
   "string",
@@ -77,6 +80,7 @@ export const uiNodeTypes = ["ui element", "ui fragment", "ui text", "ui expressi
 
 export type ComponentNode = {
   type: "component"
+  id: string
   name: string
   props?: UIPropDeclaration[]
   body: StatementNode[]
@@ -85,6 +89,7 @@ export type ComponentNode = {
 
 export type UIPropDeclaration = {
   type: "ui prop declaration"
+  id: string
   name: string
   value: ExpressionNode
   meta?: CodeMeta
@@ -96,6 +101,7 @@ export type UIPropDeclaration = {
  */
 export type UIElementNode = {
   type: "ui element"
+  id: string
   name: string
   props?: (UIPropNode | UISpreadPropNode)[]
   style?: UIStyleNode[]
@@ -105,6 +111,7 @@ export type UIElementNode = {
 
 export type UIPropNode = {
   type: "ui prop"
+  id: string
   name: string
   value: ExpressionNode
   meta?: CodeMeta
@@ -112,6 +119,7 @@ export type UIPropNode = {
 
 export type UISpreadPropNode = {
   type: "ui spread prop"
+  id: string
   arg: ExpressionNode
   meta?: CodeMeta
 }
@@ -121,6 +129,7 @@ export type UISpreadPropNode = {
  */
 export type UIStyleNode = {
   type: "ui style"
+  id: string
   name: string
   value: ExpressionNode
   meta?: CodeMeta
@@ -128,32 +137,53 @@ export type UIStyleNode = {
 
 export type UITextNode = {
   type: "ui text"
+  id: string
   text: string
   meta?: CodeMeta
 }
 
 export type UIFragmentNode = {
   type: "ui fragment"
+  id: string
   children?: UINode[]
   meta?: CodeMeta
 }
 
 export type UIExpressionNode = {
   type: "ui expression"
+  id: string
   expression: ExpressionNode
   meta?: CodeMeta
 }
 
 export type ReturnStatementNode = {
   type: "return"
+  id: string
   arg: ExpressionNode
   meta?: CodeMeta
 }
 
-export type AssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%="
+export type AssignmentOperator =
+  | "="
+  | "+="
+  | "-="
+  | "*="
+  | "/="
+  | "%="
+  | "**="
+  | "<<="
+  | ">>="
+  | ">>>="
+  | "|="
+  | "^="
+  | "&="
+  | "||="
+  | "&&="
+  | "??="
 
 export type AssignmentStatement = {
   type: "assignment"
+  id: string
   operator: AssignmentOperator
   left: ReferenceNode | PathAccessNode
   right: ExpressionNode
@@ -162,12 +192,14 @@ export type AssignmentStatement = {
 
 export type PathAccessNode = {
   type: "path access"
+  id: string
   path: ExpressionNode[]
   meta?: CodeMeta
 }
 
 export type VarStatement = {
   type: "var"
+  id: string
   name: string
   value: ExpressionNode
   meta?: CodeMeta
@@ -175,6 +207,7 @@ export type VarStatement = {
 
 export type StateStatement = {
   type: "state"
+  id: string
   name: string
   value: ExpressionNode
   meta?: CodeMeta
@@ -182,47 +215,79 @@ export type StateStatement = {
 
 export type PrintStatement = {
   type: "print"
+  id: string
   arg: ExpressionNode
   meta?: CodeMeta
 }
 
 export type TryStatementNode = {
   type: "try"
+  id: string
   body: StatementNode[]
   catch: StatementNode[]
   finally?: StatementNode[]
   meta?: CodeMeta
 }
 
+export type IfStatementNode = {
+  type: "if"
+  id: string
+  test: ExpressionNode
+  then: StatementNode[]
+  /** if-else if chain */
+  elseIf?: ElseIfNode[]
+  else?: StatementNode[]
+  meta?: CodeMeta
+}
+
+/**
+ * Node to support if-else if chains.
+ */
+export type ElseIfNode = {
+  type: "else if"
+  id: string
+  test: ExpressionNode
+  then: StatementNode[]
+  meta?: CodeMeta
+}
+
 /**
  * A reference to a variable or function.
+ * Things are referenced by their id. This means ids are part of the semantics of the language.
+ * A function or variable should have a name in order to be referenced.
  */
 export type ReferenceNode = {
   type: "ref"
-  name: string
+  id: string
+  /** The id of the variable or function */
+  refId: string
   meta?: CodeMeta
 }
 
 export type StringLiteral = {
   type: "string"
+  id: string
   value: string
   meta?: CodeMeta
 }
 
 export type NumberLiteral = {
   type: "number"
+  id: string
   value: number
   meta?: CodeMeta
 }
 
 export type BooleanLiteral = {
   type: "boolean"
+  id: string
   value: boolean
   meta?: CodeMeta
 }
 
 export type NAryExpression = {
   type: "nary"
+  id: string
   operator: NAryOperator
   args: ExpressionNode[]
   meta?: CodeMeta
@@ -253,6 +318,7 @@ export type NAryOperator = keyof typeof NAryOperators
  */
 export type FunctionNode = {
   type: "function"
+  id: string
   name?: string
   inline?: boolean
   params?: ParamDeclaration[]
@@ -262,6 +328,7 @@ export type FunctionNode = {
 
 export type ParamDeclaration = {
   type: "param"
+  id: string
   name: string
   meta?: CodeMeta
 }
@@ -271,6 +338,7 @@ export type ParamDeclaration = {
  */
 export type FunctionCallNode = {
   type: "function call"
+  id: string
   callee: ReferenceNode | PathAccessNode
   args: ExpressionNode[]
   meta?: CodeMeta
@@ -278,12 +346,14 @@ export type FunctionCallNode = {
 
 export type ObjectNode = {
   type: "object"
+  id: string
   properties: ObjectProperty[]
   meta?: CodeMeta
 }
 
 export type ObjectProperty = {
   type: "property"
+  id: string
   name: ExpressionNode
   value: ExpressionNode
   meta?: CodeMeta

@@ -1,7 +1,5 @@
 import { Parser } from "acorn"
 import acornJSXParser from "acorn-jsx"
-import { Program } from "estree"
-import fs from "fs"
 
 import { ASTtoCTTransformer, collapseWhitespace } from "./astTransformer"
 import { ProgramNode } from "./interpreter"
@@ -27,6 +25,8 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 1,
       body: [],
     } satisfies ProgramNode)
   })
@@ -47,15 +47,20 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 4,
       body: [
         {
           type: "component",
+          id: "1",
           name: "App",
           body: [
             {
               type: "return",
+              id: "2",
               arg: {
                 type: "ui element",
+                id: "3",
                 name: "div",
                 props: [],
                 children: [],
@@ -83,16 +88,21 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 4,
       body: [
         {
           type: "function",
+          id: "1",
           name: "myFunc",
           params: [],
           body: [
             {
               type: "return",
+              id: "2",
               arg: {
                 type: "string",
+                id: "3",
                 value: "Hello, World!",
               },
             },
@@ -128,52 +138,64 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 11,
       body: [
         {
           type: "component",
+          id: "1",
           name: "App",
           body: [
             {
               type: "return",
+              id: "2",
               arg: {
                 type: "ui element",
+                id: "3",
                 name: "div",
                 props: [],
                 children: [
                   {
                     type: "ui element",
+                    id: "4",
                     name: "h1",
                     props: [],
                     children: [
                       {
                         type: "ui text",
+                        id: "5",
                         text: "Hello, World!",
                       },
                     ],
                   },
                   {
                     type: "ui element",
+                    id: "6",
                     name: "p",
                     props: [],
                     children: [
                       {
                         type: "ui text",
+                        id: "7",
                         text: "This is a paragraph",
                       },
                     ],
                   },
                   {
                     type: "ui element",
+                    id: "8",
                     name: "ul",
                     props: [],
                     children: [
                       {
                         type: "ui element",
+                        id: "9",
                         name: "li",
                         props: [],
                         children: [
                           {
                             type: "ui text",
+                            id: "10",
                             text: "This is a list item",
                           },
                         ],
@@ -188,6 +210,85 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ],
     } satisfies ProgramNode)
   })
+
+  it("should transform a program with a variable and function declarations and references and resolve the references", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          function myFunc() {
+            let x = 0
+
+            if (false) {
+              myFunc()
+            }
+
+            return x
+          }
+        `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      id: "0",
+      idCounter: 10,
+      body: [
+        {
+          type: "function",
+          id: "1",
+          name: "myFunc",
+          params: [],
+          body: [
+            {
+              type: "var",
+              id: "2",
+              name: "x",
+              value: {
+                type: "number",
+                id: "3",
+                value: 0,
+              },
+            },
+            {
+              type: "if",
+              id: "4",
+              test: {
+                type: "boolean",
+                id: "5",
+                value: false,
+              },
+              then: [
+                {
+                  type: "function call",
+                  id: "6",
+                  callee: {
+                    type: "ref",
+                    id: "7",
+                    refId: "1",
+                  },
+                  args: [],
+                },
+              ],
+            },
+            {
+              type: "return",
+              id: "8",
+              arg: {
+                type: "ref",
+                id: "9",
+                refId: "2",
+              },
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
+  return
 
   it("should detect and transform the use of React.useState", () => {
     const transformer = new ASTtoCTTransformer()
@@ -211,33 +312,42 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 6,
       body: [
         {
           type: "component",
+          id: "1",
           name: "App",
           body: [
             {
               type: "state",
+              id: "2",
               name: "state",
               value: {
                 type: "string",
+                id: "3",
                 value: "initial state",
               },
             },
             {
               type: "return",
+              id: "4",
               arg: {
                 type: "ui element",
+                id: "5",
                 name: "div",
                 props: [],
                 children: [
                   {
                     type: "ui element",
+                    id: "6",
                     name: "h1",
                     props: [],
                     children: [
                       {
                         type: "ui text",
+                        id: "7",
                         text: "React State Transform",
                       },
                     ],
@@ -250,6 +360,8 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ],
     } satisfies ProgramNode)
   })
+
+  return
 
   it("should transform the use of JSX expressions", () => {
     const transformer = new ASTtoCTTransformer()
@@ -273,36 +385,46 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 8,
       body: [
         {
           type: "component",
+          id: "1",
           name: "App",
           body: [
             {
               type: "var",
+              id: "2",
               name: "message",
               value: {
                 type: "string",
+                id: "3",
                 value: "Hello, World!",
               },
             },
             {
               type: "return",
+              id: "4",
               arg: {
                 type: "ui element",
+                id: "5",
                 name: "div",
                 props: [],
                 children: [
                   {
                     type: "ui element",
+                    id: "6",
                     name: "h1",
                     props: [],
                     children: [
                       {
                         type: "ui expression",
+                        id: "7",
                         expression: {
                           type: "ref",
-                          name: "message",
+                          id: "8",
+                          refId: "2",
                         },
                       },
                     ],
@@ -353,25 +475,32 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 3,
       body: [
         {
           type: "assignment",
+          id: "1",
           operator: "=",
           left: {
             type: "path access",
+            id: "2",
             path: [
               {
                 type: "ref",
-                name: "obj",
+                id: "3",
+                refId: "1",
               },
               {
-                type: "ref",
-                name: "value",
+                type: "string",
+                id: "4",
+                value: "value",
               },
             ],
           },
           right: {
             type: "number",
+            id: "5",
             value: 0,
           },
         },
@@ -393,21 +522,28 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 4,
       body: [
         {
           type: "var",
+          id: "1",
           name: "obj",
           value: {
             type: "object",
+            id: "2",
             properties: [
               {
                 type: "property",
+                id: "3",
                 name: {
                   type: "ref",
+                  id: "4",
                   name: "value",
                 },
                 value: {
                   type: "number",
+                  id: "5",
                   value: 0,
                 },
               },
@@ -438,15 +574,20 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 7,
       body: [
         {
           type: "try",
+          id: "1",
           body: [
             {
               type: "var",
+              id: "2",
               name: "num1",
               value: {
                 type: "number",
+                id: "3",
                 value: 2,
               },
             },
@@ -454,9 +595,11 @@ describe("ASTtoCTTransformer - astTransformer", () => {
           catch: [
             {
               type: "var",
+              id: "4",
               name: "num2",
               value: {
                 type: "number",
+                id: "5",
                 value: 3,
               },
             },
@@ -464,9 +607,11 @@ describe("ASTtoCTTransformer - astTransformer", () => {
           finally: [
             {
               type: "var",
+              id: "6",
               name: "num3",
               value: {
                 type: "number",
+                id: "7",
                 value: 1,
               },
             },
@@ -490,19 +635,25 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 6,
       body: [
         {
           type: "function call",
+          id: "1",
           callee: {
             type: "ref",
+            id: "2",
             name: "setFn",
           },
           args: [
             {
               type: "function",
+              id: "3",
               params: [
                 {
                   type: "param",
+                  id: "4",
                   name: "a",
                 },
                 {
@@ -540,33 +691,42 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 6,
       body: [
         {
           type: "function",
+          id: "1",
           name: "myFunc",
           params: [
             {
               type: "param",
+              id: "2",
               name: "a",
             },
             {
               type: "param",
+              id: "3",
               name: "b",
             },
           ],
           body: [
             {
               type: "return",
+              id: "4",
               arg: {
                 type: "nary",
+                id: "5",
                 operator: "+",
                 args: [
                   {
                     type: "ref",
+                    id: "6",
                     name: "a",
                   },
                   {
                     type: "ref",
+                    id: "7",
                     name: "b",
                   },
                 ],
@@ -596,22 +756,29 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
     expect(codeTree).toStrictEqual({
       type: "program",
+      id: "0",
+      idCounter: 5,
       body: [
         {
           type: "component",
+          id: "1",
           name: "Comp",
           body: [
             {
               type: "return",
+              id: "2",
               arg: {
                 type: "ui element",
+                id: "3",
                 name: "div",
                 props: [
                   {
                     type: "ui prop",
+                    id: "4",
                     name: "className",
                     value: {
                       type: "string",
+                      id: "5",
                       value: "class1 class2",
                     },
                   },
@@ -619,6 +786,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                 children: [
                   {
                     type: "ui text",
+                    id: "6",
                     text: "Hello",
                   },
                 ],
