@@ -3,6 +3,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "editor.formatOnSave": true,
   "cSpell.words": [
+    "autosize",
     "CodePortal",
     "debuggability",
     "declarators",
