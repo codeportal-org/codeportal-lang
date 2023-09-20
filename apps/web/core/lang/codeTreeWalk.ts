@@ -23,11 +23,11 @@ import {
 } from "./interpreter"
 
 export class CodeTreeWalk {
-  currentNode: CodeNode | undefined = undefined
+  parentNodeStack: CodeNode[] = []
   callback: (node: CodeNode, parent: CodeNode | undefined) => void = () => {}
 
   reset() {
-    this.currentNode = undefined
+    this.parentNodeStack = []
     this.callback = () => {}
   }
 
@@ -40,13 +40,19 @@ export class CodeTreeWalk {
     this.reset()
   }
 
-  private walkProgram(code: ProgramNode) {
-    this.callback(code, undefined)
-    this.currentNode = code
+  private currentParentNode(): CodeNode | undefined {
+    return this.parentNodeStack[this.parentNodeStack.length - 1]
+  }
 
-    code.body.forEach((child) => {
+  private walkProgram(node: ProgramNode) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
+
+    node.body.forEach((child) => {
       this.walkStatement(child)
     })
+
+    this.parentNodeStack.pop()
   }
 
   private walkStatement(node: StatementNode) {
@@ -89,8 +95,7 @@ export class CodeTreeWalk {
   }
 
   private walkLiteral(node: LiteralNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
   }
 
   private walkUI(node: UINode) {
@@ -110,17 +115,19 @@ export class CodeTreeWalk {
   }
 
   private walkUIExpression(node: UIExpressionNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     this.walkExpression(node.expression)
+
+    this.parentNodeStack.pop()
   }
 
-  private walkUIElement(code: UIElementNode) {
-    this.callback(code, this.currentNode)
-    this.currentNode = code
+  private walkUIElement(node: UIElementNode) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
-    code.props?.forEach((child) => {
+    node.props?.forEach((child) => {
       if (child.type === "ui prop") {
         this.walkUIPropNode(child)
       } else {
@@ -128,51 +135,63 @@ export class CodeTreeWalk {
       }
     })
 
-    code.children?.forEach((child) => {
+    node.children?.forEach((child) => {
       this.walkUI(child)
     })
+
+    this.parentNodeStack.pop()
   }
 
   private walkUIPropNode(node: UIPropNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     this.walkExpression(node.value)
+
+    this.parentNodeStack.pop()
   }
 
   private walkUISpreadPropNode(node: UISpreadPropNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     this.walkExpression(node.arg)
+
+    this.parentNodeStack.pop()
   }
 
   private walkReturnStatement(code: ReturnStatementNode) {
-    this.callback(code, this.currentNode)
-    this.currentNode = code
+    this.callback(code, this.currentParentNode())
+    this.parentNodeStack.push(code)
 
     this.walkExpression(code.arg)
+
+    this.parentNodeStack.pop()
   }
 
   private walkVariableDeclaration(code: VarStatement) {
-    this.callback(code, this.currentNode)
-    this.currentNode = code
+    this.callback(code, this.currentParentNode())
+    this.parentNodeStack.push(code)
 
     this.walkExpression(code.value)
+
+    this.parentNodeStack.pop()
   }
 
   private walkFunctionDeclaration(node: FunctionNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     node.body.forEach((child) => {
       this.walkStatement(child)
     })
+
+    this.parentNodeStack.pop()
   }
 
   private walkFunctionCall(node: FunctionCallNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     if (node.callee.type === "path access") {
       this.walkPathAccess(node.callee)
@@ -183,32 +202,37 @@ export class CodeTreeWalk {
     node.args.forEach((child) => {
       this.walkExpression(child)
     })
+
+    this.parentNodeStack.pop()
   }
 
   private walkRef(node: ReferenceNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
   }
 
   private walkPathAccess(node: PathAccessNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     node.path.forEach((child) => {
       this.walkExpression(child)
     })
+
+    this.parentNodeStack.pop()
   }
 
   private walkStateDeclaration(node: StateStatement) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     this.walkExpression(node.value)
+
+    this.parentNodeStack.pop()
   }
 
   private walkComponent(node: ComponentNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     node.props?.forEach((child) => {
       this.walkPropDeclaration(child)
@@ -217,26 +241,31 @@ export class CodeTreeWalk {
     node.body.forEach((child) => {
       this.walkStatement(child)
     })
+
+    this.parentNodeStack.pop()
   }
 
   private walkPropDeclaration(node: UIPropDeclaration) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     this.walkExpression(node.value)
+
+    this.parentNodeStack.pop()
   }
 
   walkUIFragment(node: UIFragmentNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
 
     node.children?.forEach((child) => {
       this.walkUI(child)
     })
+
+    this.parentNodeStack.pop()
   }
 
   walkUIText(node: UITextNode) {
-    this.callback(node, this.currentNode)
-    this.currentNode = node
+    this.callback(node, this.currentParentNode())
   }
 }
