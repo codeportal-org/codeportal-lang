@@ -8,7 +8,15 @@ export function useClerkSWR<T>(url: string) {
   const fetcher = async (url: string) => {
     return fetch(url, {
       headers: { Authorization: `Bearer ${await getToken()}` },
-    }).then((res) => res.json())
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch")
+        } else {
+          return res
+        }
+      })
+      .then((res) => res.json())
   }
 
   return useSWR<T>(url, fetcher)
@@ -25,7 +33,15 @@ export function useClerkSWRMutation<T, K>(
       method,
       headers: { Authorization: `Bearer ${await getToken()}` },
       body: JSON.stringify(arg),
-    }).then((res) => res.json())
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch")
+        } else {
+          return res
+        }
+      })
+      .then((res) => res.json())
   }
 
   return useSWRMutation<T, any, any, K>(url, mutate)
