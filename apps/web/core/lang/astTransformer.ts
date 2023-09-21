@@ -26,6 +26,7 @@ import {
 import {
   AssignmentStatement,
   ComponentNode,
+  ElseIfNode,
   ExpressionNode,
   FunctionCallNode,
   FunctionNode,
@@ -149,39 +150,9 @@ export class ASTtoCTTransformer {
       idCounter: this.idCounter,
     }
 
-    this.pushScope()
-
-    for (const statement of node.body) {
-      if (statement.type === "FunctionDeclaration") {
-        // see if it is a React component
-        const statements = statement.body.body
-        let lastStatement: any = statements[statements.length - 1]
-
-        if (
-          this.topLevelComponent ||
-          (lastStatement &&
-            lastStatement.type === "ReturnStatement" &&
-            lastStatement.argument?.type === "JSXElement")
-        ) {
-          programNode.body.push(this.transformComponent(statement))
-        } else {
-          programNode.body.push(this.transformFunctionDeclaration(statement))
-        }
-      } else if (
-        statement.type === "VariableDeclaration" ||
-        statement.type === "ExpressionStatement" ||
-        statement.type === "ReturnStatement" ||
-        statement.type === "TryStatement"
-      ) {
-        programNode.body.push(this.transformStatement(statement))
-      } else {
-        throw new Error(`Unknown program statement type: ${statement.type}`)
-      }
-    }
+    programNode.body.push(...this.transformStatementList(node.body as Statement[], true))
 
     programNode.idCounter = this.idCounter
-
-    this.popScope()
 
     return programNode
   }
@@ -255,6 +226,37 @@ export class ASTtoCTTransformer {
     this.popScope()
 
     return functionNode
+  }
+
+  transformStatementList(statementList: Statement[], isRoot = false): StatementNode[] {
+    const statementNodes: StatementNode[] = []
+
+    this.pushScope()
+
+    for (const statement of statementList) {
+      if (statement.type === "FunctionDeclaration") {
+        // see if it is a React component
+        const statements = statement.body.body
+        let lastStatement: any = statements[statements.length - 1]
+
+        if (
+          (this.topLevelComponent && isRoot) ||
+          (lastStatement &&
+            lastStatement.type === "ReturnStatement" &&
+            lastStatement.argument?.type === "JSXElement")
+        ) {
+          statementNodes.push(this.transformComponent(statement))
+        } else {
+          statementNodes.push(this.transformFunctionDeclaration(statement))
+        }
+      } else {
+        statementNodes.push(this.transformStatement(statement as Statement))
+      }
+    }
+
+    this.popScope()
+
+    return statementNodes
   }
 
   transformStatement(node: Statement): StatementNode | any {
@@ -676,22 +678,33 @@ export class ASTtoCTTransformer {
       catch: [],
     }
 
-    for (const statement of node.block.body) {
-      tryStatement.body.push(this.transformStatement(statement))
-    }
+    tryStatement.body.push(...this.transformStatementList(node.block.body))
 
     if (node.handler) {
+      this.pushScope()
+      if (node.handler.param) {
+        if (node.handler.param.type !== "Identifier") {
+          throw new Error(`Unknown catch param type: ${node.handler.param.type}`)
+        }
+        const paramNode = {
+          type: "param",
+          id: this.getNewId(),
+          name: node.handler.param.name,
+        } satisfies ParamDeclaration
+
+        this.addToScope(paramNode.name, paramNode.id)
+
+        tryStatement.catchParam = paramNode
+      }
+
       for (const statement of node.handler.body.body) {
         tryStatement.catch.push(this.transformStatement(statement))
       }
+      this.popScope()
     }
 
     if (node.finalizer) {
-      tryStatement.finally = []
-
-      for (const statement of node.finalizer.body) {
-        tryStatement.finally.push(this.transformStatement(statement))
-      }
+      tryStatement.finally = this.transformStatementList(node.finalizer.body)
     }
 
     return tryStatement
@@ -757,25 +770,52 @@ export class ASTtoCTTransformer {
     if (node.consequent.type === "ExpressionStatement") {
       ifStatement.then.push(this.transformExpressionStatement(node.consequent))
     } else if (node.consequent.type === "BlockStatement") {
-      for (const statement of node.consequent.body) {
-        ifStatement.then.push(this.transformStatement(statement))
-      }
+      ifStatement.then.push(...this.transformStatementList(node.consequent.body))
     } else {
       throw new Error(`Unknown if consequent type: ${node.consequent.type}`)
     }
 
-    if (node.alternate) {
-      ifStatement.else = []
+    // terminate else or chain else-if's
 
+    if (node.alternate) {
       if (node.alternate.type === "ExpressionStatement") {
-        ifStatement.else.push(this.transformExpressionStatement(node.alternate))
+        ifStatement.else = [this.transformExpressionStatement(node.alternate)]
       } else if (node.alternate.type === "BlockStatement") {
-        for (const statement of node.alternate.body) {
-          ifStatement.else.push(this.transformStatement(statement))
-        }
+        ifStatement.else = this.transformStatementList(node.alternate.body)
       } else if (node.alternate.type === "IfStatement") {
-        // TODO!!! else-if chain
-        // ifStatement.elseIf.push(this.transformIfStatement(node.alternate))
+        ifStatement.elseIf = []
+        let current: Statement = node.alternate
+
+        while (current.type === "IfStatement") {
+          const elseIf: ElseIfNode = {
+            type: "else if",
+            id: this.getNewId(),
+            test: this.transformExpression(current.test),
+            then: [],
+          }
+
+          if (current.consequent.type === "ExpressionStatement") {
+            elseIf.then.push(this.transformExpressionStatement(current.consequent))
+          } else if (current.consequent.type === "BlockStatement") {
+            elseIf.then.push(...this.transformStatementList(current.consequent.body))
+          } else {
+            throw new Error(`Unknown if consequent type: ${current.consequent.type}`)
+          }
+
+          ifStatement.elseIf.push(elseIf)
+
+          if (!current.alternate) {
+            break
+          }
+
+          current = current.alternate
+        }
+
+        if (current.type === "ExpressionStatement") {
+          ifStatement.else = [this.transformExpressionStatement(current)]
+        } else if (current.type === "BlockStatement") {
+          ifStatement.else = this.transformStatementList(current.body)
+        }
       } else {
         throw new Error(`Unknown if alternate type: ${node.alternate.type}`)
       }
