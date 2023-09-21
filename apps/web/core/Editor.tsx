@@ -26,7 +26,7 @@ import { ThemeColor } from "@/db/schema"
 
 import Chat from "./Chat"
 import { CodeView } from "./CodeView"
-import { editorEmitter } from "./editorSingleton"
+import { editorEvents } from "./editorEvents"
 import { ASTtoCTTransformer } from "./lang/astTransformer"
 import { CodeProcessor } from "./lang/codeProcessor"
 import { ProgramNode } from "./lang/interpreter"
@@ -67,6 +67,12 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
 
   const prodAppURL = `${window.location.protocol}//${appId}.${window.location.host}`
   const devAppURL = `${window.location.protocol}//dev-${appId}.${window.location.host}`
+
+  React.useEffect(() => {
+    if (iframeRef.current) {
+      editorEvents.setDevIframe(iframeRef.current)
+    }
+  }, [iframeRef.current])
 
   React.useEffect(() => {
     if (completionContainerRef.current) {
@@ -176,7 +182,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
               <button
                 className="mr-1 h-6 cursor-pointer rounded px-1 py-1 transition-colors hover:bg-slate-400"
                 onClick={() => {
-                  iframeRef.current?.contentWindow?.postMessage({ type: "refresh" }, "*")
+                  editorEvents.refresh()
                 }}
               >
                 <ArrowPathIcon className="h-full" />
@@ -248,7 +254,7 @@ function ThemePopover({ appId, isLoading }: { appId: string; isLoading: boolean 
 
   const handleSave = () => {
     updateTheme.trigger({ theme: { color, radius } }).then(() => {
-      editorEmitter.refresh()
+      editorEvents.refresh()
     })
     setOpen(false)
   }

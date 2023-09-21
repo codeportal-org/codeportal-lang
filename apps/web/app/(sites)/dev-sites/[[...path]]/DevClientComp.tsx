@@ -1,39 +1,46 @@
 "use client"
 
-import { ClientSideSuspense } from "@liveblocks/react"
 import React from "react"
 
-import { PublicRoomProvider, publicLiveRoomContext } from "@/lib/liveblocks.config"
+import { devSitesEvents } from "./devSitesEvents"
 
 export function DevClientComp({ appId }: { appId: string }) {
   React.useEffect(() => {
-    window.addEventListener("message", (event) => {
+    const messageListener = (event: MessageEvent) => {
       if (event.data.type === "refresh") {
+        devSitesEvents.refresh()
         window.location.reload()
       }
+    }
+
+    window.addEventListener("message", messageListener)
+
+    const unsubscribeOnRefresh = devSitesEvents.onRefresh(() => {
+      window.location.reload()
     })
 
-    document.addEventListener("click", () => {
+    const globalClickHandler = () => {
       // forward click to parent to close theme popover
       parent.postMessage({ type: "child-app-click" }, "*")
-    })
+    }
+    document.addEventListener("click", globalClickHandler)
+
+    return () => {
+      window.removeEventListener("message", messageListener)
+      unsubscribeOnRefresh()
+      document.removeEventListener("click", globalClickHandler)
+    }
   }, [])
 
   return (
-    <PublicRoomProvider id={`editor-${appId}`} initialPresence={{}}>
-      <ClientSideSuspense fallback={<div>Loading...</div>}>
-        {() => <RealTimeListener />}
-      </ClientSideSuspense>
-    </PublicRoomProvider>
+    <>
+      <button
+        onClick={() => {
+          devSitesEvents.refresh()
+        }}
+      >
+        Refresh
+      </button>
+    </>
   )
-}
-
-function RealTimeListener() {
-  publicLiveRoomContext.useEventListener(({ connectionId, event }: any) => {
-    if (event.type === "refresh") {
-      window.location.reload()
-    }
-  })
-
-  return <></>
 }
