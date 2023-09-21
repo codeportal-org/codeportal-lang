@@ -78,8 +78,6 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   const draggedNode = draggedNodeId ? codeDB?.getNodeByID(draggedNodeId) : null
   const droppedOnNode = droppedOnNodeId ? codeDB?.getNodeByID(droppedOnNodeId) : null
 
-  console.log("--- draggedNode: ", draggedNode, draggedNodeId)
-
   const handleDragStart = ({ active }: DragStartEvent) => {
     console.log("drag start")
 
@@ -94,11 +92,11 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   }
 
   const handleDragEnd = () => {
+    console.log("drag end", draggedNodeKind)
     if (draggedNodeKind === "statement") {
       codeDB?.moveStatementNode(draggedNode! as StatementNode, droppedOnNode! as StatementNode)
     }
 
-    console.log("drag end")
     setDraggedNodeId(null)
     setDraggedNodeKind(null)
     setDroppedOnNodeId(null)
@@ -167,49 +165,12 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
 }
 
 export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
-  console.log("render statement view", nodeId)
   const node = useNode<StatementNode>(nodeId)
-  const hasParent = node.meta?.parent !== undefined
-
-  const [draggedNodeId] = useAtom(draggedNodeIdAtom)
-  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
-
-  const isDroppedOnNode = !isOverlay && nodeId === droppedOnNodeId
-  const isDraggedNode = !isOverlay && nodeId === draggedNodeId
-
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: nodeId,
-    data: { type: node.type, kind: "statement" } satisfies DropData,
-    disabled: !hasParent,
-  })
-
-  const droppable = useDroppable({
-    id: nodeId,
-    data: { type: node.type, kind: "statement" } satisfies DropData,
-    disabled: !hasParent,
-  })
 
   if (!node) return null
 
   return (
-    <div
-      className={cn(
-        "bg-code-bg relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
-        {
-          "border-slate-400": isDraggedNode,
-          "border-dashed border-slate-400 opacity-95": isOverlay,
-        },
-      )}
-      ref={(ref) => {
-        setNodeRef(ref)
-        droppable.setNodeRef(ref)
-      }}
-      {...listeners}
-      {...attributes}
-    >
-      {isDroppedOnNode && (
-        <div className="absolute left-0 top-0 h-1 w-full bg-lime-600 opacity-50" />
-      )}
+    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay} kind="statement">
       {node.type === "component" && (
         <>
           <div className="flex flex-row">
@@ -251,7 +212,7 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
           <ExpressionView node={node.arg} />
         </div>
       )}
-    </div>
+    </DraggableNodeContainer>
   )
 }
 
@@ -284,41 +245,8 @@ export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
 export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: boolean }) => {
   const nodeId = node.id
 
-  const [draggedNodeId] = useAtom(draggedNodeIdAtom)
-  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
-
-  const isDroppedOnNode = !isOverlay && nodeId === droppedOnNodeId
-  const isDraggedNode = !isOverlay && nodeId === draggedNodeId
-
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: nodeId,
-    data: { type: node.type, kind: "ui node" } satisfies DropData,
-  })
-
-  const droppable = useDroppable({
-    id: nodeId,
-    data: { type: node.type, kind: "ui node" } satisfies DropData,
-  })
-
   return (
-    <div
-      className={cn(
-        "bg-code-bg relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
-        {
-          "border-slate-400": isDraggedNode,
-          "border-dashed border-slate-400 opacity-95": isOverlay,
-        },
-      )}
-      ref={(ref) => {
-        setNodeRef(ref)
-        droppable.setNodeRef(ref)
-      }}
-      {...listeners}
-      {...attributes}
-    >
-      {isDroppedOnNode && (
-        <div className="absolute left-0 top-0 h-1 w-full bg-lime-600 opacity-50" />
-      )}
+    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay} kind="ui node">
       {node.type === "ui text" && <UITextView node={node} />}
       {node.type === "ui element" && (
         <div className="flex flex-col">
@@ -355,7 +283,7 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
           {"}"}
         </div>
       )}
-    </div>
+    </DraggableNodeContainer>
   )
 }
 
@@ -394,6 +322,68 @@ const StatementList = ({
 }) => {
   return (
     <div className={cn("flex flex-col border-l border-l-slate-200", indentationClass, className)}>
+      {children}
+    </div>
+  )
+}
+
+const DraggableNodeContainer = ({
+  nodeId,
+  isOverlay,
+  children,
+  kind,
+}: {
+  kind: "statement" | "ui node"
+  nodeId: string
+  isOverlay?: boolean
+  children: React.ReactNode
+}) => {
+  const node = useNode<StatementNode>(nodeId)
+  const hasParent = node.meta?.parent !== undefined
+
+  const [draggedNodeId] = useAtom(draggedNodeIdAtom)
+  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
+
+  const isDroppedOnNode = !isOverlay && nodeId === droppedOnNodeId
+  const isDraggedNode = !isOverlay && nodeId === draggedNodeId
+
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: nodeId,
+    data: { type: node.type, kind } satisfies DropData,
+    disabled: !hasParent,
+  })
+
+  const droppable = useDroppable({
+    id: nodeId,
+    data: { type: node.type, kind } satisfies DropData,
+    disabled: !hasParent,
+  })
+
+  if (!node) return null
+
+  return (
+    <div
+      className={cn(
+        "relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
+        {
+          "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
+        },
+      )}
+      ref={(ref) => {
+        setNodeRef(ref)
+        droppable.setNodeRef(ref)
+      }}
+      {...listeners}
+      {...attributes}
+    >
+      {isDroppedOnNode && (
+        <div
+          className={cn("absolute bottom-0 left-0 h-1 w-full opacity-50", {
+            "bg-lime-600": !isDraggedNode,
+            "bg-gray-300": isDraggedNode,
+          })}
+        />
+      )}
       {children}
     </div>
   )
@@ -453,7 +443,7 @@ const closestTopRightCorner =
       const droppableContainerData: DropData = droppableContainer.data.current as any
 
       const droppableNode = codeDB?.getNodeByID(id as string)
-      if (codeDB.isDescendantOf(droppableNode!, activeNode!)) {
+      if (codeDB.isDescendantOf(droppableNode!, activeNode!) && id !== active.id) {
         continue
       }
 
