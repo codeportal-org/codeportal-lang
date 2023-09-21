@@ -224,6 +224,7 @@ export type TryStatementNode = {
   type: "try"
   id: string
   body: StatementNode[]
+  catchParam?: ParamDeclaration
   catch: StatementNode[]
   finally?: StatementNode[]
   meta?: CodeMeta
