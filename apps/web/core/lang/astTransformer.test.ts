@@ -288,8 +288,6 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  return
-
   it("should detect and transform the use of React.useState", () => {
     const transformer = new ASTtoCTTransformer()
 
@@ -313,7 +311,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 6,
+      idCounter: 8,
       body: [
         {
           type: "component",
@@ -361,8 +359,6 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  return
-
   it("should transform the use of JSX expressions", () => {
     const transformer = new ASTtoCTTransformer()
 
@@ -386,7 +382,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 8,
+      idCounter: 9,
       body: [
         {
           type: "component",
@@ -464,6 +460,8 @@ describe("ASTtoCTTransformer - astTransformer", () => {
   it("should transform a program with MemberExpression like obj.value", () => {
     const transformer = new ASTtoCTTransformer()
 
+    transformer.addGlobal("obj", "<obj-id>")
+
     const codeTree = transformer.transform(
       Parser.extend(acornJSXParser()).parse(
         `
@@ -476,7 +474,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 3,
+      idCounter: 6,
       body: [
         {
           type: "assignment",
@@ -488,12 +486,12 @@ describe("ASTtoCTTransformer - astTransformer", () => {
             path: [
               {
                 type: "ref",
-                id: "3",
-                refId: "1",
+                id: "4",
+                refId: "<obj-id>",
               },
               {
                 type: "string",
-                id: "4",
+                id: "3",
                 value: "value",
               },
             ],
@@ -507,6 +505,8 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ],
     } satisfies ProgramNode)
   })
+
+  return
 
   it("should transform a program with an ObjectExpression like { value: 0 }", () => {
     const transformer = new ASTtoCTTransformer()

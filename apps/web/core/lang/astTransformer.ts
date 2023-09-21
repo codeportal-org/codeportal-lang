@@ -5,6 +5,7 @@ import {
   Expression,
   ExpressionStatement,
   FunctionDeclaration,
+  Identifier,
   IfStatement,
   JSXElement,
   JSXExpressionContainer,
@@ -76,6 +77,12 @@ export class ASTtoCTTransformer {
    */
   scopeStack: Map<string, string>[] = []
 
+  globalScope: Map<string, string> = new Map()
+
+  addGlobal(name: string, id: string) {
+    this.globalScope.set(name, id)
+  }
+
   private addToScope(name: string, id: string) {
     if (this.scopeStack.length === 0) {
       throw new Error("No scope to add to")
@@ -105,6 +112,12 @@ export class ASTtoCTTransformer {
       }
     }
 
+    const id = this.globalScope.get(name)
+
+    if (id) {
+      return id
+    }
+
     throw new Error(`Identifier ${name} not found`)
   }
 
@@ -112,10 +125,14 @@ export class ASTtoCTTransformer {
     this.topLevelComponent = topLevelComponent
   }
 
-  transform(node: Program) {
-    this.componentMode = false
+  reset() {
     this.idCounter = 0
+    this.scopeStack = []
+    this.globalScope = new Map()
+    this.componentMode = false
+  }
 
+  transform(node: Program) {
     if (node.type === "Program") {
       return this.transformProgram(node)
     }
@@ -388,6 +405,7 @@ export class ASTtoCTTransformer {
   }
 
   transformBinaryExpression(node: BinaryExpression): NAryExpression {
+    const nAryId = this.getNewId()
     const args: ExpressionNode[] = []
 
     let operator = node.operator
@@ -410,7 +428,7 @@ export class ASTtoCTTransformer {
 
     return {
       type: "nary",
-      id: this.getNewId(),
+      id: nAryId,
       operator: operator as any,
       args: args.reverse(),
     }
@@ -528,6 +546,8 @@ export class ASTtoCTTransformer {
   }
 
   transformAssignmentExpression(node: AssignmentExpression): any {
+    const assignmentNodeId = this.getNewId()
+
     const left = node.left
 
     let leftNode: ReferenceNode | PathAccessNode
@@ -541,7 +561,7 @@ export class ASTtoCTTransformer {
 
     return {
       type: "assignment",
-      id: this.getNewId(),
+      id: assignmentNodeId,
       operator: node.operator,
       left: leftNode,
       right: this.transformExpression(node.right),
@@ -549,11 +569,20 @@ export class ASTtoCTTransformer {
   }
 
   transformMemberExpression(node: MemberExpression): PathAccessNode {
+    const pathAccessId = this.getNewId()
     let path: any[] = []
 
     let current = node
     while (current.type === "MemberExpression") {
-      path.push(this.transformExpression(current.property as Expression))
+      if (current.computed) {
+        path.push(this.transformExpression(current.property as Expression))
+      } else {
+        path.push({
+          type: "string",
+          id: this.getNewId(),
+          value: (current.property as Identifier).name,
+        } satisfies StringLiteral)
+      }
       current = current.object as MemberExpression
     }
 
@@ -561,7 +590,7 @@ export class ASTtoCTTransformer {
 
     return {
       type: "path access",
-      id: this.getNewId(),
+      id: pathAccessId,
       path: path.reverse(),
     }
   }
