@@ -14,7 +14,7 @@ Design principles:
 Language features:
 
 - Chained object/list access is always safe. Think of it like if in JavaScript you did `a.b.c.d` but as `a?.b?.c?.d` every time. If any of the objects in the chain are undefined or null, the result is undefined and no error is thrown. The difference is that with PortalLang this happens under the hood, with no clutter and you don't have to worry about it. No more undefined or null references exceptions! 🎉 Bye "Uncaught TypeError: Cannot read properties of undefined/null (reading 'x')" 👋.
-- Everything looks sync by default even though things are async under the hood. No more `async` or `await` keywords cluttering your code! ✨
+- Everything looks sync by default even though some things are async under the hood, for those we await them. This means no more `async` or `await` keywords cluttering your code! ✨
 - On demand errors as values in the form of `{ value, error }` at the function call level if you need it. It is opt-in! If not, the error is thrown as usual.
 - There is only one way to declare a function that can be adapted to the use case, unlike JavaScript that has ... well it depends on how you count.
 - There is only strict equality `===` and no loose equality `==`.
