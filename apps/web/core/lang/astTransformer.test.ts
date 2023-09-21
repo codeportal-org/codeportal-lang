@@ -1083,6 +1083,198 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
+  it("should transform a program that uses an async function and awaits values", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    transformer.addGlobal("fetch", "<fetch>")
+    transformer.addGlobal("setName", "<setName>")
+    transformer.addGlobal("JSON", "<JSON>")
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+        async function myFunc(name) {
+          const response = await fetch("/api/data/form-submission", {
+            method: "POST",
+            body: JSON.stringify({ name }),
+          })
+
+          const data = await response.json()
+          setName(data.name)
+        }
+      `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      id: "0",
+      idCounter: 31,
+      body: [
+        {
+          type: "function",
+          id: "1",
+          name: "myFunc",
+          params: [
+            {
+              type: "param",
+              id: "2",
+              name: "name",
+            },
+          ],
+          body: [
+            {
+              type: "var",
+              id: "3",
+              name: "response",
+              value: {
+                type: "function call",
+                id: "4",
+                callee: {
+                  type: "ref",
+                  id: "5",
+                  refId: "<fetch>",
+                },
+                args: [
+                  {
+                    type: "string",
+                    id: "6",
+                    value: "/api/data/form-submission",
+                  },
+                  {
+                    type: "object",
+                    id: "7",
+                    properties: [
+                      {
+                        type: "property",
+                        id: "8",
+                        name: {
+                          type: "string",
+                          id: "9",
+                          value: "method",
+                        },
+                        value: {
+                          type: "string",
+                          id: "10",
+                          value: "POST",
+                        },
+                      },
+                      {
+                        type: "property",
+                        id: "11",
+                        name: {
+                          type: "string",
+                          id: "12",
+                          value: "body",
+                        },
+                        value: {
+                          type: "function call",
+                          id: "13",
+                          callee: {
+                            type: "path access",
+                            id: "14",
+                            path: [
+                              {
+                                type: "ref",
+                                id: "16",
+                                refId: "<JSON>",
+                              },
+                              {
+                                type: "string",
+                                id: "15",
+                                value: "stringify",
+                              },
+                            ],
+                          },
+                          args: [
+                            {
+                              type: "object",
+                              id: "17",
+                              properties: [
+                                {
+                                  type: "property",
+                                  id: "18",
+                                  name: {
+                                    type: "string",
+                                    id: "19",
+                                    value: "name",
+                                  },
+                                  value: {
+                                    type: "ref",
+                                    id: "20",
+                                    refId: "2",
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            {
+              type: "var",
+              id: "21",
+              name: "data",
+              value: {
+                type: "function call",
+                id: "22",
+                callee: {
+                  type: "path access",
+                  id: "23",
+                  path: [
+                    {
+                      type: "ref",
+                      id: "25",
+                      refId: "3",
+                    },
+                    {
+                      type: "string",
+                      id: "24",
+                      value: "json",
+                    },
+                  ],
+                },
+                args: [],
+              },
+            },
+            {
+              type: "function call",
+              id: "26",
+              callee: {
+                type: "ref",
+                id: "27",
+                refId: "<setName>",
+              },
+              args: [
+                {
+                  type: "path access",
+                  id: "28",
+                  path: [
+                    {
+                      type: "ref",
+                      id: "30",
+                      refId: "21",
+                    },
+                    {
+                      type: "string",
+                      id: "29",
+                      value: "name",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
   return
 
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
@@ -1130,25 +1322,29 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ) as any,
     )
 
-    // fs.writeFileSync("./codeTree.json", JSON.stringify(codeTree, null, 2))
-
     expect(codeTree).toBe({
       type: "program",
+      id: "0",
+      idCounter: 21,
       body: [
         {
           type: "component",
+          id: "1",
           name: "App",
           body: [
             {
               type: "state",
+              id: "2",
               name: "name",
               value: {
                 type: "string",
+                id: "3",
                 value: "",
               },
             },
             {
               type: "function",
+              id: "4",
               name: "handleSubmit",
               body: [
                 // {
@@ -1184,78 +1380,96 @@ describe("ASTtoCTTransformer - astTransformer", () => {
             },
             {
               type: "return",
+              id: "5",
               arg: {
                 type: "ui element",
+                id: "6",
                 name: "div",
                 props: [],
                 children: [
                   {
                     type: "ui element",
+                    id: "7",
                     name: "h1",
                     props: [],
                     children: [
                       {
                         type: "ui text",
+                        id: "8",
                         text: "Hello, {name}!",
                       },
                     ],
                   },
                   {
                     type: "ui element",
+                    id: "9",
                     name: "form",
                     props: [
                       {
                         type: "ui prop",
+                        id: "10",
                         name: "onSubmit",
                         value: {
                           type: "ref",
-                          name: "handleSubmit",
+                          id: "11",
+                          refId: "4",
                         },
                       },
                     ],
                     children: [
                       {
                         type: "ui element",
+                        id: "12",
                         name: "input",
                         props: [
                           {
                             type: "ui prop",
+                            id: "13",
                             name: "type",
                             value: {
                               type: "string",
+                              id: "14",
                               value: "text",
                             },
                           },
                           {
                             type: "ui prop",
+                            id: "15",
                             name: "value",
                             value: {
                               type: "string",
+                              id: "16",
                               value: "name",
                             },
                           },
                           {
                             type: "ui prop",
+                            id: "17",
                             name: "onChange",
                             value: {
-                              type: "inline function",
+                              type: "function",
+                              id: "18",
                               params: [
                                 {
                                   type: "param",
+                                  id: "19",
                                   name: "event",
                                 },
                               ],
                               body: [
                                 {
                                   type: "function call",
+                                  id: "20",
                                   callee: {
                                     type: "ref",
-                                    name: "setName",
+                                    id: "21",
+                                    refId: "setName",
                                   },
                                   args: [
                                     {
                                       type: "ref",
-                                      name: "event.target.value",
+                                      id: "22",
+                                      refId: "event.target.value",
                                     },
                                   ],
                                 },
@@ -1266,13 +1480,16 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                       },
                       {
                         type: "ui element",
+                        id: "23",
                         name: "button",
                         props: [
                           {
                             type: "ui prop",
+                            id: "24",
                             name: "type",
                             value: {
                               type: "string",
+                              id: "25",
                               value: "submit",
                             },
                           },
@@ -1280,6 +1497,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                         children: [
                           {
                             type: "ui text",
+                            id: "26",
                             text: "Submit",
                           },
                         ],

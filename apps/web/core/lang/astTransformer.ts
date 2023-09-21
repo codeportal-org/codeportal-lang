@@ -405,6 +405,9 @@ export class ASTtoCTTransformer {
       return this.transformObjectExpression(node)
     } else if (node.type === "ArrowFunctionExpression") {
       return this.transformArrowFunctionExpression(node)
+    } else if (node.type === "AwaitExpression") {
+      // We strip await expressions
+      return this.transformExpression(node.argument)
     }
 
     throw new Error(`Unknown expression type: ${node.type}`)
