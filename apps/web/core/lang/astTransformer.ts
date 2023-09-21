@@ -484,20 +484,31 @@ export class ASTtoCTTransformer {
       type: "ui element",
       id: this.getNewId(),
       name: (node.openingElement.name as JSXIdentifier).name,
-      props: node.openingElement.attributes.map((attribute) => {
-        return attribute.type === "JSXAttribute"
-          ? ({
-              type: "ui prop",
-              id: this.getNewId(),
-              name: attribute.name.name as string,
-              value: this.transformExpression(attribute.value as Expression),
-            } satisfies UIPropNode)
-          : ({
-              type: "ui spread prop",
-              id: this.getNewId(),
-              arg: this.transformExpression(attribute.argument),
-            } satisfies UISpreadPropNode)
-      }),
+      props: node.openingElement.attributes
+        .map((attribute) => {
+          return attribute.type === "JSXAttribute" &&
+            attribute.name.type === "JSXIdentifier" &&
+            attribute.value
+            ? ({
+                type: "ui prop",
+                id: this.getNewId(),
+                name: attribute.name.name as string,
+                value:
+                  attribute.value.type === "Literal"
+                    ? this.transformLiteral(attribute.value)
+                    : attribute.value.type === "JSXExpressionContainer"
+                    ? this.transformExpression(attribute.value.expression as Expression)
+                    : this.transformJSXElement(attribute.value as JSXElement),
+              } satisfies UIPropNode)
+            : attribute.type === "JSXSpreadAttribute" && attribute.argument
+            ? ({
+                type: "ui spread prop",
+                id: this.getNewId(),
+                arg: this.transformExpression(attribute.argument),
+              } satisfies UISpreadPropNode)
+            : null
+        })
+        .filter((attribute) => attribute !== null) as (UIPropNode | UISpreadPropNode)[],
       children: node.children
         .map((child) => {
           if (child.type === "JSXElement") {
@@ -829,5 +840,5 @@ export class ASTtoCTTransformer {
 }
 
 export function collapseWhitespace(str: string) {
-  return str.replace(/\s+/g, " ").trim()
+  return str.replace(/\s+/g, " ")
 }
