@@ -2,6 +2,7 @@ import {
   ArrowFunctionExpression,
   AssignmentExpression,
   BinaryExpression,
+  BlockStatement,
   Expression,
   ExpressionStatement,
   FunctionDeclaration,
@@ -19,6 +20,7 @@ import {
   SimpleCallExpression,
   Statement,
   TryStatement,
+  VariableDeclaration,
 } from "estree-jsx"
 
 import {
@@ -266,23 +268,35 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformVariableDeclaration(node: any): any {
+  transformVariableDeclaration(
+    node: VariableDeclaration,
+  ): VarStatement | FunctionNode | StateStatement {
     if (node.declarations.length > 1) {
       throw new Error("Multiple variable declarators in a declaration is not supported")
+    }
+
+    if (!node.declarations[0]) {
+      throw new Error("No variable declarator in declaration")
     }
 
     // pattern matching React state, it detects `React.useState`
     if (this.componentMode) {
       if (
-        node.declarations[0].init.type === "CallExpression" &&
-        node.declarations[0].init.callee.object?.name === "React" &&
-        node.declarations[0].init.callee.property?.name === "useState"
+        node.declarations[0].init?.type === "CallExpression" &&
+        (node.declarations[0].init.callee as MemberExpression).object.type === "Identifier" &&
+        ((node.declarations[0].init.callee as MemberExpression).object as Identifier)?.name ===
+          "React" &&
+        (node.declarations[0].init.callee as MemberExpression).property?.type === "Identifier" &&
+        ((node.declarations[0].init.callee as MemberExpression).property as Identifier)?.name ===
+          "useState" &&
+        node.declarations[0].id.type === "ArrayPattern" &&
+        node.declarations[0].id?.elements[0]?.type === "Identifier"
       ) {
         const stateNode: StateStatement = {
           type: "state",
           id: this.getNewId(),
-          name: node.declarations[0].id.elements[0].name,
-          value: this.transformExpression(node.declarations[0].init.arguments[0]),
+          name: node.declarations[0].id?.elements[0]?.name,
+          value: this.transformExpression(node.declarations[0].init.arguments[0] as Expression),
         }
 
         this.addToScope(stateNode.name, stateNode.id)
@@ -292,35 +306,53 @@ export class ASTtoCTTransformer {
     }
 
     // transform arrow functions into regular functions
-    if (node.declarations[0].init.type === "ArrowFunctionExpression") {
+    if (
+      node.declarations[0].init?.type === "ArrowFunctionExpression" &&
+      node.declarations[0].id.type === "Identifier"
+    ) {
       const functionNode: FunctionNode = {
         type: "function",
         id: this.getNewId(),
         name: node.declarations[0].id.name,
-        params: node.declarations[0].init.params.map(
-          (param: any) =>
-            ({
-              type: "param",
-              id: this.getNewId(),
-              name: param.name,
-            } satisfies ParamDeclaration),
-        ),
+        params: [],
         body: [],
       }
 
       this.addToScope(functionNode.name!, functionNode.id)
 
+      this.pushScope()
+
+      functionNode.params?.push(
+        ...node.declarations[0].init.params.map((param) => {
+          if (param.type !== "Identifier") {
+            throw new Error(`Unknown arrow function param type: ${param.type}`)
+          }
+
+          const paramNode = {
+            type: "param",
+            id: this.getNewId(),
+            name: param.name,
+          } satisfies ParamDeclaration
+
+          this.addToScope(paramNode.name, paramNode.id)
+
+          return paramNode
+        }),
+      )
+
       if (node.declarations[0].init.expression) {
         functionNode.body.push({
           type: "return",
           id: this.getNewId(),
-          arg: this.transformExpression(node.declarations[0].init.body),
+          arg: this.transformExpression(node.declarations[0].init.body as Expression),
         })
       } else {
-        for (const statement of node.declarations[0].init.body.body) {
+        for (const statement of (node.declarations[0].init.body as BlockStatement).body) {
           functionNode.body.push(this.transformStatement(statement))
         }
       }
+
+      this.popScope()
 
       return functionNode
     }
@@ -330,8 +362,8 @@ export class ASTtoCTTransformer {
     const varStatement: VarStatement = {
       type: "var",
       id: this.getNewId(),
-      name: node.declarations[0].id.name,
-      value: this.transformExpression(node.declarations[0].init),
+      name: (node.declarations[0].id as Identifier).name,
+      value: this.transformExpression(node.declarations[0].init as Expression),
     }
 
     this.addToScope(varStatement.name, varStatement.id)
@@ -669,14 +701,21 @@ export class ASTtoCTTransformer {
     this.pushScope()
 
     functionNode.params?.push(
-      ...node.params.map(
-        (param: any) =>
-          ({
-            type: "param",
-            id: this.getNewId(),
-            name: param.name,
-          } satisfies ParamDeclaration),
-      ),
+      ...node.params.map((param) => {
+        if (param.type !== "Identifier") {
+          throw new Error(`Unknown arrow function param type: ${param.type}`)
+        }
+
+        const paramNode = {
+          type: "param",
+          id: this.getNewId(),
+          name: param.name,
+        } satisfies ParamDeclaration
+
+        this.addToScope(paramNode.name, paramNode.id)
+
+        return paramNode
+      }),
     )
 
     if (node.expression) {
@@ -728,6 +767,7 @@ export class ASTtoCTTransformer {
           ifStatement.else.push(this.transformStatement(statement))
         }
       } else if (node.alternate.type === "IfStatement") {
+        // TODO!!! else-if chain
         // ifStatement.elseIf.push(this.transformIfStatement(node.alternate))
       } else {
         throw new Error(`Unknown if alternate type: ${node.alternate.type}`)

@@ -552,8 +552,6 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  return
-
   it("should transform a program with a TryStatement, and the ", () => {
     const transformer = new ASTtoCTTransformer()
 
@@ -575,7 +573,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 7,
+      idCounter: 8,
       body: [
         {
           type: "try",
@@ -624,6 +622,8 @@ describe("ASTtoCTTransformer - astTransformer", () => {
   it("should transform arrow functions", () => {
     const transformer = new ASTtoCTTransformer()
 
+    transformer.addGlobal("setFn", "<setFn>")
+
     const codeTree = transformer.transform(
       Parser.extend(acornJSXParser()).parse(
         `
@@ -636,7 +636,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 6,
+      idCounter: 8,
       body: [
         {
           type: "function call",
@@ -644,7 +644,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
           callee: {
             type: "ref",
             id: "2",
-            name: "setFn",
+            refId: "<setFn>",
           },
           args: [
             {
@@ -658,15 +658,18 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                 },
                 {
                   type: "param",
+                  id: "5",
                   name: "b",
                 },
               ],
               body: [
                 {
                   type: "return",
+                  id: "6",
                   arg: {
                     type: "ref",
-                    name: "b",
+                    id: "7",
+                    refId: "5",
                   },
                 },
               ],
@@ -676,6 +679,8 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ],
     } satisfies ProgramNode)
   })
+
+  return
 
   it("should transform arrow functions with a variable declaration into named functions", () => {
     const transformer = new ASTtoCTTransformer()
