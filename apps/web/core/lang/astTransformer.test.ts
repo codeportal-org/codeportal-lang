@@ -506,8 +506,6 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  return
-
   it("should transform a program with an ObjectExpression like { value: 0 }", () => {
     const transformer = new ASTtoCTTransformer()
 
@@ -523,7 +521,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 4,
+      idCounter: 6,
       body: [
         {
           type: "var",
@@ -537,9 +535,9 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                 type: "property",
                 id: "3",
                 name: {
-                  type: "ref",
+                  type: "string",
                   id: "4",
-                  name: "value",
+                  value: "value",
                 },
                 value: {
                   type: "number",
@@ -553,6 +551,8 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ],
     } satisfies ProgramNode)
   })
+
+  return
 
   it("should transform a program with a TryStatement, and the ", () => {
     const transformer = new ASTtoCTTransformer()

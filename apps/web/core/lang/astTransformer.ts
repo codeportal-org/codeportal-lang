@@ -14,6 +14,7 @@ import {
   JSXText,
   Literal,
   MemberExpression,
+  ObjectExpression,
   Program,
   SimpleCallExpression,
   Statement,
@@ -595,7 +596,7 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformObjectExpression(node: any): ObjectNode {
+  transformObjectExpression(node: ObjectExpression): ObjectNode {
     const object: ObjectNode = {
       type: "object",
       id: this.getNewId(),
@@ -603,11 +604,25 @@ export class ASTtoCTTransformer {
     }
 
     for (const property of node.properties) {
+      if (property.type !== "Property") {
+        throw new Error(`Unknown object property type: ${property.type}`)
+      }
+
+      const propertyId = this.getNewId()
+
+      const name = property.computed
+        ? this.transformExpression(property.key as Expression)
+        : ({
+            type: "string",
+            id: this.getNewId(),
+            value: (property.key as Identifier).name,
+          } satisfies StringLiteral)
+
       object.properties.push({
         type: "property",
-        id: this.getNewId(),
-        name: this.transformExpression(property.key),
-        value: this.transformExpression(property.value),
+        id: propertyId,
+        name,
+        value: this.transformExpression(property.value as Expression),
       })
     }
 
