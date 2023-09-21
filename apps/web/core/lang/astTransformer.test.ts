@@ -680,8 +680,6 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  return
-
   it("should transform arrow functions with a variable declaration into named functions", () => {
     const transformer = new ASTtoCTTransformer()
 
@@ -697,7 +695,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 6,
+      idCounter: 8,
       body: [
         {
           type: "function",
@@ -726,13 +724,13 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                 args: [
                   {
                     type: "ref",
-                    id: "6",
-                    name: "a",
+                    id: "7",
+                    refId: "2",
                   },
                   {
                     type: "ref",
-                    id: "7",
-                    name: "b",
+                    id: "6",
+                    refId: "3",
                   },
                 ],
               },
@@ -762,7 +760,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 5,
+      idCounter: 7,
       body: [
         {
           type: "component",
