@@ -480,7 +480,7 @@ export class ASTtoCTTransformer {
   }
 
   transformJSXElement(node: JSXElement): UIElementNode {
-    return {
+    const uiElementNode: UIElementNode = {
       type: "ui element",
       id: this.getNewId(),
       name: (node.openingElement.name as JSXIdentifier).name,
@@ -525,6 +525,12 @@ export class ASTtoCTTransformer {
         })
         .filter((child: any) => child !== null) as UINode[],
     }
+
+    if (uiElementNode.children?.length === 0) {
+      delete uiElementNode.children
+    }
+
+    return uiElementNode
   }
 
   transformJSXText(node: JSXText): UITextNode | null {

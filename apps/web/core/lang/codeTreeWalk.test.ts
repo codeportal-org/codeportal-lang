@@ -63,7 +63,6 @@ describe("CodeTreeWalk", () => {
                 name: "div",
                 meta: { extras: { count: 5 } },
                 props: [],
-                children: [],
               },
             },
           ],
