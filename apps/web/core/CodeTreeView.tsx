@@ -338,6 +338,7 @@ const DraggableNodeContainer = ({
   isOverlay?: boolean
   children: React.ReactNode
 }) => {
+  const codeDB = useCodeDB()
   const node = useNode<StatementNode>(nodeId)
   const hasParent = node.meta?.parent !== undefined
 
@@ -346,6 +347,8 @@ const DraggableNodeContainer = ({
 
   const isDroppedOnNode = !isOverlay && nodeId === droppedOnNodeId
   const isDraggedNode = !isOverlay && nodeId === draggedNodeId
+
+  const draggedNode = draggedNodeId ? codeDB?.getNodeByID(draggedNodeId) : null
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
@@ -358,6 +361,11 @@ const DraggableNodeContainer = ({
     data: { type: node.type, kind } satisfies DropData,
     disabled: !hasParent,
   })
+
+  const relativeStatementPosition =
+    draggedNode && isDroppedOnNode
+      ? codeDB?.relativeStatementNodePosition(node, draggedNode as StatementNode)
+      : "none"
 
   if (!node) return null
 
@@ -378,9 +386,12 @@ const DraggableNodeContainer = ({
     >
       {isDroppedOnNode && (
         <div
-          className={cn("absolute bottom-0 left-0 h-1 w-full opacity-50", {
+          className={cn("absolute opacity-50", {
             "bg-lime-600": !isDraggedNode,
             "bg-gray-300": isDraggedNode,
+            "left-0 top-0 h-full w-1": relativeStatementPosition === "same",
+            "left-0 top-0 h-1 w-full": relativeStatementPosition === "before",
+            "bottom-0 left-0 h-1 w-full": relativeStatementPosition === "after",
           })}
         />
       )}

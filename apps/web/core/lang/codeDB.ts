@@ -155,6 +155,70 @@ export class CodeDB {
     this.notifyNodeChange(node.id)
   }
 
+  relativeStatementNodePosition(
+    refNode: StatementNode,
+    target: StatementNode,
+  ): "before" | "after" | "same" | "none" {
+    if (
+      !statementTypes.includes(refNode.type as any) ||
+      !statementTypes.includes(target.type as any)
+    ) {
+      return "none"
+    }
+
+    const nodeParent = refNode.meta?.parent as FunctionNode
+    const targetParent = target.meta?.parent as FunctionNode
+
+    if (!nodeParent || !targetParent) {
+      return "none"
+    }
+
+    const nodeIndex = nodeParent.body.indexOf(refNode)
+    const targetIndex = targetParent.body.indexOf(target)
+
+    if (nodeIndex === -1 || targetIndex === -1) {
+      return "none"
+    }
+
+    if (nodeParent === targetParent) {
+      if (nodeIndex < targetIndex) {
+        return "before"
+      } else if (nodeIndex > targetIndex) {
+        return "after"
+      } else {
+        return "same"
+      }
+    } else {
+      // go up the tree until we find a common parent
+      let currentTargetParent = targetParent
+      let currentTarget = target
+
+      while (currentTargetParent !== nodeParent) {
+        currentTarget = currentTargetParent
+        currentTargetParent = currentTargetParent.meta?.parent as FunctionNode
+
+        if (!currentTargetParent) {
+          return "none"
+        }
+      }
+
+      const nodeIndex = nodeParent.body.indexOf(refNode)
+      const targetIndex = currentTargetParent.body.indexOf(currentTarget)
+
+      if (nodeIndex === -1 || targetIndex === -1) {
+        return "none"
+      }
+
+      if (nodeIndex < targetIndex) {
+        return "before"
+      } else if (nodeIndex > targetIndex) {
+        return "after"
+      } else {
+        return "same"
+      }
+    }
+  }
+
   //   /**
   //  * Moves an expression node to a target expression node in the code tree.
   //  * If the target node is not empty, the nodes will be swapped.
