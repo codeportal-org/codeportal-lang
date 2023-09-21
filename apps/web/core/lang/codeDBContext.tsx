@@ -23,6 +23,7 @@ export function useCodeDB() {
 export function useNode<NodeType extends CodeNode>(id: string) {
   const codeDB = useCodeDB()
   const [node, setNode] = React.useState(() => codeDB?.getNodeByID(id))
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0)
 
   React.useEffect(() => {
     setNode(codeDB?.getNodeByID(id))
@@ -30,6 +31,7 @@ export function useNode<NodeType extends CodeNode>(id: string) {
     return codeDB?.onNodeChange(({ nodeId }) => {
       if (nodeId === id) {
         setNode(codeDB?.getNodeByID(id))
+        forceUpdate()
       }
     })
   }, [codeDB, id])
