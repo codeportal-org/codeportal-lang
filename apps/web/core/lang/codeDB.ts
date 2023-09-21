@@ -100,13 +100,21 @@ export class CodeDB {
     return this.isDescendantOf(node.meta.parent, target)
   }
 
+  /**
+   * Moves a statement node before a target statement node in the code tree.
+   * @param node Node to be moved.
+   * @param target Node to be moved to, the node will be moved before this node.
+   */
   moveStatementNode(node: StatementNode, target: StatementNode) {
+    console.log("--- moveStatementNode")
     if (
       !statementTypes.includes(node.type as any) ||
       !statementTypes.includes(target.type as any)
     ) {
       throw new Error("This method can only move statement nodes")
     }
+
+    console.log("--- moveStatementNode 2")
 
     if (!target.meta?.parent) {
       throw new Error("Target node must have a parent")
@@ -115,31 +123,93 @@ export class CodeDB {
     const nodeParent = node.meta?.parent as FunctionNode
     const targetParent = target.meta?.parent as FunctionNode
 
+    console.log("--- moveStatementNode 3")
+
     if (!nodeParent || !targetParent) {
       throw new Error("Node and target must have parents")
     }
 
-    if (nodeParent === targetParent) {
-      const nodeIndex = nodeParent.body.indexOf(node)
-      const targetIndex = nodeParent.body.indexOf(target)
+    console.log("--- moveStatementNode 4")
 
-      if (nodeIndex === -1 || targetIndex === -1) {
-        throw new Error("Node and target must be in the same parent")
-      }
+    const nodeIndex = nodeParent.body.indexOf(node)
+    const targetIndex = targetParent.body.indexOf(target)
 
-      // swap the nodes
-      nodeParent.body[nodeIndex] = target
-      nodeParent.body[targetIndex] = node
-
-      // update parents
-      node.meta!.parent = targetParent
-      target.meta.parent = nodeParent
-
-      // notify changes
-      this.notifyNodeChange(node.id)
-      this.notifyNodeChange(target.id)
-      this.notifyNodeChange(nodeParent.id)
-      this.notifyNodeChange(targetParent.id)
+    if (nodeIndex === -1 || targetIndex === -1) {
+      throw new Error("Node and target must be in their parents")
     }
+
+    // remove node from parent
+    nodeParent.body.splice(nodeIndex, 1)
+
+    // add node to parent at target index
+    targetParent.body.splice(targetIndex, 0, node)
+
+    // update parent
+    node.meta!.parent = targetParent
+
+    console.log("movement DONE!!")
+
+    // notify changes
+    this.notifyNodeChange(nodeParent.id)
+    this.notifyNodeChange(targetParent.id)
+    this.notifyNodeChange(node.id)
   }
+
+  //   /**
+  //  * Moves an expression node to a target expression node in the code tree.
+  //  * If the target node is not empty, the nodes will be swapped.
+  //  * @param node Node to be moved.
+  //  * @param target Node to be moved to, the node will be moved before this node.
+  //  */
+  //   moveExpressionNode(node: StatementNode, target: StatementNode) {
+  //     console.log("--- moveStatementNode")
+  //     if (
+  //       !statementTypes.includes(node.type as any) ||
+  //       !statementTypes.includes(target.type as any)
+  //     ) {
+  //       throw new Error("This method can only move statement nodes")
+  //     }
+
+  //     console.log("--- moveStatementNode 2")
+
+  //     if (!target.meta?.parent) {
+  //       throw new Error("Target node must have a parent")
+  //     }
+
+  //     const nodeParent = node.meta?.parent as FunctionNode
+  //     const targetParent = target.meta?.parent as FunctionNode
+
+  //     console.log("--- moveStatementNode 3")
+
+  //     if (!nodeParent || !targetParent) {
+  //       throw new Error("Node and target must have parents")
+  //     }
+
+  //     console.log("--- moveStatementNode 4")
+
+  //     if (nodeParent === targetParent) {
+  //       const nodeIndex = nodeParent.body.indexOf(node)
+  //       const targetIndex = nodeParent.body.indexOf(target)
+
+  //       if (nodeIndex === -1 || targetIndex === -1) {
+  //         throw new Error("Node and target must be in the same parent")
+  //       }
+
+  //       // swap the nodes
+  //       nodeParent.body[nodeIndex] = target
+  //       nodeParent.body[targetIndex] = node
+
+  //       // update parents
+  //       node.meta!.parent = targetParent
+  //       target.meta.parent = nodeParent
+
+  //       console.log("movement DONE!!")
+
+  //       // notify changes
+  //       this.notifyNodeChange(node.id)
+  //       this.notifyNodeChange(target.id)
+  //       this.notifyNodeChange(nodeParent.id)
+  //       this.notifyNodeChange(targetParent.id)
+  //     }
+  //   }
 }
