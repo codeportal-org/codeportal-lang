@@ -125,24 +125,9 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
     }
   }, [])
 
-  if (!codeTree) return <div>loading...</div>
+  if (!codeTree || !isCodeLoadedInDB) return <div>loading...</div>
 
-  const rootView = (
-    <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
-      {codeTree.type === "program" &&
-        codeTree.body.map((node, idx) => {
-          return <StatementView nodeId={node.id} key={node.id} />
-        })}
-    </div>
-  )
-
-  // If it doesn't have an ID, it's not draggable
-  if (!isCodeLoadedInDB) {
-    console.log("not loaded = -----", isCodeLoadedInDB)
-    return rootView
-  }
-
-  console.log("loaded =----")
+  console.log("render code tree view", codeTree)
 
   return (
     <DndContext
@@ -159,7 +144,12 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
         },
       }}
     >
-      {rootView}
+      <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
+        {codeTree.type === "program" &&
+          codeTree.body.map((node, idx) => {
+            return <StatementView nodeId={node.id} key={node.id} />
+          })}
+      </div>
       {createPortal(
         <DragOverlay>
           {draggedNode ? (
@@ -177,6 +167,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
 }
 
 export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
+  console.log("render statement view", nodeId)
   const node = useNode<StatementNode>(nodeId)
   const hasParent = node.meta?.parent !== undefined
 

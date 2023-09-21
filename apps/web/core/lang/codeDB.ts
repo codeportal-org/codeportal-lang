@@ -101,7 +101,10 @@ export class CodeDB {
   }
 
   moveStatementNode(node: StatementNode, target: StatementNode) {
-    if (!statementTypes.includes(node.type) || !statementTypes.includes(target.type)) {
+    if (
+      !statementTypes.includes(node.type as any) ||
+      !statementTypes.includes(target.type as any)
+    ) {
       throw new Error("This method can only move statement nodes")
     }
 
