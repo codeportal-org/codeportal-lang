@@ -231,14 +231,21 @@ export class ASTtoCTTransformer {
     this.pushScope()
 
     functionNode.params?.push(
-      ...(node.params?.map(
-        (param: any) =>
-          ({
-            type: "param",
-            id: this.getNewId(),
-            name: param.name,
-          } satisfies ParamDeclaration),
-      ) || []),
+      ...node.params.map((param) => {
+        if (param.type !== "Identifier") {
+          throw new Error(`Unknown function param type: ${param.type}`)
+        }
+
+        const paramNode = {
+          type: "param",
+          id: this.getNewId(),
+          name: param.name,
+        } satisfies ParamDeclaration
+
+        this.addToScope(paramNode.name, paramNode.id)
+
+        return paramNode
+      }),
     )
 
     for (const statement of node.body.body) {
