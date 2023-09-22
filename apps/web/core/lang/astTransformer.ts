@@ -292,12 +292,11 @@ export class ASTtoCTTransformer {
     if (this.componentMode) {
       if (
         node.declarations[0].init?.type === "CallExpression" &&
-        (node.declarations[0].init.callee as MemberExpression).object.type === "Identifier" &&
-        ((node.declarations[0].init.callee as MemberExpression).object as Identifier)?.name ===
-          "React" &&
-        (node.declarations[0].init.callee as MemberExpression).property?.type === "Identifier" &&
-        ((node.declarations[0].init.callee as MemberExpression).property as Identifier)?.name ===
-          "useState" &&
+        node.declarations[0].init.callee.type === "MemberExpression" &&
+        node.declarations[0].init.callee.object.type === "Identifier" &&
+        (node.declarations[0].init.callee.object as Identifier)?.name === "React" &&
+        node.declarations[0].init.callee.property?.type === "Identifier" &&
+        (node.declarations[0].init.callee.property as Identifier)?.name === "useState" &&
         node.declarations[0].id.type === "ArrayPattern" &&
         node.declarations[0].id?.elements[0]?.type === "Identifier"
       ) {
@@ -367,6 +366,10 @@ export class ASTtoCTTransformer {
     }
 
     // Regular variable declaration
+
+    if (node.declarations[0].id.type !== "Identifier") {
+      throw new Error(`Unknown variable declarator type: ${node.declarations[0].id.type}`)
+    }
 
     const varStatement: VarStatement = {
       type: "var",

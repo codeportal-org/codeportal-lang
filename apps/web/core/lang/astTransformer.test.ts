@@ -918,6 +918,36 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
+  it("should throw an error if array destructuring (ArrayPattern) is used in a variable declaration", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    expect(() => {
+      transformer.transform(
+        Parser.extend(acornJSXParser()).parse(
+          `
+            const [a, b] = [1, 2]
+          `,
+          { ecmaVersion: "latest" },
+        ) as any,
+      )
+    }).toThrow()
+  })
+
+  it("should throw an error if object destructuring (ObjectPattern) is used in a variable declaration", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    expect(() => {
+      transformer.transform(
+        Parser.extend(acornJSXParser()).parse(
+          `
+            const { a, b } = { a: 1, b: 2 }
+          `,
+          { ecmaVersion: "latest" },
+        ) as any,
+      )
+    }).toThrow()
+  })
+
   it("should transform a function with an if-elseif-else chain", () => {
     const transformer = new ASTtoCTTransformer()
 
@@ -1275,12 +1305,37 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
+  it("should transform an app with state changes", () => {
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+          function App() {
+            const [count, setCount] = React.useState(0)
+
+            return (
+              <div>
+                <button onClick={() => setCount(count + 1)}>+</button>
+                <button onClick={() => setCount(count - 1)}>-</button>
+                <div>{count}</div>
+              </div>
+            )
+          }
+        `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    // writeFileSync("./codeTree.ts", JSON.stringify(codeTree, null, 2))
+    expect(codeTree).toStrictEqual({})
+  })
+
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
     const transformer = new ASTtoCTTransformer()
 
     transformer.addGlobal("fetch", "<fetch>")
     transformer.addGlobal("JSON", "<JSON>")
-    transformer.addGlobal("setName", "<setName>")
     transformer.addGlobal("console", "<console>")
 
     const codeTree = transformer.transform(
