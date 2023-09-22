@@ -1,4 +1,5 @@
 import {
+  ClientRect,
   CollisionDescriptor,
   CollisionDetection,
   DragStartEvent,
@@ -37,7 +38,7 @@ import {
   UINode,
   UITextNode,
   VarStatement,
-  expressionTypes,
+  statementTypes,
   uiNodeTypes,
 } from "./lang/interpreter"
 
@@ -47,7 +48,10 @@ type DropData = { type: CodeNode["type"]; kind: NodeKind }
 
 const draggedNodeIdAtom = atom<string | null>(null)
 const draggedNodeKindAtom = atom<NodeKind | null>(null)
+const draggedNodeRectAtom = atom<ClientRect | null>(null)
+
 const droppedOnNodeIdAtom = atom<string | null>(null)
+const droppedOnNodeRectAtom = atom<ClientRect | null>(null)
 
 export const indentationClass = "pl-6"
 
@@ -73,6 +77,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
 
   const [draggedNodeId, setDraggedNodeId] = useAtom(draggedNodeIdAtom)
   const [draggedNodeKind, setDraggedNodeKind] = useAtom(draggedNodeKindAtom)
+
   const [droppedOnNodeId, setDroppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
 
   const draggedNode = draggedNodeId ? codeDB?.getNodeByID(draggedNodeId) : null
@@ -87,7 +92,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   }
 
   function handleDragOver({ active, over }: DragOverEvent) {
-    console.log("drag over", over?.id)
+    console.log("drag over")
     setDroppedOnNodeId(over?.id as string)
   }
 
@@ -95,10 +100,13 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
     console.log("drag end", draggedNodeKind)
     if (draggedNodeKind === "statement") {
       codeDB?.moveStatementNode(draggedNode! as StatementNode, droppedOnNode! as StatementNode)
+    } else if (draggedNodeKind === "ui node") {
+      codeDB?.moveUINode(draggedNode! as UINode, droppedOnNode! as UINode)
     }
 
     setDraggedNodeId(null)
     setDraggedNodeKind(null)
+
     setDroppedOnNodeId(null)
   }
 
@@ -106,6 +114,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
     console.log("drag cancel")
     setDraggedNodeId(null)
     setDraggedNodeKind(null)
+
     setDroppedOnNodeId(null)
   }
 
@@ -124,8 +133,6 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   }, [])
 
   if (!codeTree || !isCodeLoadedInDB) return <div>loading...</div>
-
-  console.log("render code tree view", codeTree)
 
   return (
     <DndContext
@@ -268,7 +275,9 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
             </div>
           </div>
           {node.children && (
-            <div className={cn("flex flex-col gap-1.5", indentationClass)}>
+            <div
+              className={cn("flex flex-col gap-1.5 border-l border-l-slate-200", indentationClass)}
+            >
               {node.children.map((node, idx) => {
                 return <ExpressionView node={node} key={idx} />
               })}
@@ -339,7 +348,7 @@ const DraggableNodeContainer = ({
   children: React.ReactNode
 }) => {
   const codeDB = useCodeDB()
-  const node = useNode<StatementNode>(nodeId)
+  const node = useNode(nodeId)
   const hasParent = node.meta?.parent !== undefined
 
   const [draggedNodeId] = useAtom(draggedNodeIdAtom)
@@ -347,8 +356,6 @@ const DraggableNodeContainer = ({
 
   const isDroppedOnNode = !isOverlay && nodeId === droppedOnNodeId
   const isDraggedNode = !isOverlay && nodeId === draggedNodeId
-
-  const draggedNode = draggedNodeId ? codeDB?.getNodeByID(draggedNodeId) : null
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
@@ -361,11 +368,6 @@ const DraggableNodeContainer = ({
     data: { type: node.type, kind } satisfies DropData,
     disabled: !hasParent,
   })
-
-  const relativeStatementPosition =
-    draggedNode && isDroppedOnNode
-      ? codeDB?.relativeStatementNodePosition(node, draggedNode as StatementNode)
-      : "none"
 
   if (!node) return null
 
@@ -386,12 +388,9 @@ const DraggableNodeContainer = ({
     >
       {isDroppedOnNode && (
         <div
-          className={cn("absolute opacity-50", {
+          className={cn("absolute left-0 top-0 h-full w-1 opacity-50", {
             "bg-lime-600": !isDraggedNode,
             "bg-gray-300": isDraggedNode,
-            "left-0 top-0 h-full w-1": relativeStatementPosition === "same",
-            "left-0 top-0 h-1 w-full": relativeStatementPosition === "before",
-            "bottom-0 left-0 h-1 w-full": relativeStatementPosition === "after",
           })}
         />
       )}
@@ -448,12 +447,22 @@ const closestTopRightCorner =
 
     const activeNode = codeDB?.getNodeByID(active.id as string)
 
+    const isActiveNodeUI = uiNodeTypes.includes(activeNode?.type as any)
+
     for (const droppableContainer of droppableContainers) {
       const { id } = droppableContainer
 
       const droppableContainerData: DropData = droppableContainer.data.current as any
 
       const droppableNode = codeDB?.getNodeByID(id as string)
+
+      if (isActiveNodeUI) {
+        // if moving a UI node, only allow dropping on UI nodes that have a parent UI node
+        if (!uiNodeTypes.includes(droppableNode?.meta?.parent?.type as any)) {
+          continue
+        }
+      }
+
       if (codeDB.isDescendantOf(droppableNode!, activeNode!) && id !== active.id) {
         continue
       }

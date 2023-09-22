@@ -1,7 +1,16 @@
 import { createNanoEvents } from "nanoevents"
 
 import { CodeTreeWalk } from "./codeTreeWalk"
-import { CodeNode, FunctionNode, ProgramNode, StatementNode, statementTypes } from "./interpreter"
+import {
+  CodeNode,
+  FunctionNode,
+  ProgramNode,
+  StatementNode,
+  UIElementNode,
+  UINode,
+  statementTypes,
+  uiNodeTypes,
+} from "./interpreter"
 
 /**
  * CodeDB indexes the Code Tree and stores it in useful data structures to be used by the Editor.
@@ -106,15 +115,12 @@ export class CodeDB {
    * @param target Node to be moved to, the node will be moved before this node.
    */
   moveStatementNode(node: StatementNode, target: StatementNode) {
-    console.log("--- moveStatementNode")
     if (
       !statementTypes.includes(node.type as any) ||
       !statementTypes.includes(target.type as any)
     ) {
       throw new Error("This method can only move statement nodes")
     }
-
-    console.log("--- moveStatementNode 2")
 
     if (!target.meta?.parent) {
       throw new Error("Target node must have a parent")
@@ -123,13 +129,9 @@ export class CodeDB {
     const nodeParent = node.meta?.parent as FunctionNode
     const targetParent = target.meta?.parent as FunctionNode
 
-    console.log("--- moveStatementNode 3")
-
     if (!nodeParent || !targetParent) {
       throw new Error("Node and target must have parents")
     }
-
-    console.log("--- moveStatementNode 4")
 
     const nodeIndex = nodeParent.body.indexOf(node)
     const targetIndex = targetParent.body.indexOf(target)
@@ -147,76 +149,53 @@ export class CodeDB {
     // update parent
     node.meta!.parent = targetParent
 
-    console.log("movement DONE!!")
-
     // notify changes
     this.notifyNodeChange(nodeParent.id)
     this.notifyNodeChange(targetParent.id)
     this.notifyNodeChange(node.id)
   }
 
-  relativeStatementNodePosition(
-    refNode: StatementNode,
-    target: StatementNode,
-  ): "before" | "after" | "same" | "none" {
-    if (
-      !statementTypes.includes(refNode.type as any) ||
-      !statementTypes.includes(target.type as any)
-    ) {
-      return "none"
+  /**
+   * Moves a UI node before a target statement node in the code tree.
+   * @param node Node to be moved.
+   * @param target Node to be moved to, the node will be moved before this node.
+   */
+  moveUINode(node: UINode, target: UINode) {
+    if (!node.meta?.parent || !target.meta?.parent) {
+      throw new Error("Node and target must have parents")
     }
 
-    const nodeParent = refNode.meta?.parent as FunctionNode
-    const targetParent = target.meta?.parent as FunctionNode
+    const nodeParent = node.meta?.parent as UIElementNode
+    const targetParent = target.meta?.parent as UIElementNode
 
     if (!nodeParent || !targetParent) {
-      return "none"
+      throw new Error("Node and target must have parents")
     }
 
-    const nodeIndex = nodeParent.body.indexOf(refNode)
-    const targetIndex = targetParent.body.indexOf(target)
+    if (!nodeParent.children || !targetParent.children) {
+      throw new Error("Node and target must have children")
+    }
+
+    const nodeIndex = nodeParent.children.indexOf(node)
+    const targetIndex = targetParent.children.indexOf(target)
 
     if (nodeIndex === -1 || targetIndex === -1) {
-      return "none"
+      throw new Error("Node and target must be in their parents")
     }
 
-    if (nodeParent === targetParent) {
-      if (nodeIndex < targetIndex) {
-        return "before"
-      } else if (nodeIndex > targetIndex) {
-        return "after"
-      } else {
-        return "same"
-      }
-    } else {
-      // go up the tree until we find a common parent
-      let currentTargetParent = targetParent
-      let currentTarget = target
+    // remove node from parent
+    nodeParent.children.splice(nodeIndex, 1)
 
-      while (currentTargetParent !== nodeParent) {
-        currentTarget = currentTargetParent
-        currentTargetParent = currentTargetParent.meta?.parent as FunctionNode
+    // add node to parent at target index
+    targetParent.children.splice(targetIndex, 0, node)
 
-        if (!currentTargetParent) {
-          return "none"
-        }
-      }
+    // update parent
+    node.meta!.parent = targetParent
 
-      const nodeIndex = nodeParent.body.indexOf(refNode)
-      const targetIndex = currentTargetParent.body.indexOf(currentTarget)
-
-      if (nodeIndex === -1 || targetIndex === -1) {
-        return "none"
-      }
-
-      if (nodeIndex < targetIndex) {
-        return "before"
-      } else if (nodeIndex > targetIndex) {
-        return "after"
-      } else {
-        return "same"
-      }
-    }
+    // notify changes
+    this.notifyNodeChange(nodeParent.id)
+    this.notifyNodeChange(targetParent.id)
+    this.notifyNodeChange(node.id)
   }
 
   //   /**
