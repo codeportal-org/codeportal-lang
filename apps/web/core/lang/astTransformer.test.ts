@@ -1330,8 +1330,340 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ) as any,
     )
 
-    writeFileSync("./codeTree.ts", JSON.stringify(codeTree, null, 2))
-    expect(codeTree).toStrictEqual({})
+    // writeFileSync("./codeTree.ts", JSON.stringify(codeTree, null, 2))
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      id: "0",
+      idCounter: 69,
+      body: [
+        {
+          type: "component",
+          id: "1",
+          name: "App",
+          body: [
+            {
+              type: "state",
+              id: "2",
+              name: "count",
+              value: {
+                type: "number",
+                id: "3",
+                value: 0,
+              },
+            },
+            {
+              type: "return",
+              id: "4",
+              arg: {
+                type: "ui element",
+                id: "5",
+                name: "div",
+                props: [],
+                children: [
+                  {
+                    type: "ui element",
+                    id: "6",
+                    name: "button",
+                    props: [
+                      {
+                        type: "ui prop",
+                        id: "7",
+                        name: "onClick",
+                        value: {
+                          type: "function",
+                          id: "8",
+                          params: [],
+                          body: [
+                            {
+                              type: "return",
+                              id: "9",
+                              arg: {
+                                type: "state change",
+                                id: "15",
+                                state: {
+                                  type: "ref",
+                                  id: "16",
+                                  refId: "2",
+                                },
+                                body: {
+                                  type: "nary",
+                                  id: "12",
+                                  operator: "+",
+                                  args: [
+                                    {
+                                      type: "ref",
+                                      id: "14",
+                                      refId: "2",
+                                    },
+                                    {
+                                      type: "number",
+                                      id: "13",
+                                      value: 1,
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                    children: [
+                      {
+                        type: "ui text",
+                        id: "17",
+                        text: "Increment",
+                      },
+                    ],
+                  },
+                  {
+                    type: "ui element",
+                    id: "18",
+                    name: "button",
+                    props: [
+                      {
+                        type: "ui prop",
+                        id: "19",
+                        name: "onClick",
+                        value: {
+                          type: "function",
+                          id: "20",
+                          params: [],
+                          body: [
+                            {
+                              type: "return",
+                              id: "21",
+                              arg: {
+                                type: "state change",
+                                id: "27",
+                                state: {
+                                  type: "ref",
+                                  id: "28",
+                                  refId: "2",
+                                },
+                                body: {
+                                  type: "nary",
+                                  id: "24",
+                                  operator: "+",
+                                  args: [
+                                    {
+                                      type: "ref",
+                                      id: "26",
+                                      refId: "2",
+                                    },
+                                    {
+                                      type: "number",
+                                      id: "25",
+                                      value: 1,
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                    children: [
+                      {
+                        type: "ui text",
+                        id: "29",
+                        text: "Increment",
+                      },
+                    ],
+                  },
+                  {
+                    type: "ui element",
+                    id: "30",
+                    name: "button",
+                    props: [
+                      {
+                        type: "ui prop",
+                        id: "31",
+                        name: "onClick",
+                        value: {
+                          type: "function",
+                          id: "32",
+                          params: [],
+                          body: [
+                            {
+                              type: "return",
+                              id: "33",
+                              arg: {
+                                type: "state change",
+                                id: "39",
+                                state: {
+                                  type: "ref",
+                                  id: "40",
+                                  refId: "2",
+                                },
+                                body: {
+                                  type: "nary",
+                                  id: "36",
+                                  operator: "+",
+                                  args: [
+                                    {
+                                      type: "ref",
+                                      id: "38",
+                                      refId: "2",
+                                    },
+                                    {
+                                      type: "number",
+                                      id: "37",
+                                      value: 1,
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                    children: [
+                      {
+                        type: "ui text",
+                        id: "41",
+                        text: "Increment",
+                      },
+                    ],
+                  },
+                  {
+                    type: "ui element",
+                    id: "42",
+                    name: "button",
+                    props: [
+                      {
+                        type: "ui prop",
+                        id: "43",
+                        name: "onClick",
+                        value: {
+                          type: "function",
+                          id: "44",
+                          params: [],
+                          body: [
+                            {
+                              type: "return",
+                              id: "45",
+                              arg: {
+                                type: "state change",
+                                id: "51",
+                                state: {
+                                  type: "ref",
+                                  id: "52",
+                                  refId: "2",
+                                },
+                                body: {
+                                  type: "nary",
+                                  id: "48",
+                                  operator: "+",
+                                  args: [
+                                    {
+                                      type: "ref",
+                                      id: "50",
+                                      refId: "2",
+                                    },
+                                    {
+                                      type: "number",
+                                      id: "49",
+                                      value: 1,
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                    children: [
+                      {
+                        type: "ui text",
+                        id: "53",
+                        text: "Increment",
+                      },
+                    ],
+                  },
+                  {
+                    type: "ui element",
+                    id: "54",
+                    name: "button",
+                    props: [
+                      {
+                        type: "ui prop",
+                        id: "55",
+                        name: "onClick",
+                        value: {
+                          type: "function",
+                          id: "56",
+                          params: [],
+                          body: [
+                            {
+                              type: "return",
+                              id: "57",
+                              arg: {
+                                type: "state change",
+                                id: "63",
+                                state: {
+                                  type: "ref",
+                                  id: "64",
+                                  refId: "2",
+                                },
+                                body: {
+                                  type: "nary",
+                                  id: "60",
+                                  operator: "+",
+                                  args: [
+                                    {
+                                      type: "ref",
+                                      id: "62",
+                                      refId: "2",
+                                    },
+                                    {
+                                      type: "number",
+                                      id: "61",
+                                      value: 1,
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                    children: [
+                      {
+                        type: "ui text",
+                        id: "65",
+                        text: "Increment",
+                      },
+                    ],
+                  },
+                  {
+                    type: "ui element",
+                    id: "66",
+                    name: "div",
+                    props: [],
+                    children: [
+                      {
+                        type: "ui expression",
+                        id: "67",
+                        expression: {
+                          type: "ref",
+                          id: "68",
+                          refId: "2",
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    })
   })
 
   return
