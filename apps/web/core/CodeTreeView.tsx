@@ -152,7 +152,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
     >
       <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
         {codeTree.type === "program" &&
-          codeTree.body.map((node, idx) => {
+          codeTree.body.map((node) => {
             return <StatementView nodeId={node.id} key={node.id} />
           })}
       </div>
@@ -310,8 +310,8 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
           <div
             className={cn("flex flex-col gap-1.5 border-l border-l-slate-200", indentationClass)}
           >
-            {node.children.map((node, idx) => {
-              return <ExpressionView node={node} key={idx} />
+            {node.children.map((node) => {
+              return <ExpressionView node={node} key={node.id} />
             })}
           </div>
         )}
