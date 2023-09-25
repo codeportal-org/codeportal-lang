@@ -176,49 +176,64 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
 
   if (!node) return null
 
+  let statementView: React.ReactNode
+
+  if (node.type === "component") {
+    statementView = (
+      <>
+        <div className="flex flex-row">
+          <span className="text-code-keyword">component</span>
+          <span className="pl-1">{/* spacer */}</span>
+          <span className="text-code-callable"> {node.name} </span>
+          <div className="text-gray-500">
+            {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
+          </div>
+        </div>
+        <StatementList>
+          {node.body.map((node) => {
+            return <StatementView nodeId={node.id} key={node.id} />
+          })}
+        </StatementList>
+      </>
+    )
+  } else if (node.type === "function") {
+    statementView = (
+      <>
+        <div className="flex flex-row">
+          <span className="text-code-keyword">fun</span>
+          <span className="text-code-callable"> {node.name} </span>
+          <div className="text-gray-500">
+            {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
+          </div>
+        </div>
+        <StatementList>
+          {node.body.map((node) => {
+            return <StatementView nodeId={node.id} key={node.id} />
+          })}
+        </StatementList>
+      </>
+    )
+  } else if (node.type === "var") {
+    statementView = <VariableStatementView node={node} />
+  } else if (node.type === "return") {
+    statementView = (
+      <div className="flex flex-row gap-1.5">
+        <span className="text-code-keyword">return</span>
+        <ExpressionView node={node.arg} />
+      </div>
+    )
+  } else {
+    statementView = (
+      <div>
+        unknown statement type: <span className="text-red-500">{node.type}</span>
+      </div>
+    )
+  }
+
   return (
     <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay} kind="statement">
-      {node.type === "component" && (
-        <>
-          <div className="flex flex-row">
-            <span className="text-code-keyword">component</span>
-            <span className="pl-1">{/* spacer */}</span>
-            <span className="text-code-callable"> {node.name} </span>
-            <div className="text-gray-500">
-              {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
-            </div>
-          </div>
-          <StatementList>
-            {node.body.map((node) => {
-              return <StatementView nodeId={node.id} key={node.id} />
-            })}
-          </StatementList>
-        </>
-      )}
-      {node.type === "function" && (
-        <>
-          <div className="flex flex-row">
-            <span className="text-code-keyword">fun</span>
-            <span className="text-code-callable"> {node.name} </span>
-            <div className="text-gray-500">
-              {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
-            </div>
-          </div>
-          <StatementList>
-            {node.body.map((node) => {
-              return <StatementView nodeId={node.id} key={node.id} />
-            })}
-          </StatementList>
-        </>
-      )}
-      {node.type === "var" && <VariableStatementView node={node} />}
+      {statementView}
       {/* {node.type === "expression" && <ExpressionView node={node.expression} />} */}
-      {node.type === "return" && (
-        <div className="flex flex-row gap-1.5">
-          <span className="text-code-keyword">return</span>
-          <ExpressionView node={node.arg} />
-        </div>
-      )}
     </DraggableNodeContainer>
   )
 }
@@ -252,46 +267,60 @@ export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
 export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: boolean }) => {
   const nodeId = node.id
 
+  let uiNodeView: React.ReactNode
+
+  if (node.type === "ui text") {
+    uiNodeView = <UITextView node={node} />
+  } else if (node.type === "ui element") {
+    return (
+      <div className="flex flex-col">
+        <div className="text-code-ui-element-name flex items-center gap-1.5">
+          {node.name === "div" ? (
+            <>
+              <Square size={16} className="text-code-name" />
+              Box
+            </>
+          ) : node.name === "p" ? (
+            <div className="text-code-ui-element-name">Paragraph</div>
+          ) : node.name.startsWith("h") && !isNaN(Number(node.name[1])) ? (
+            <div className="text-code-ui-element-name">Heading {node.name[1]}</div>
+          ) : (
+            node.name
+          )}
+          <div className="text-gray-500">
+            {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
+          </div>
+        </div>
+        {node.children && (
+          <div
+            className={cn("flex flex-col gap-1.5 border-l border-l-slate-200", indentationClass)}
+          >
+            {node.children.map((node, idx) => {
+              return <ExpressionView node={node} key={idx} />
+            })}
+          </div>
+        )}
+      </div>
+    )
+  } else if (node.type === "ui expression") {
+    uiNodeView = (
+      <div className="flex flex-row gap-1.5">
+        {"{"}
+        <ExpressionView node={node.expression} />
+        {"}"}
+      </div>
+    )
+  } else {
+    uiNodeView = (
+      <div>
+        unknown ui node type: <span className="text-red-500">{node.type}</span>
+      </div>
+    )
+  }
+
   return (
     <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay} kind="ui node">
-      {node.type === "ui text" && <UITextView node={node} />}
-      {node.type === "ui element" && (
-        <div className="flex flex-col">
-          <div className="text-code-ui-element-name flex items-center gap-1.5">
-            {node.name === "div" ? (
-              <>
-                <Square size={16} className="text-code-name" />
-                Box
-              </>
-            ) : node.name === "p" ? (
-              <div className="text-code-ui-element-name">Paragraph</div>
-            ) : node.name.startsWith("h") && !isNaN(Number(node.name[1])) ? (
-              <div className="text-code-ui-element-name">Heading {node.name[1]}</div>
-            ) : (
-              node.name
-            )}
-            <div className="text-gray-500">
-              {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
-            </div>
-          </div>
-          {node.children && (
-            <div
-              className={cn("flex flex-col gap-1.5 border-l border-l-slate-200", indentationClass)}
-            >
-              {node.children.map((node, idx) => {
-                return <ExpressionView node={node} key={idx} />
-              })}
-            </div>
-          )}
-        </div>
-      )}
-      {node.type === "ui expression" && (
-        <div className="flex flex-row gap-1.5">
-          {"{"}
-          <ExpressionView node={node.expression} />
-          {"}"}
-        </div>
-      )}
+      {uiNodeView}
     </DraggableNodeContainer>
   )
 }

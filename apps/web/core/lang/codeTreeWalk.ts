@@ -5,10 +5,12 @@ import {
   FunctionCallNode,
   FunctionNode,
   LiteralNode,
+  NAryExpression,
   PathAccessNode,
   ProgramNode,
   ReferenceNode,
   ReturnStatementNode,
+  StateChangeNode,
   StateStatement,
   StatementNode,
   UIElementNode,
@@ -82,6 +84,12 @@ export class CodeTreeWalk {
       this.walkLiteral(node)
     } else if (node.type === "ref") {
       this.walkRef(node)
+    } else if (node.type === "function") {
+      this.walkFunctionDeclaration(node)
+    } else if (node.type === "nary") {
+      this.walkNAryExpression(node)
+    } else if (node.type === "state change") {
+      this.walkStateChangeDeclaration(node)
     } else if (
       node.type === "ui element" ||
       node.type === "ui fragment" ||
@@ -230,6 +238,23 @@ export class CodeTreeWalk {
     this.parentNodeStack.pop()
   }
 
+  private walkStateChangeDeclaration(node: StateChangeNode) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
+
+    this.walkRef(node.state)
+
+    if (Array.isArray(node.body)) {
+      node.body.forEach((child) => {
+        this.walkStatement(child)
+      })
+    } else {
+      this.walkExpression(node.body)
+    }
+
+    this.parentNodeStack.pop()
+  }
+
   private walkComponent(node: ComponentNode) {
     this.callback(node, this.currentParentNode())
     this.parentNodeStack.push(node)
@@ -254,7 +279,7 @@ export class CodeTreeWalk {
     this.parentNodeStack.pop()
   }
 
-  walkUIFragment(node: UIFragmentNode) {
+  private walkUIFragment(node: UIFragmentNode) {
     this.callback(node, this.currentParentNode())
     this.parentNodeStack.push(node)
 
@@ -265,7 +290,18 @@ export class CodeTreeWalk {
     this.parentNodeStack.pop()
   }
 
-  walkUIText(node: UITextNode) {
+  private walkUIText(node: UITextNode) {
     this.callback(node, this.currentParentNode())
+  }
+
+  private walkNAryExpression(node: NAryExpression) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
+
+    node.args.forEach((child) => {
+      this.walkExpression(child)
+    })
+
+    this.parentNodeStack.pop()
   }
 }
