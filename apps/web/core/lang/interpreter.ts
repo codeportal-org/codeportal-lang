@@ -44,6 +44,7 @@ export type StatementNode =
   | VarStatement
   | StateStatement
   | FunctionCallNode
+  | StateChangeNode
   | AssignmentStatement
   | TryStatementNode
   | IfStatementNode
@@ -71,6 +72,7 @@ export type ExpressionNode =
   | PathAccessNode
   | ObjectNode
   | NAryExpression
+  | StateChangeNode
 
 export type LiteralNode = StringLiteral | NumberLiteral | BooleanLiteral
 
@@ -357,6 +359,14 @@ export type ObjectProperty = {
   id: string
   name: ExpressionNode
   value: ExpressionNode
+  meta?: CodeMeta
+}
+
+export type StateChangeNode = {
+  type: "state change"
+  id: string
+  state: ReferenceNode
+  body: ExpressionNode | StatementNode[]
   meta?: CodeMeta
 }
 

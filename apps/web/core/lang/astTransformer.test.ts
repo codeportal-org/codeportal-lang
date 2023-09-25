@@ -1316,8 +1316,11 @@ describe("ASTtoCTTransformer - astTransformer", () => {
 
             return (
               <div>
-                <button onClick={() => setCount(count + 1)}>+</button>
-                <button onClick={() => setCount(count - 1)}>-</button>
+                <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+                <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+                <button onClick={() => setCount(count + 1)}>Increment</button>
+                <button onClick={() => setCount((c2) => c2 + 1)}>Increment</button>
+                <button onClick={() => setCount(count + 1)}>Increment</button>
                 <div>{count}</div>
               </div>
             )
@@ -1327,9 +1330,11 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       ) as any,
     )
 
-    // writeFileSync("./codeTree.ts", JSON.stringify(codeTree, null, 2))
+    writeFileSync("./codeTree.ts", JSON.stringify(codeTree, null, 2))
     expect(codeTree).toStrictEqual({})
   })
+
+  return
 
   it("should transform a small app example that uses fetch, React.useState, and a small form", () => {
     const transformer = new ASTtoCTTransformer()

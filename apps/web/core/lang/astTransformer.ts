@@ -1,3 +1,4 @@
+import { full as acornWalkFull } from "acorn-walk"
 import {
   ArrowFunctionExpression,
   AssignmentExpression,
@@ -39,6 +40,7 @@ import {
   PathAccessNode,
   ProgramNode,
   ReferenceNode,
+  StateChangeNode,
   StateStatement,
   StatementNode,
   StringLiteral,
@@ -298,7 +300,8 @@ export class ASTtoCTTransformer {
         node.declarations[0].init.callee.property?.type === "Identifier" &&
         (node.declarations[0].init.callee.property as Identifier)?.name === "useState" &&
         node.declarations[0].id.type === "ArrayPattern" &&
-        node.declarations[0].id?.elements[0]?.type === "Identifier"
+        node.declarations[0].id?.elements[0]?.type === "Identifier" &&
+        node.declarations[0].id?.elements[1]?.type === "Identifier"
       ) {
         const stateNode: StateStatement = {
           type: "state",
@@ -308,6 +311,9 @@ export class ASTtoCTTransformer {
         }
 
         this.addToScope(stateNode.name, stateNode.id)
+
+        const setStateName = node.declarations[0].id?.elements[1].name
+        this.addToScope(setStateName, `#state-${stateNode.name}`)
 
         return stateNode
       }
@@ -579,7 +585,7 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformCallExpression(node: SimpleCallExpression): FunctionCallNode {
+  transformCallExpression(node: SimpleCallExpression): FunctionCallNode | StateChangeNode {
     const functionCallId = this.getNewId()
 
     let callee: ReferenceNode | PathAccessNode
@@ -588,6 +594,41 @@ export class ASTtoCTTransformer {
       callee = this.transformMemberExpression(node.callee)
     } else if (node.callee.type === "Identifier") {
       callee = this.transformIdentifier(node.callee)
+
+      if (callee.refId.startsWith("#state")) {
+        const stateName = callee.refId.split("-")[1]!
+        const stateId = this.resolveIdentifier(stateName)
+
+        let body: ExpressionNode | StatementNode[]
+
+        if (node.arguments[0]?.type === "ArrowFunctionExpression") {
+          const arrowFunction = node.arguments[0]
+          if (arrowFunction.params[0]?.type !== "Identifier") {
+            throw new Error("State setter arrow function should have a single identifier param")
+          }
+          const paramName = arrowFunction.params[0].name
+          replaceIdentifierInASTExpression(arrowFunction.body, paramName, stateName)
+
+          if (arrowFunction.body.type === "BlockStatement") {
+            body = this.transformStatementList(arrowFunction.body.body)
+          } else {
+            body = this.transformExpression(arrowFunction.body as Expression)
+          }
+        } else {
+          body = this.transformExpression(node.arguments[0] as Expression)
+        }
+
+        return {
+          type: "state change",
+          id: this.getNewId(),
+          state: {
+            type: "ref",
+            id: this.getNewId(),
+            refId: stateId,
+          },
+          body,
+        } satisfies StateChangeNode
+      }
     } else {
       throw new Error(`Unknown call expression callee type: ${node.callee.type}`)
     }
@@ -600,7 +641,7 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformExpressionStatement(node: ExpressionStatement): any {
+  transformExpressionStatement(node: ExpressionStatement): StatementNode {
     if (node.expression.type === "AssignmentExpression") {
       return this.transformAssignmentExpression(node.expression)
     } else if (node.expression.type === "CallExpression") {
@@ -610,7 +651,7 @@ export class ASTtoCTTransformer {
     throw new Error(`Unknown expression statement type: ${node.expression.type}`)
   }
 
-  transformAssignmentExpression(node: AssignmentExpression): any {
+  transformAssignmentExpression(node: AssignmentExpression): AssignmentStatement {
     const assignmentNodeId = this.getNewId()
 
     const left = node.left
@@ -630,7 +671,7 @@ export class ASTtoCTTransformer {
       operator: node.operator,
       left: leftNode,
       right: this.transformExpression(node.right),
-    } satisfies AssignmentStatement
+    }
   }
 
   transformMemberExpression(node: MemberExpression): PathAccessNode {
@@ -850,4 +891,12 @@ export class ASTtoCTTransformer {
 
 export function collapseWhitespace(str: string) {
   return str.replace(/\s+/g, " ")
+}
+
+function replaceIdentifierInASTExpression(ast: any, oldName: string, newName: string) {
+  acornWalkFull(ast, (node: any) => {
+    if (node.type === "Identifier" && node.name === oldName) {
+      node.name = newName
+    }
+  })
 }
