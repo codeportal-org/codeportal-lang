@@ -13,6 +13,10 @@ export type SpecialNodes =
 export type CodeMeta = {
   parent?: CodeNode
   extras?: Record<string, any>
+  ui?: {
+    isHovered: boolean
+    isSelected: boolean
+  }
 }
 
 export type ProgramNode = {

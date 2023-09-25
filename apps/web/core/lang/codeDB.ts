@@ -43,7 +43,12 @@ export class CodeDB {
   load(programNode: ProgramNode) {
     this.codeTreeWalker.full(programNode, (node, parent) => {
       if (!node.meta) {
-        node.meta = {}
+        node.meta = {
+          ui: {
+            isHovered: false,
+            isSelected: false,
+          },
+        }
       }
 
       // attach parent to all nodes
@@ -196,6 +201,26 @@ export class CodeDB {
     this.notifyNodeChange(nodeParent.id)
     this.notifyNodeChange(targetParent.id)
     this.notifyNodeChange(node.id)
+  }
+
+  hoverNode(nodeId: string) {
+    const node = this.getNodeByID(nodeId)
+    if (!node || !node.meta?.ui) {
+      return
+    }
+
+    node.meta.ui.isHovered = true
+    this.notifyNodeChange(nodeId)
+  }
+
+  hoverNodeOff(nodeId: string) {
+    const node = this.getNodeByID(nodeId)
+    if (!node || !node.meta?.ui) {
+      return
+    }
+
+    node.meta.ui.isHovered = false
+    this.notifyNodeChange(nodeId)
   }
 
   //   /**
