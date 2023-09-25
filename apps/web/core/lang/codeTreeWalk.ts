@@ -72,6 +72,8 @@ export class CodeTreeWalk {
       this.walkFunctionCall(node)
     } else if (node.type === "state") {
       this.walkStateDeclaration(node)
+    } else if (node.type === "state change") {
+      this.walkStateChangeDeclaration(node)
     } else {
       throw new Error(`Unknown statement type: ${node.type}`)
     }
