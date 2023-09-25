@@ -12,6 +12,7 @@ import "./index.scss"
 import { useCommandBarStore } from "./store"
 
 export type CommandItemData = {
+  id: string
   title: string
   icon: React.ReactNode
   onSelect: () => void
@@ -36,6 +37,7 @@ export const CommandBar = ({ commandList }: { commandList: CommandItemData[] }) 
 
   const generalCommandList = [
     {
+      id: "go-to-dashboard",
       title: "Go to dashboard",
       icon: <SquaresPlusIcon className="h-6" />,
       onSelect: () => {
@@ -57,10 +59,10 @@ export const CommandBar = ({ commandList }: { commandList: CommandItemData[] }) 
       <Command.List>
         <Command.Empty>No results found.</Command.Empty>
 
-        {[...commandList, ...generalCommandList].map((command, idx) => (
+        {[...commandList, ...generalCommandList].map((command) => (
           <CommandItem
-            key={idx}
-            id={idx}
+            key={command.id}
+            id={command.id}
             icon={command.icon}
             onSelect={() => {
               command.onSelect()
