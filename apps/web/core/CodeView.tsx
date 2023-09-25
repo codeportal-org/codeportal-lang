@@ -20,13 +20,14 @@ function App() {
 
   return (
     <div>
-      <button onClick={() => setCount(count + 1)}>+</button>
-      <button onClick={() => setCount(count - 1)}>-</button>
-      <div>{count}</div>
+      <button onClick={() => {setCount(count + 1)}}>+</button>
+      <button onClick={() => {setCount(count - 1)}}>-</button>
+      <div>Count: {count}</div>
     </div>
   )
 }
 `
+
 codeProcessor.extend((ast) => astTransformer.transform(ast))
 const testCodeTree = codeProcessor.process(testCode)
 
