@@ -33,6 +33,7 @@ import {
   NumberLiteral,
   ProgramNode,
   ReferenceNode,
+  StateStatement,
   StatementNode,
   StringLiteral,
   UINode,
@@ -222,6 +223,8 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
         <ExpressionView node={node.arg} />
       </div>
     )
+  } else if (node.type === "state") {
+    statementView = <StateStatementView node={node} />
   } else {
     statementView = (
       <div>
@@ -242,6 +245,18 @@ export const VariableStatementView = ({ node }: { node: VarStatement }) => {
   return (
     <div className="flex flex-row gap-1.5">
       <span className="text-code-keyword">var</span>
+      <span className="text-code-name">{node.name}</span>
+      <span className="text-code-symbol">=</span>
+
+      <ExpressionView node={node.value} />
+    </div>
+  )
+}
+
+export const StateStatementView = ({ node }: { node: StateStatement }) => {
+  return (
+    <div className="flex flex-row gap-1.5">
+      <span className="text-code-keyword">state</span>
       <span className="text-code-name">{node.name}</span>
       <span className="text-code-symbol">=</span>
 
@@ -272,7 +287,7 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
   if (node.type === "ui text") {
     uiNodeView = <UITextView node={node} />
   } else if (node.type === "ui element") {
-    return (
+    uiNodeView = (
       <div className="flex flex-col">
         <div className="text-code-ui-element-name flex items-center gap-1.5">
           {node.name === "div" ? (
