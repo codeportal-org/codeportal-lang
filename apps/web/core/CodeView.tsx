@@ -8,7 +8,7 @@ import { CodeTreeView } from "./CodeTreeView"
 import { ASTtoCTTransformer } from "./lang/astTransformer"
 import { CodeDBProvider, useCodeDB } from "./lang/codeDBContext"
 import { CodeProcessor } from "./lang/codeProcessor"
-import { ProgramNode } from "./lang/interpreter"
+import { ProgramNode, UITextNode } from "./lang/codeTree"
 
 const astTransformer = new ASTtoCTTransformer()
 const codeProcessor = new CodeProcessor({ appId: "test" })
@@ -89,6 +89,15 @@ const CodeContainer = React.forwardRef<
   React.useEffect(() => {
     codeDB?.reset()
     codeDB?.load(testCodeTree)
+
+    console.log("-----  loaded", codeDB?.codeTree)
+
+    codeDB?.onNodeChange(({ nodeId }) => {
+      if (nodeId === "29") {
+        const node: UITextNode = codeDB.getNodeByID("29")
+        console.log("-----  node change!!!!!!!", node.text)
+      }
+    })
   }, [])
 
   if (testCodeTree) {

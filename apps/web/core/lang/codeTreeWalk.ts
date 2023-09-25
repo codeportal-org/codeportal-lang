@@ -22,7 +22,7 @@ import {
   UISpreadPropNode,
   UITextNode,
   VarStatement,
-} from "./interpreter"
+} from "./codeTree"
 
 export class CodeTreeWalk {
   parentNodeStack: CodeNode[] = []

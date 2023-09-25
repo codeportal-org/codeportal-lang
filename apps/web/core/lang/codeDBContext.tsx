@@ -1,7 +1,7 @@
 import React from "react"
 
 import { CodeDB } from "./codeDB"
-import { CodeNode } from "./interpreter"
+import { CodeNode } from "./codeTree"
 
 const CodeDBContext = React.createContext<CodeDB | null>(null)
 

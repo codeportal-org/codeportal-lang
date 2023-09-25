@@ -1,6 +1,5 @@
 import { createNanoEvents } from "nanoevents"
 
-import { CodeTreeWalk } from "./codeTreeWalk"
 import {
   CodeNode,
   FunctionNode,
@@ -10,7 +9,8 @@ import {
   UINode,
   statementTypes,
   uiNodeTypes,
-} from "./interpreter"
+} from "./codeTree"
+import { CodeTreeWalk } from "./codeTreeWalk"
 
 /**
  * CodeDB indexes the Code Tree and stores it in useful data structures to be used by the Editor.
@@ -98,8 +98,8 @@ export class CodeDB {
     return this.codeTree
   }
 
-  getNodeByID(id: string) {
-    return this.nodeMap.get(id)
+  getNodeByID<NodeType extends CodeNode>(id: string) {
+    return this.nodeMap.get(id) as NodeType
   }
 
   isDescendantOf(node: CodeNode, target: CodeNode): boolean {
@@ -220,6 +220,16 @@ export class CodeDB {
     }
 
     node.meta.ui.isHovered = false
+    this.notifyNodeChange(nodeId)
+  }
+
+  updateUIText(nodeId: string, text: string) {
+    const node = this.getNodeByID(nodeId)
+    if (!node || node.type !== "ui text") {
+      return
+    }
+
+    node.text = text
     this.notifyNodeChange(nodeId)
   }
 

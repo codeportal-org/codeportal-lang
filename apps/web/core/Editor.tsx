@@ -29,7 +29,7 @@ import { CodeView } from "./CodeView"
 import { editorEvents } from "./editorEvents"
 import { ASTtoCTTransformer } from "./lang/astTransformer"
 import { CodeProcessor } from "./lang/codeProcessor"
-import { ProgramNode } from "./lang/interpreter"
+import { ProgramNode } from "./lang/codeTree"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
   const clerk = useClerk()

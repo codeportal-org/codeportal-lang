@@ -2,8 +2,8 @@ import { Parser } from "acorn"
 import acornJSXParser from "acorn-jsx"
 
 import { ASTtoCTTransformer } from "./astTransformer"
+import { ProgramNode } from "./codeTree"
 import { CodeTreeWalk } from "./codeTreeWalk"
-import { ProgramNode } from "./interpreter"
 
 describe("CodeTreeWalk", () => {
   it("should walk all the nodes in a Code Tree", () => {

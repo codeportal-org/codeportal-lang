@@ -44,7 +44,7 @@ import {
   VarStatement,
   statementTypes,
   uiNodeTypes,
-} from "./lang/interpreter"
+} from "./lang/codeTree"
 
 type NodeKind = "statement" | "ui node"
 
@@ -534,7 +534,12 @@ const DraggableNodeContainer = ({
 }
 
 export const UITextView = ({ node }: { node: UITextNode }) => {
+  const codeDB = useCodeDB()
   const [text, setText] = React.useState(node.text)
+
+  React.useEffect(() => {
+    codeDB?.updateUIText(node.id, text)
+  }, [text])
 
   return (
     <div className="flex gap-1.5">

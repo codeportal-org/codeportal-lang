@@ -3,7 +3,7 @@ import acornJSXParser from "acorn-jsx"
 import { writeFileSync } from "fs"
 
 import { ASTtoCTTransformer, collapseWhitespace } from "./astTransformer"
-import { ProgramNode } from "./interpreter"
+import { ProgramNode } from "./codeTree"
 
 describe("collapseWhitespace", () => {
   it("should collapse whitespace", () => {
