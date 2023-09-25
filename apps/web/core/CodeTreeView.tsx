@@ -18,7 +18,7 @@ import {
   useSensors,
 } from "@dnd-kit/core"
 import { atom, useAtom } from "jotai"
-import { Square, Text } from "lucide-react"
+import { Square, Type } from "lucide-react"
 import React, { PointerEvent } from "react"
 import { createPortal } from "react-dom"
 import TextareaAutosize from "react-textarea-autosize"
@@ -30,9 +30,12 @@ import { useCodeDB, useNode } from "./lang/codeDBContext"
 import {
   CodeNode,
   ExpressionNode,
+  FunctionNode,
+  NAryExpression,
   NumberLiteral,
   ProgramNode,
   ReferenceNode,
+  StateChangeNode,
   StateStatement,
   StatementNode,
   StringLiteral,
@@ -198,24 +201,9 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
       </>
     )
   } else if (node.type === "function") {
-    statementView = (
-      <>
-        <div className="flex flex-row">
-          <span className="text-code-keyword">fun</span>
-          <span className="text-code-callable"> {node.name} </span>
-          <div className="text-gray-500">
-            {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
-          </div>
-        </div>
-        <StatementList>
-          {node.body.map((node) => {
-            return <StatementView nodeId={node.id} key={node.id} />
-          })}
-        </StatementList>
-      </>
-    )
+    statementView = <FunctionView node={node} />
   } else if (node.type === "var") {
-    statementView = <VariableStatementView node={node} />
+    statementView = <VariableStatementView nodeId={node.id} />
   } else if (node.type === "return") {
     statementView = (
       <div className="flex flex-row gap-1.5">
@@ -224,7 +212,9 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
       </div>
     )
   } else if (node.type === "state") {
-    statementView = <StateStatementView node={node} />
+    statementView = <StateStatementView nodeId={node.id} />
+  } else if (node.type === "state change") {
+    statementView = <StateChangeView node={node} />
   } else {
     statementView = (
       <div>
@@ -241,11 +231,22 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
   )
 }
 
-export const VariableStatementView = ({ node }: { node: VarStatement }) => {
+export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<VarStatement>(nodeId)
+
   return (
     <div className="flex flex-row gap-1.5">
       <span className="text-code-keyword">var</span>
-      <span className="text-code-name">{node.name}</span>
+      <span
+        className={cn(
+          "text-code-name rounded-md bg-gray-100 px-1 transition-all hover:bg-gray-200",
+          {
+            "bg-gray-200": node.meta?.ui?.isHovered,
+          },
+        )}
+      >
+        {node.name}
+      </span>
       <span className="text-code-symbol">=</span>
 
       <ExpressionView node={node.value} />
@@ -253,11 +254,22 @@ export const VariableStatementView = ({ node }: { node: VarStatement }) => {
   )
 }
 
-export const StateStatementView = ({ node }: { node: StateStatement }) => {
+export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<StateStatement>(nodeId)
+
   return (
     <div className="flex flex-row gap-1.5">
-      <span className="text-code-keyword">state</span>
-      <span className="text-code-name">{node.name}</span>
+      <span className="text-code-keyword ">state</span>
+      <span
+        className={cn(
+          "text-code-name rounded-md bg-gray-100 px-1 transition-all hover:bg-gray-200",
+          {
+            "bg-gray-200": node.meta?.ui?.isHovered,
+          },
+        )}
+      >
+        {node.name}
+      </span>
       <span className="text-code-symbol">=</span>
 
       <ExpressionView node={node.value} />
@@ -268,15 +280,25 @@ export const StateStatementView = ({ node }: { node: StateStatement }) => {
 export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
   if (!node) return null
 
-  return (
-    <>
-      {node.type === "string" && <StringView node={node} />}
-      {node.type === "number" && <NumberView node={node} />}
-      {node.type === "boolean" && <BooleanView node={node} />}
-      {node.type === "ref" && <ReferenceView nodeId={node.id} />}
-      {uiNodeTypes.includes(node.type) && <UINodeView node={node as UINode} />}
-    </>
-  )
+  if (node.type === "string") {
+    return <StringView node={node} />
+  } else if (node.type === "number") {
+    return <NumberView node={node} />
+  } else if (node.type === "boolean") {
+    return <BooleanView node={node} />
+  } else if (node.type === "function") {
+    return <FunctionView node={node} />
+  } else if (node.type === "ref") {
+    return <ReferenceView nodeId={node.id} />
+  } else if (node.type === "nary") {
+    return <NaryExpressionView node={node} />
+  } else if (node.type === "state change") {
+    return <StateChangeView node={node} />
+  } else if (uiNodeTypes.includes(node.type)) {
+    return <UINodeView node={node as UINode} />
+  } else {
+    return <div>unknown expression type: {node.type}</div>
+  }
 }
 
 export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: boolean }) => {
@@ -302,10 +324,33 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
           ) : (
             node.name
           )}
-          <div className="text-gray-500">
-            {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
-          </div>
         </div>
+        {node.props && (
+          <>
+            <div className={indentationClass}>
+              <div className={cn("grid grid-cols-5 gap-4 text-gray-500", indentationClass)}>
+                {node.props.map((prop) =>
+                  prop.type === "ui prop" ? (
+                    <>
+                      <div className="col-span-1">{prop.name}:</div>
+                      <div className="col-span-4">
+                        <ExpressionView node={prop.value} />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="col-span-1">... spread</div>
+                      <div className="col-span-4">
+                        <ExpressionView node={prop.arg} />
+                      </div>
+                    </>
+                  ),
+                )}
+              </div>
+            </div>
+            <div className="pt-1">{/* spacer */}</div>
+          </>
+        )}
         {node.children && (
           <div
             className={cn("flex flex-col gap-1.5 border-l border-l-slate-200", indentationClass)}
@@ -353,16 +398,61 @@ export const BooleanView = ({ node }: { node: { value: boolean } }) => {
 }
 
 export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
+  const codeDB = useCodeDB()
   const node = useNode<ReferenceNode>(nodeId)
-
   const referencedNode = useNode<VarStatement>(node.refId)
 
-  // TODO: implement highligh declaration on hover!
-
   return (
-    <span className="text-code-name rounded-md bg-gray-100 px-1 transition-all hover:bg-gray-200">
+    <span
+      className={cn("text-code-name rounded-md bg-gray-100 px-1 transition-all hover:bg-gray-200", {
+        "bg-gray-200": referencedNode.meta?.ui?.isHovered,
+      })}
+      onMouseOver={() => {
+        codeDB?.hoverNode(node.refId)
+      }}
+      onMouseLeave={() => {
+        codeDB?.hoverNodeOff(node.refId)
+      }}
+    >
       {referencedNode.name}
     </span>
+  )
+}
+
+const StateChangeView = ({ node }: { node: StateChangeNode }) => {
+  return (
+    <div className="flex flex-row items-start gap-1.5">
+      <span className="text-code-keyword">✨</span>
+      <ReferenceView nodeId={node.state.id} />
+      <span className="text-code-symbol">=</span>
+
+      {Array.isArray(node.body) ? (
+        <StatementList>
+          {node.body.map((node) => {
+            return <StatementView nodeId={node.id} key={node.id} />
+          })}
+        </StatementList>
+      ) : (
+        <ExpressionView node={node.body} />
+      )}
+    </div>
+  )
+}
+
+const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
+  return (
+    <div className="flex flex-row gap-1.5">
+      {node.args.map((arg, idx) => {
+        return (
+          <React.Fragment key={arg.id}>
+            <ExpressionView node={arg} />
+            {idx < node.args.length - 1 && (
+              <span className="text-code-symbol">{node.operator}</span>
+            )}
+          </React.Fragment>
+        )
+      })}
+    </div>
   )
 }
 
@@ -448,15 +538,34 @@ export const UITextView = ({ node }: { node: UITextNode }) => {
 
   return (
     <div className="flex gap-1.5">
-      <div className="flex h-[26px] w-6 items-center justify-center">
-        <Text size={18} className="text-code-name" />
+      <div className="flex h-[24px] w-6 items-center justify-center">
+        <Type size={16} className="text-code-name" />
       </div>
       <TextareaAutosize
-        className="text-code-ui-text w-full max-w-lg resize-none rounded border border-slate-300 px-1 py-0 focus-visible:outline-none focus-visible:ring-1"
+        className="text-code-ui-text w-full max-w-lg resize-none rounded border-none border-slate-300 bg-gray-100 px-2 py-0 focus-visible:outline-none focus-visible:ring-1"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
     </div>
+  )
+}
+
+export const FunctionView = ({ node }: { node: FunctionNode }) => {
+  return (
+    <>
+      <div className="flex flex-row">
+        <span className="text-code-keyword">fun</span>
+        <span className="text-code-callable"> {node.name} </span>
+        <div className="text-gray-500">
+          {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
+        </div>
+      </div>
+      <StatementList>
+        {node.body.map((node) => {
+          return <StatementView nodeId={node.id} key={node.id} />
+        })}
+      </StatementList>
+    </>
   )
 }
 
