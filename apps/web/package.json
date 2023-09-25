@@ -53,6 +53,7 @@
     "react-resizable-panels": "^0.0.54",
     "react-textarea-autosize": "^8.5.3",
     "styled-jsx": "^5.1.2",
+    "superjson": "^1.13.1",
     "swr": "^2.2.0",
     "tailwind-merge": "^1.14.0",
     "tinykeys": "^2.1.0",

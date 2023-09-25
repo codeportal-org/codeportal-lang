@@ -1,4 +1,5 @@
 import { createNanoEvents } from "nanoevents"
+import superjson from "superjson"
 
 import {
   CodeNode,
@@ -231,6 +232,22 @@ export class CodeDB {
 
     node.text = text
     this.notifyNodeChange(nodeId)
+  }
+
+  exportCodeTree() {
+    if (!this.codeTree) {
+      throw new Error("Code tree is not loaded")
+    }
+
+    const newCodeTree: ProgramNode = superjson.parse(superjson.stringify(this.codeTree))
+
+    const walker = new CodeTreeWalk()
+
+    walker.full(newCodeTree, (node) => {
+      delete node.meta
+    })
+
+    return newCodeTree
   }
 
   //   /**
