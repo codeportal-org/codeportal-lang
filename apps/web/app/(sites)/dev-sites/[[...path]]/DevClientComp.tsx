@@ -32,15 +32,5 @@ export function DevClientComp({ appId }: { appId: string }) {
     }
   }, [])
 
-  return (
-    <>
-      <button
-        onClick={() => {
-          devSitesEvents.refresh()
-        }}
-      >
-        Refresh
-      </button>
-    </>
-  )
+  return <></>
 }
