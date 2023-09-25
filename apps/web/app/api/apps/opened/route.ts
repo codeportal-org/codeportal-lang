@@ -11,8 +11,7 @@ export type AppOpenedRequest = {
 export async function POST(request: Request) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const body: AppOpenedRequest = await request.json()

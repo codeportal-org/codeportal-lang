@@ -8,8 +8,7 @@ import { ThemeConfig } from "@/db/schema"
 export async function GET(request: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const rows = await db
@@ -29,8 +28,7 @@ export async function GET(request: Request, { params }: { params: { appId: strin
 export async function PUT(request: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const body: { theme: ThemeConfig } = await request.json()

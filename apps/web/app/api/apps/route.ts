@@ -9,8 +9,7 @@ import { NewAppFormData } from "./types"
 export async function GET(request: Request) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const apps = await db.query.apps.findMany({
@@ -24,8 +23,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const body: NewAppFormData = await request.json()

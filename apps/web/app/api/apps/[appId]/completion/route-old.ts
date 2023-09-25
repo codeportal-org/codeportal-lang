@@ -15,8 +15,7 @@ export const runtime = "edge"
 export async function POST(req: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const appId = params.appId

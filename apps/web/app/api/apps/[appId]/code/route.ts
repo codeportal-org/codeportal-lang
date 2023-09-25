@@ -7,8 +7,7 @@ import { db, schema } from "@/db/index"
 export async function GET(req: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const app = await db.query.apps.findFirst({
@@ -19,14 +18,13 @@ export async function GET(req: Request, { params }: { params: { appId: string } 
     return NextResponse.json({ error: "App not found" }, { status: 404 })
   }
 
-  return NextResponse.json({ code: app.mainModule?.code, prompt: app.prompt })
+  return NextResponse.json({ code: app.mainModule?.code, prompt: app.prompt } as any)
 }
 
 export async function PATCH(request: Request, { params }: { params: { appId: string } }) {
   const { userId } = auth()
   if (!userId) {
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const body = await request.json()

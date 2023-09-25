@@ -18,8 +18,7 @@ export async function POST(req: Request, { params }: { params: { appId: string }
   const { userId } = auth()
   if (!userId) {
     console.log("---- no user id", userId)
-    NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    return
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const appId = params.appId
@@ -64,7 +63,7 @@ export async function POST(req: Request, { params }: { params: { appId: string }
     } as JSXSyntaxCompletionResponse)
   } catch (error) {
     console.error("---- error", error)
-    NextResponse.json({ error: "completion error" }, { status: 500 })
+    return NextResponse.json({ error: "completion error" }, { status: 500 })
   }
 }
 
