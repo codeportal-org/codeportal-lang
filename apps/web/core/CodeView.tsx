@@ -5,183 +5,30 @@ import React from "react"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 import { CodeTreeView } from "./CodeTreeView"
+import { ASTtoCTTransformer } from "./lang/astTransformer"
 import { CodeDBProvider, useCodeDB } from "./lang/codeDBContext"
+import { CodeProcessor } from "./lang/codeProcessor"
 import { ProgramNode } from "./lang/interpreter"
 
-const testCodeTree = {
-  type: "program",
-  id: "0",
-  idCounter: 1,
-  body: [
-    {
-      type: "component",
-      name: "App",
-      id: "1",
-      body: [
-        {
-          type: "var",
-          id: "2",
-          name: "title",
-          value: {
-            type: "string",
-            id: "3",
-            value: "Welcome to HelloWorld App",
-          },
-        },
-        {
-          type: "var",
-          id: "4",
-          name: "description",
-          value: {
-            type: "string",
-            id: "5",
-            value:
-              "This app is designed to display a simple ‘Hello World’ message. It’s a classic example of a basic yet powerful web application.",
-          },
-        },
-        {
-          type: "return",
-          id: "6",
-          arg: {
-            type: "ui element",
-            id: "7",
-            name: "div",
-            props: [
-              {
-                type: "ui prop",
-                id: "8",
-                name: "className",
-                value: {
-                  type: "string",
-                  id: "9",
-                  value: "max-w-3xl mx-auto p-4",
-                },
-              },
-            ],
-            children: [
-              {
-                type: "ui element",
-                id: "10",
-                name: "h1",
-                props: [
-                  {
-                    type: "ui prop",
-                    id: "11",
-                    name: "className",
-                    value: {
-                      type: "string",
-                      id: "12",
-                      value: "text-3xl font-bold mb-4",
-                    },
-                  },
-                ],
-                children: [
-                  {
-                    type: "ui expression",
-                    id: "13",
-                    expression: {
-                      type: "ref",
-                      id: "14",
-                      refId: "2",
-                    },
-                  },
-                ],
-              },
-              {
-                type: "ui element",
-                id: "15",
-                name: "p",
-                props: [
-                  {
-                    type: "ui prop",
-                    id: "16",
-                    name: "className",
-                    value: {
-                      type: "string",
-                      id: "17",
-                      value: "text-lg mb-4",
-                    },
-                  },
-                ],
-                children: [
-                  {
-                    type: "ui expression",
-                    id: "18",
-                    expression: {
-                      type: "ref",
-                      id: "19",
-                      refId: "4",
-                    },
-                  },
-                ],
-              },
-              {
-                type: "ui element",
-                id: "20",
-                name: "div",
-                props: [
-                  {
-                    type: "ui prop",
-                    id: "21",
-                    name: "className",
-                    value: {
-                      type: "string",
-                      id: "22",
-                      value: "bg-blue-100 p-4 rounded-md",
-                    },
-                  },
-                ],
-                children: [
-                  {
-                    type: "ui element",
-                    id: "23",
-                    name: "p",
-                    props: [
-                      {
-                        type: "ui prop",
-                        id: "24",
-                        name: "className",
-                        value: {
-                          type: "string",
-                          id: "25",
-                          value: "text-2xl font-bold",
-                        },
-                      },
-                    ],
-                    children: [
-                      {
-                        type: "ui text",
-                        id: "26",
-                        text: "Hello World",
-                      },
-                      {
-                        type: "ui element",
-                        id: "27",
-                        name: "span",
-                        children: [
-                          {
-                            type: "ui text",
-                            id: "28",
-                            text: "!",
-                          },
-                        ],
-                      },
-                      {
-                        type: "ui text",
-                        id: "29",
-                        text: " :)",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      ],
-    },
-  ],
-} satisfies ProgramNode
+const astTransformer = new ASTtoCTTransformer()
+const codeProcessor = new CodeProcessor({ appId: "test" })
+
+astTransformer.addGlobal("useState", "<useState>")
+const testCode = `
+function App() {
+  const [count, setCount] = React.useState(0)
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>+</button>
+      <button onClick={() => setCount(count - 1)}>-</button>
+      <div>{count}</div>
+    </div>
+  )
+}
+`
+codeProcessor.extend((ast) => astTransformer.transform(ast))
+const testCodeTree = codeProcessor.process(testCode)
 
 export const CodeView = React.forwardRef<
   HTMLDivElement,
