@@ -441,7 +441,7 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
 
 const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
   return (
-    <div className="flex flex-row gap-1.5">
+    <div className="flex flex-row flex-wrap items-start gap-1.5">
       {node.args.map((arg, idx) => {
         return (
           <React.Fragment key={arg.id}>
