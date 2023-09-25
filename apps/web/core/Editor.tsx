@@ -217,6 +217,7 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
       <CommandBar
         commandList={[
           {
+            id: "open-dev-in-new-tab",
             title: "Open dev page (in new tab)",
             icon: <ArrowTopRightOnSquareIcon className="h-6" />,
             onSelect: () => {
