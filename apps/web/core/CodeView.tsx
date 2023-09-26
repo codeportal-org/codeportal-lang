@@ -13,7 +13,6 @@ import { ProgramNode, UITextNode } from "./lang/codeTree"
 const astTransformer = new ASTtoCTTransformer()
 const codeProcessor = new CodeProcessor({ appId: "test" })
 
-astTransformer.addGlobal("useState", "<useState>")
 const testCode = `
 function App() {
   const [count, setCount] = React.useState(0)
