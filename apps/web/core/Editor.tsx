@@ -93,42 +93,36 @@ export function Editor({ appId, appName }: { appId: string; appName?: string }) 
   }`
 
   React.useEffect(() => {
-    codeProcessor.setApiTokenFn(() => clerk.client.activeSessions[0]?.getToken() as any)
-
-    codeProcessor.extend((ast) => astTransformer.transform(ast))
-
-    const removeListener = codeProcessor.onAST((codeTree) => {
-      console.log("codeTree emitted", codeTree)
-      setCodeTree(codeTree)
-    })
-
-    return () => {
-      removeListener()
-    }
+    // codeProcessor.setApiTokenFn(() => clerk.client.activeSessions[0]?.getToken() as any)
+    // codeProcessor.extend((ast) => astTransformer.transform(ast))
+    // const removeListener = codeProcessor.onAST((codeTree) => {
+    //   console.log("codeTree emitted", codeTree)
+    //   setCodeTree(codeTree)
+    // })
+    // return () => {
+    //   removeListener()
+    // }
   }, [codeProcessor, astTransformer])
 
   React.useEffect(() => {
-    async function processCode() {
-      if (isCodeLoading) {
-        return
-      }
-
-      if (isLoading) {
-        await codeProcessor.processStep(code)
-      } else {
-        // in case processing was running, reset it
-        codeProcessor.reset()
-
-        if (!codeQuery.data?.code) {
-          return
-        }
-
-        const codeTree = codeProcessor.process(code)
-        console.log("FINAL --- codeTree", codeTree)
-        setCodeTree(codeTree)
-      }
-    }
-    processCode()
+    // async function processCode() {
+    //   if (isCodeLoading) {
+    //     return
+    //   }
+    //   if (isLoading) {
+    //     await codeProcessor.processStep(code)
+    //   } else {
+    //     // in case processing was running, reset it
+    //     codeProcessor.reset()
+    //     if (!codeQuery.data?.code) {
+    //       return
+    //     }
+    //     const codeTree = codeProcessor.process(code)
+    //     console.log("FINAL --- codeTree", codeTree)
+    //     setCodeTree(codeTree)
+    //   }
+    // }
+    // processCode()
   }, [code, isFinished, isLoading, codeProcessor, isCodeLoading])
 
   return (

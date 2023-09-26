@@ -3,7 +3,8 @@ import { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
 import React from "react"
 
-import { ComponentNode, interpretComponent } from "@/core/lang/interpreter"
+import { ComponentNode } from "@/core/lang/codeTree"
+import { Interpreter } from "@/core/lang/interpreter"
 import { db, schema } from "@/db/index"
 import { MainModule } from "@/db/schema"
 
@@ -53,32 +54,24 @@ export async function SitePage({ params, searchParams }: SitePageProps) {
     return notFound()
   }
 
-  /*
-   Server side code
-  */
-
-  // const siteRender = await portalServerRenderer({ mainModule: app.mainModule })
-
-  return (
-    <>
-      {/* {siteRender} */}
-      {/* <ClientComp mainModule={app.mainModule} theme={app.theme} /> */}
-    </>
-  )
+  return <ClientComp mainModule={app.mainModule} theme={app.theme} />
 }
 
 export default SitePage
 
-// async function portalServerRenderer({
-//   mainModule,
-// }: {
-//   mainModule: MainModule | null
-// }): Promise<React.ReactNode> {
-//   if (!mainModule) {
-//     return <></>
-//   }
+/*
+  Server components support, disabled for now
+*/
+async function serverComponentRenderer({ mainModule }: { mainModule: MainModule | null }) {
+  if (!mainModule) {
+    return <></>
+  }
 
-//   const code: ComponentNode = mainModule.code
+  const code: ComponentNode = mainModule.code
 
-//   return interpretComponent(code)
-// }
+  const interpreter = new Interpreter()
+
+  interpreter.setReactMode("server")
+
+  return interpreter.interpretComponent(code) as any
+}
