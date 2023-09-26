@@ -5,6 +5,7 @@ import {
   ExpressionNode,
   FunctionNode,
   NAryExpression,
+  ObjectNode,
   ProgramNode,
   ReferenceNode,
   StateChangeNode,
@@ -163,6 +164,7 @@ export class Interpreter {
             }
           }
         }
+        console.log("---- props", props)
       }
 
       if (!node.children || node.children.length === 0) {
@@ -188,6 +190,8 @@ export class Interpreter {
       return this.interpretRef(node)
     } else if (node.type === "nary") {
       return this.interpretNaryExpression(node)
+    } else if (node.type === "object") {
+      return this.interpretObjectNode(node)
     } else if (node.type === "function") {
       return this.interpretFunction(node)
     } else if (
@@ -300,5 +304,17 @@ export class Interpreter {
     } else {
       throw new Error(`Operator ${operator} is not implemented`)
     }
+  }
+
+  private interpretObjectNode(node: ObjectNode) {
+    const obj: Record<string, any> = {}
+
+    for (const prop of node.props) {
+      const name = this.interpretExpression(prop.name)
+
+      obj[name] = this.interpretExpression(prop.value)
+    }
+
+    return obj
   }
 }

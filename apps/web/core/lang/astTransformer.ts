@@ -705,7 +705,7 @@ export class ASTtoCTTransformer {
     const object: ObjectNode = {
       type: "object",
       id: this.getNewId(),
-      properties: [],
+      props: [],
     }
 
     for (const property of node.properties) {
@@ -723,7 +723,7 @@ export class ASTtoCTTransformer {
             value: (property.key as Identifier).name,
           } satisfies StringLiteral)
 
-      object.properties.push({
+      object.props.push({
         type: "property",
         id: propertyId,
         name,

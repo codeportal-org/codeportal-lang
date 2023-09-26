@@ -354,7 +354,7 @@ export type FunctionCallNode = {
 export type ObjectNode = {
   type: "object"
   id: string
-  properties: ObjectProperty[]
+  props: ObjectProperty[]
   meta?: CodeMeta
 }
 
