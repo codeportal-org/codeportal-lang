@@ -1,5 +1,4 @@
 import { createNanoEvents } from "nanoevents"
-import superjson from "superjson"
 
 import {
   CodeNode,
