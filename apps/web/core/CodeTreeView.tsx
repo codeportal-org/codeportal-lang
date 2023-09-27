@@ -421,10 +421,12 @@ export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
 
 const StateChangeView = ({ node }: { node: StateChangeNode }) => {
   return (
-    <div className="flex flex-row items-start gap-1.5">
-      <span className="text-code-keyword">✨</span>
-      <ReferenceView nodeId={node.state.id} />
-      <span className="text-code-symbol">=</span>
+    <div className="flex flex-row flex-wrap items-start gap-1.5">
+      <div className="flex flex-row items-center gap-1.5 border-2 border-transparent">
+        <span className="text-code-keyword">set</span>
+        <ReferenceView nodeId={node.state.id} />
+        <span className="text-code-symbol">to</span>
+      </div>
 
       {Array.isArray(node.body) ? (
         <StatementList>
