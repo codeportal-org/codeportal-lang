@@ -483,7 +483,7 @@ const DraggableNodeContainer = ({
 }) => {
   const codeDB = useCodeDB()
   const node = useNode(nodeId)
-  const hasParent = node.meta?.parent !== undefined
+  const hasParent = node.meta?.parentId !== undefined
 
   const [draggedNodeId] = useAtom(draggedNodeIdAtom)
   const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
@@ -616,7 +616,8 @@ const closestTopRightCorner =
 
       if (isActiveNodeUI) {
         // if moving a UI node, only allow dropping on UI nodes that have a parent UI node
-        if (!uiNodeTypes.includes(droppableNode?.meta?.parent?.type as any)) {
+        const droppableNodeParent = codeDB.getNodeByID(droppableNode?.meta?.parentId!)
+        if (!uiNodeTypes.includes(droppableNodeParent?.type as any)) {
           continue
         }
       }

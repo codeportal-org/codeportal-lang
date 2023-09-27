@@ -11,7 +11,7 @@ export type SpecialNodes =
   | ObjectProperty
 
 export type CodeMeta = {
-  parent?: CodeNode
+  parentId?: string
   extras?: Record<string, any>
   ui?: {
     isHovered: boolean

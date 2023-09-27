@@ -53,7 +53,7 @@ export class CodeDB {
       }
 
       // attach parent to all nodes
-      node.meta.parent = parent
+      node.meta.parentId = parent?.id
 
       // add an id to all nodes
       if (!node.id) {
@@ -108,11 +108,13 @@ export class CodeDB {
       return true
     }
 
-    if (!node.meta?.parent) {
+    if (!node.meta?.parentId) {
       return false
     }
 
-    return this.isDescendantOf(node.meta.parent, target)
+    const parent = this.getNodeByID(node.meta.parentId)
+
+    return this.isDescendantOf(parent, target)
   }
 
   /**
@@ -128,12 +130,12 @@ export class CodeDB {
       throw new Error("This method can only move statement nodes")
     }
 
-    if (!target.meta?.parent) {
+    if (!target.meta?.parentId) {
       throw new Error("Target node must have a parent")
     }
 
-    const nodeParent = node.meta?.parent as FunctionNode
-    const targetParent = target.meta?.parent as FunctionNode
+    const nodeParent = this.getNodeByID(node.meta?.parentId!) as FunctionNode
+    const targetParent = this.getNodeByID(target.meta?.parentId!) as FunctionNode
 
     if (!nodeParent || !targetParent) {
       throw new Error("Node and target must have parents")
@@ -153,7 +155,7 @@ export class CodeDB {
     targetParent.body.splice(targetIndex, 0, node)
 
     // update parent
-    node.meta!.parent = targetParent
+    node.meta!.parentId = targetParent.id
 
     // notify changes
     this.notifyNodeChange(nodeParent.id)
@@ -167,12 +169,12 @@ export class CodeDB {
    * @param target Node to be moved to, the node will be moved before this node.
    */
   moveUINode(node: UINode, target: UINode) {
-    if (!node.meta?.parent || !target.meta?.parent) {
+    if (!node.meta?.parentId || !target.meta?.parentId) {
       throw new Error("Node and target must have parents")
     }
 
-    const nodeParent = node.meta?.parent as UIElementNode
-    const targetParent = target.meta?.parent as UIElementNode
+    const nodeParent = this.getNodeByID(node.meta?.parentId!) as UIElementNode
+    const targetParent = this.getNodeByID(target.meta?.parentId!) as UIElementNode
 
     if (!nodeParent || !targetParent) {
       throw new Error("Node and target must have parents")
@@ -196,7 +198,7 @@ export class CodeDB {
     targetParent.children.splice(targetIndex, 0, node)
 
     // update parent
-    node.meta!.parent = targetParent
+    node.meta!.parentId = targetParent.id
 
     // notify changes
     this.notifyNodeChange(nodeParent.id)
@@ -239,7 +241,7 @@ export class CodeDB {
       throw new Error("Code tree is not loaded")
     }
 
-    const newCodeTree: ProgramNode = superjson.parse(superjson.stringify(this.codeTree))
+    const newCodeTree: ProgramNode = JSON.parse(JSON.stringify(this.codeTree)) as any
 
     const walker = new CodeTreeWalk()
 
@@ -249,62 +251,4 @@ export class CodeDB {
 
     return newCodeTree
   }
-
-  //   /**
-  //  * Moves an expression node to a target expression node in the code tree.
-  //  * If the target node is not empty, the nodes will be swapped.
-  //  * @param node Node to be moved.
-  //  * @param target Node to be moved to, the node will be moved before this node.
-  //  */
-  //   moveExpressionNode(node: StatementNode, target: StatementNode) {
-  //     console.log("--- moveStatementNode")
-  //     if (
-  //       !statementTypes.includes(node.type as any) ||
-  //       !statementTypes.includes(target.type as any)
-  //     ) {
-  //       throw new Error("This method can only move statement nodes")
-  //     }
-
-  //     console.log("--- moveStatementNode 2")
-
-  //     if (!target.meta?.parent) {
-  //       throw new Error("Target node must have a parent")
-  //     }
-
-  //     const nodeParent = node.meta?.parent as FunctionNode
-  //     const targetParent = target.meta?.parent as FunctionNode
-
-  //     console.log("--- moveStatementNode 3")
-
-  //     if (!nodeParent || !targetParent) {
-  //       throw new Error("Node and target must have parents")
-  //     }
-
-  //     console.log("--- moveStatementNode 4")
-
-  //     if (nodeParent === targetParent) {
-  //       const nodeIndex = nodeParent.body.indexOf(node)
-  //       const targetIndex = nodeParent.body.indexOf(target)
-
-  //       if (nodeIndex === -1 || targetIndex === -1) {
-  //         throw new Error("Node and target must be in the same parent")
-  //       }
-
-  //       // swap the nodes
-  //       nodeParent.body[nodeIndex] = target
-  //       nodeParent.body[targetIndex] = node
-
-  //       // update parents
-  //       node.meta!.parent = targetParent
-  //       target.meta.parent = nodeParent
-
-  //       console.log("movement DONE!!")
-
-  //       // notify changes
-  //       this.notifyNodeChange(node.id)
-  //       this.notifyNodeChange(target.id)
-  //       this.notifyNodeChange(nodeParent.id)
-  //       this.notifyNodeChange(targetParent.id)
-  //     }
-  //   }
 }
