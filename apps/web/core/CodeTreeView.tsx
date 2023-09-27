@@ -328,22 +328,22 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
         {node.props && (
           <>
             <div className={indentationClass}>
-              <div className={cn("grid grid-cols-5 gap-4 text-gray-500", indentationClass)}>
+              <div className={cn("flex flex-col gap-1.5 text-gray-500", indentationClass)}>
                 {node.props.map((prop) =>
                   prop.type === "ui prop" ? (
-                    <React.Fragment key={prop.id}>
+                    <div key={prop.id} className="flex flex-wrap gap-2">
                       <div className="col-span-1">{prop.name}:</div>
                       <div className="col-span-4">
                         <ExpressionView node={prop.value} />
                       </div>
-                    </React.Fragment>
+                    </div>
                   ) : (
-                    <React.Fragment key={prop.id}>
+                    <div key={prop.id} className="flex flex-wrap gap-2">
                       <div className="col-span-1">... spread</div>
                       <div className="col-span-4">
                         <ExpressionView node={prop.arg} />
                       </div>
-                    </React.Fragment>
+                    </div>
                   ),
                 )}
               </div>
