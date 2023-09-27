@@ -4,7 +4,9 @@ import Script from "next/script"
 import React from "react"
 
 import { ASTtoCTTransformer } from "@/core/lang/astTransformer"
+import { CodeDB } from "@/core/lang/codeDB"
 import { CodeProcessor } from "@/core/lang/codeProcessor"
+import { CodeNode } from "@/core/lang/codeTree"
 import { Interpreter } from "@/core/lang/interpreter"
 import { MainModule, ThemeConfig } from "@/db/schema"
 
@@ -30,22 +32,69 @@ import { MainModule, ThemeConfig } from "@/db/schema"
 // codeProcessor.extend((ast) => astTransformer.transform(ast))
 // const testCodeTree = codeProcessor.process(testCode)
 
+const codeChangesChannel = new BroadcastChannel("code-changes")
+
 export function ClientComp({
   mainModule,
   theme,
+  isDev,
 }: {
   mainModule: MainModule | null
   theme: ThemeConfig | null
+  isDev: boolean
 }) {
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0)
+  const [codeDB] = React.useState<CodeDB>(() => {
+    const _codeDB = new CodeDB()
+    if (isDev) {
+      _codeDB.load(mainModule?.code)
+    } else {
+      // set it directly to avoid loading
+      _codeDB.codeTree = mainModule?.code
+    }
+
+    return _codeDB
+  })
+
   React.useEffect(() => {
-    // console.log("---- client side code")
+    const messageListener = (event: MessageEvent) => {
+      if (event.data.type === "codeChange") {
+        codeChangesChannel.postMessage(event.data)
+        handleCodeChange(event.data.node)
+      }
+    }
+
+    window.addEventListener("message", messageListener)
+
+    const codeChangeListener = (event: MessageEvent) => {
+      if (event.data.type === "codeChange") {
+        handleCodeChange(event.data.node)
+      }
+    }
+
+    codeChangesChannel.addEventListener("message", codeChangeListener)
+
+    return () => {
+      window.removeEventListener("message", messageListener)
+      codeChangesChannel.removeEventListener("message", codeChangeListener)
+    }
   }, [])
+
+  const handleCodeChange = (node: CodeNode) => {
+    if (!isDev) {
+      return
+    }
+
+    console.log("--- handleCodeChange", node)
+    codeDB.updateNode(node.id, node)
+    forceUpdate()
+  }
 
   // console.log("ClientComp---->")
 
-  const interpreter = new Interpreter()
+  const interpreter = new Interpreter(isDev)
 
-  return <>{interpreter.interpretComponent(mainModule?.code)}</>
+  return <>{interpreter.interpretComponent(codeDB?.codeTree as any)}</>
 
   // return (
   //   <>

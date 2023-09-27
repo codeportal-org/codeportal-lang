@@ -5,6 +5,7 @@ import React from "react"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 import { CodeTreeView } from "./CodeTreeView"
+import { editorEvents } from "./editorEvents"
 import { ASTtoCTTransformer } from "./lang/astTransformer"
 import { CodeDBProvider, useCodeDB } from "./lang/codeDBContext"
 import { CodeProcessor } from "./lang/codeProcessor"
@@ -98,6 +99,12 @@ const CodeContainer = React.forwardRef<
         const node: UITextNode = codeDB.getNodeByID("29")
         console.log("-----  node change!!!!!!!", node.text)
       }
+    })
+
+    codeDB?.onNodeChange(({ nodeId }) => {
+      const node = codeDB.getNodeByID(nodeId)
+
+      editorEvents.notifyCodeChange(node)
     })
   }, [])
 

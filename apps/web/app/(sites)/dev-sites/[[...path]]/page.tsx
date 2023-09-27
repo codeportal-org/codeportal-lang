@@ -35,7 +35,11 @@ export default async function DevSitePage({ params, searchParams }: SitePageProp
   const newPath = [...params.path]
   newPath[0] = appId
 
-  const SitePageComp = await SitePage({ params: { ...params, path: newPath }, searchParams })
+  const SitePageComp = await SitePage({
+    params: { ...params, path: newPath },
+    searchParams,
+    isDev: true,
+  })
 
   return (
     <>

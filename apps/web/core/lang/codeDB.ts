@@ -225,6 +225,17 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
+  updateNode(nodeId: string, newNode: CodeNode) {
+    const node = this.getNodeByID(nodeId)
+    if (!node) {
+      return
+    }
+
+    Object.assign(node, newNode)
+
+    this.notifyNodeChange(nodeId)
+  }
+
   updateUIText(nodeId: string, text: string) {
     const node = this.getNodeByID(nodeId)
     if (!node || node.type !== "ui text") {

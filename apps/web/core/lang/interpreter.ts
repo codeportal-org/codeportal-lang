@@ -21,6 +21,12 @@ type StateWrapper = {
 }
 
 export class Interpreter {
+  isDev: boolean = false
+
+  constructor(isDev?: boolean) {
+    this.isDev = isDev ?? false
+  }
+
   reactMode: "client" | "server" = "client"
 
   setReactMode(mode: "client" | "server") {
@@ -164,7 +170,6 @@ export class Interpreter {
             }
           }
         }
-        console.log("---- props", props)
       }
 
       if (!node.children || node.children.length === 0) {

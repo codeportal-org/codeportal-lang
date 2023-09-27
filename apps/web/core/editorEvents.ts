@@ -1,3 +1,5 @@
+import { CodeNode } from "./lang/codeTree"
+
 class EditorEvents {
   private devIframe: HTMLIFrameElement | null = null
 
@@ -7,6 +9,14 @@ class EditorEvents {
 
   refresh() {
     this.devIframe?.contentWindow?.postMessage({ type: "refresh" }, "*")
+  }
+
+  notifyCodeChange(node: CodeNode) {
+    const newNode = { ...node }
+
+    delete newNode.meta
+
+    this.devIframe?.contentWindow?.postMessage({ type: "codeChange", node }, "*")
   }
 }
 
