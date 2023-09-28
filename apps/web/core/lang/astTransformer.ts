@@ -21,6 +21,7 @@ import {
   SimpleCallExpression,
   Statement,
   TryStatement,
+  UnaryExpression,
   VariableDeclaration,
 } from "estree-jsx"
 
@@ -53,6 +54,7 @@ import {
   UIPropNode,
   UISpreadPropNode,
   UITextNode,
+  UnaryExpressionNode,
   VarStatement,
 } from "./codeTree"
 
@@ -401,10 +403,12 @@ export class ASTtoCTTransformer {
   transformExpression(node: Expression): ExpressionNode {
     if (node.type === "Identifier") {
       return this.transformIdentifier(node)
-    } else if (node.type === "BinaryExpression") {
-      return this.transformBinaryExpression(node)
     } else if (node.type === "Literal") {
       return this.transformLiteral(node)
+    } else if (node.type === "BinaryExpression") {
+      return this.transformBinaryExpression(node)
+    } else if (node.type === "UnaryExpression") {
+      return this.transformUnaryExpression(node)
     } else if (node.type === "JSXElement") {
       return this.transformJSXElement(node)
     } else if (node.type === "CallExpression") {
@@ -711,6 +715,31 @@ export class ASTtoCTTransformer {
       type: "path access",
       id: pathAccessId,
       path: path.reverse(),
+    }
+  }
+
+  transformUnaryExpression(node: UnaryExpression): UnaryExpressionNode | ExpressionNode {
+    if (
+      node.operator === "typeof" ||
+      node.operator === "void" ||
+      node.operator === "delete" ||
+      node.operator === "~"
+    ) {
+      throw new Error(`Unsupported unary operator: ${node.operator}`)
+    }
+
+    if (node.operator === "+") {
+      // unwrap the unnecessary unary expression
+      return this.transformExpression(node.argument)
+    }
+
+    const unaryExpressionId = this.getNewId()
+
+    return {
+      type: "unary",
+      id: unaryExpressionId,
+      operator: node.operator,
+      arg: this.transformExpression(node.argument),
     }
   }
 
