@@ -1,6 +1,7 @@
 import React from "react"
 
 import {
+  ComponentCallNode,
   ComponentNode,
   ExpressionNode,
   FunctionNode,
@@ -37,20 +38,35 @@ export class Interpreter {
 
   private scopeStack: Map<string, any>[] = []
 
-  interpretComponent(node: ComponentNode): React.ReactNode {
+  interpret(node: ProgramNode) {
     this.pushScope()
     for (const statement of node.body) {
-      const res = this.interpretStatement(statement)
-
-      if (res) {
-        return res
-      }
+      this.interpretStatement(statement)
     }
-    this.popScope()
+
+    // leave the global scope on the stack so the program can continue
   }
 
-  interpret(node: ProgramNode) {
-    this.interpretStatementList(node.body)
+  interpretComponentCall(node: ComponentCallNode) {
+    const component = this.resolveValueById(node.comp.refId) as React.FC
+
+    const props: Record<string, any> = {}
+
+    if (node.props) {
+      for (const prop of node.props) {
+        props[prop.name] = this.interpretExpression(prop.value)
+      }
+    }
+
+    if (node.children && node.children.length > 0) {
+      const children = node.children.map((child) => {
+        return this.interpretUINode(child)
+      })
+
+      return React.createElement(component, props, children)
+    }
+
+    return React.createElement(component, props)
   }
 
   private pushScope() {
@@ -71,6 +87,38 @@ export class Interpreter {
     return currentScope
   }
 
+  private interpretComponent(node: ComponentNode): React.FC {
+    const scope = this.getScope()
+    const component = (props: any) => {
+      console.log("calling component", node.id)
+      this.pushScope()
+      if (node.props) {
+        for (let i = 0; i < node.props.length; i++) {
+          const prop = node.props[i]!
+          this.getScope().set(prop.id, props[prop.name])
+        }
+      }
+
+      try {
+        this.interpretStatementList(node.body)
+      } catch (error) {
+        if (error instanceof ReturnValue) {
+          this.popScope()
+          return error.value
+        } else {
+          throw error
+        }
+      }
+      this.popScope()
+    }
+    if (node.name) {
+      component.displayName = node.name
+    }
+
+    scope.set(node.id, component)
+    return component
+  }
+
   private interpretStatementList(code: StatementNode[]) {
     this.pushScope()
     for (const statement of code) {
@@ -81,8 +129,7 @@ export class Interpreter {
 
   interpretStatement(node: StatementNode): any {
     if (node.type === "component") {
-      // TODO: Revisit this
-      return this.interpretComponent(node)
+      this.interpretComponent(node)
     } else if (node.type === "var") {
       this.interpretVariableDeclaration(node)
     } else if (node.type === "state") {
@@ -90,7 +137,7 @@ export class Interpreter {
     } else if (node.type === "state change") {
       this.interpretStateChange(node)
     } else if (node.type === "return") {
-      return this.interpretExpression(node.arg)
+      throw new ReturnValue(this.interpretExpression(node.arg))
     } else if (node.type === "print") {
       console.log(this.interpretExpression(node.arg))
     } else {
@@ -123,15 +170,15 @@ export class Interpreter {
     }
 
     const stateWrapper = this.resolveValueById(node.state.refId) as StateWrapper
-    if (Array.isArray(node.body)) {
-      stateWrapper.stateArray[1](this.interpretStatementList(node.body)) // TODO: review return values
-    } else {
-      console.log(
-        "---- interpretStateChange",
-        stateWrapper.stateArray[0],
-        JSON.stringify(node.body),
-      )
-      stateWrapper.stateArray[1](this.interpretExpression(node.body))
+
+    try {
+      this.interpretStatementList(node.body)
+    } catch (error) {
+      if (error instanceof ReturnValue) {
+        stateWrapper.stateArray[1](error.value)
+      } else {
+        throw error
+      }
     }
   }
 
@@ -253,9 +300,22 @@ export class Interpreter {
           this.getScope().set(param.id, args[i])
         }
       }
-      this.interpretStatementList(node.body)
+      try {
+        this.interpretStatementList(node.body)
+      } catch (error) {
+        if (error instanceof ReturnValue) {
+          this.popScope()
+          return error.value
+        } else {
+          throw error
+        }
+      }
       this.popScope()
     }
+    if (node.name) {
+      Object.defineProperty(func, "name", { value: node.name })
+    }
+
     scope.set(node.id, func)
     return func
   }
@@ -321,5 +381,11 @@ export class Interpreter {
     }
 
     return obj
+  }
+}
+
+export class ReturnValue extends Error {
+  constructor(public value: any) {
+    super()
   }
 }

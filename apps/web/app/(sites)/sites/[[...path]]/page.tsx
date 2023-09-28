@@ -63,16 +63,16 @@ export default SitePage
 /*
   Server components support, disabled for now
 */
-async function serverComponentRenderer({ mainModule }: { mainModule: MainModule | null }) {
-  if (!mainModule) {
-    return <></>
-  }
+// async function serverComponentRenderer({ mainModule }: { mainModule: MainModule | null }) {
+//   if (!mainModule) {
+//     return <></>
+//   }
 
-  const code: ComponentNode = mainModule.code
+//   const code: ComponentNode = mainModule.code
 
-  const interpreter = new Interpreter()
+//   const interpreter = new Interpreter()
 
-  interpreter.setReactMode("server")
+//   interpreter.setReactMode("server")
 
-  return interpreter.interpretComponent(code) as any
-}
+//   return interpreter.interpretComponent(code) as any
+// }

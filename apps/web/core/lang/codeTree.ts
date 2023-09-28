@@ -73,6 +73,8 @@ export type ExpressionNode =
   | ReferenceNode
   | FunctionNode
   | FunctionCallNode
+  | ComponentNode
+  | ComponentCallNode
   | PathAccessNode
   | ObjectNode
   | NAryExpression
@@ -80,7 +82,12 @@ export type ExpressionNode =
 
 export type LiteralNode = StringLiteral | NumberLiteral | BooleanLiteral
 
-export type UINode = UIElementNode | UITextNode | UIFragmentNode | UIExpressionNode
+export type UINode =
+  | UIElementNode
+  | UITextNode
+  | UIFragmentNode
+  | UIExpressionNode
+  | ComponentCallNode
 
 export const uiNodeTypes = ["ui element", "ui fragment", "ui text", "ui expression"]
 
@@ -90,6 +97,15 @@ export type ComponentNode = {
   name: string
   props?: UIPropDeclaration[]
   body: StatementNode[]
+  meta?: CodeMeta
+}
+
+export type ComponentCallNode = {
+  type: "component call"
+  id: string
+  comp: ReferenceNode
+  props?: UIPropNode[]
+  children?: UINode[]
   meta?: CodeMeta
 }
 
@@ -370,6 +386,6 @@ export type StateChangeNode = {
   type: "state change"
   id: string
   state: ReferenceNode
-  body: ExpressionNode | StatementNode[]
+  body: StatementNode[]
   meta?: CodeMeta
 }

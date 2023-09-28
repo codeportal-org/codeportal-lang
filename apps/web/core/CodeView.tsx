@@ -20,7 +20,7 @@ function App() {
 
   return (
     <div>
-      <button onClick={() => {setCount(count + 1)}}>+</button>
+      <button onClick={() => {setCount(c => {return c + 1})}}>+</button>
       <button onClick={() => {setCount(count - 1)}}>-</button>
       <div>Count: {count}</div>
     </div>
