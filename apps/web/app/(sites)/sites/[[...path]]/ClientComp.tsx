@@ -44,6 +44,8 @@ export function ClientComp({
   isDev: boolean
 }) {
   const [, forceUpdate] = React.useReducer((x) => x + 1, 0)
+  const [interpreter] = React.useState(() => new Interpreter(isDev))
+
   const [codeDB] = React.useState<CodeDB>(() => {
     const _codeDB = new CodeDB()
     if (isDev) {
@@ -85,8 +87,6 @@ export function ClientComp({
     codeDB.updateNode(node.id, node)
     forceUpdate()
   }
-
-  const interpreter = new Interpreter(isDev)
 
   interpreter.interpret(testCodeTree)
 
