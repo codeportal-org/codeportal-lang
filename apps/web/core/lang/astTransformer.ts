@@ -40,6 +40,7 @@ import {
   PathAccessNode,
   ProgramNode,
   ReferenceNode,
+  ReturnStatementNode,
   StateChangeNode,
   StateStatement,
   StatementNode,
@@ -599,7 +600,7 @@ export class ASTtoCTTransformer {
         const stateName = callee.refId.split("-")[1]!
         const stateId = this.resolveIdentifier(stateName)
 
-        let body: ExpressionNode | StatementNode[]
+        let body: StatementNode[]
 
         if (node.arguments[0]?.type === "ArrowFunctionExpression") {
           const arrowFunction = node.arguments[0]
@@ -612,10 +613,22 @@ export class ASTtoCTTransformer {
           if (arrowFunction.body.type === "BlockStatement") {
             body = this.transformStatementList(arrowFunction.body.body)
           } else {
-            body = this.transformExpression(arrowFunction.body as Expression)
+            body = [
+              {
+                type: "return",
+                id: this.getNewId(),
+                arg: this.transformExpression(arrowFunction.body as Expression),
+              } satisfies ReturnStatementNode,
+            ]
           }
         } else {
-          body = this.transformExpression(node.arguments[0] as Expression)
+          body = [
+            {
+              type: "return",
+              id: this.getNewId(),
+              arg: this.transformExpression(node.arguments[0] as Expression),
+            } satisfies ReturnStatementNode,
+          ]
         }
 
         return {

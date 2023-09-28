@@ -530,7 +530,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
           value: {
             type: "object",
             id: "2",
-            properties: [
+            props: [
               {
                 type: "property",
                 id: "3",
@@ -1175,7 +1175,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                   {
                     type: "object",
                     id: "7",
-                    properties: [
+                    props: [
                       {
                         type: "property",
                         id: "8",
@@ -1221,7 +1221,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                             {
                               type: "object",
                               id: "17",
-                              properties: [
+                              props: [
                                 {
                                   type: "property",
                                   id: "18",
@@ -1334,7 +1334,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
-      idCounter: 69,
+      idCounter: 74,
       body: [
         {
           type: "component",
@@ -1379,29 +1379,35 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                               id: "9",
                               arg: {
                                 type: "state change",
-                                id: "15",
+                                id: "16",
                                 state: {
                                   type: "ref",
-                                  id: "16",
+                                  id: "17",
                                   refId: "2",
                                 },
-                                body: {
-                                  type: "nary",
-                                  id: "12",
-                                  operator: "+",
-                                  args: [
-                                    {
-                                      type: "ref",
-                                      id: "14",
-                                      refId: "2",
-                                    },
-                                    {
-                                      type: "number",
+                                body: [
+                                  {
+                                    type: "return",
+                                    id: "12",
+                                    arg: {
+                                      type: "nary",
                                       id: "13",
-                                      value: 1,
+                                      operator: "+",
+                                      args: [
+                                        {
+                                          type: "ref",
+                                          id: "15",
+                                          refId: "2",
+                                        },
+                                        {
+                                          type: "number",
+                                          id: "14",
+                                          value: 1,
+                                        },
+                                      ],
                                     },
-                                  ],
-                                },
+                                  },
+                                ],
                               },
                             },
                           ],
@@ -1411,53 +1417,59 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                     children: [
                       {
                         type: "ui text",
-                        id: "17",
+                        id: "18",
                         text: "Increment",
                       },
                     ],
                   },
                   {
                     type: "ui element",
-                    id: "18",
+                    id: "19",
                     name: "button",
                     props: [
                       {
                         type: "ui prop",
-                        id: "19",
+                        id: "20",
                         name: "onClick",
                         value: {
                           type: "function",
-                          id: "20",
+                          id: "21",
                           params: [],
                           body: [
                             {
                               type: "return",
-                              id: "21",
+                              id: "22",
                               arg: {
                                 type: "state change",
-                                id: "27",
+                                id: "29",
                                 state: {
                                   type: "ref",
-                                  id: "28",
+                                  id: "30",
                                   refId: "2",
                                 },
-                                body: {
-                                  type: "nary",
-                                  id: "24",
-                                  operator: "+",
-                                  args: [
-                                    {
-                                      type: "ref",
+                                body: [
+                                  {
+                                    type: "return",
+                                    id: "25",
+                                    arg: {
+                                      type: "nary",
                                       id: "26",
-                                      refId: "2",
+                                      operator: "+",
+                                      args: [
+                                        {
+                                          type: "ref",
+                                          id: "28",
+                                          refId: "2",
+                                        },
+                                        {
+                                          type: "number",
+                                          id: "27",
+                                          value: 1,
+                                        },
+                                      ],
                                     },
-                                    {
-                                      type: "number",
-                                      id: "25",
-                                      value: 1,
-                                    },
-                                  ],
-                                },
+                                  },
+                                ],
                               },
                             },
                           ],
@@ -1467,109 +1479,59 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                     children: [
                       {
                         type: "ui text",
-                        id: "29",
-                        text: "Increment",
-                      },
-                    ],
-                  },
-                  {
-                    type: "ui element",
-                    id: "30",
-                    name: "button",
-                    props: [
-                      {
-                        type: "ui prop",
                         id: "31",
-                        name: "onClick",
-                        value: {
-                          type: "function",
-                          id: "32",
-                          params: [],
-                          body: [
-                            {
-                              type: "return",
-                              id: "33",
-                              arg: {
-                                type: "state change",
-                                id: "39",
-                                state: {
-                                  type: "ref",
-                                  id: "40",
-                                  refId: "2",
-                                },
-                                body: {
-                                  type: "nary",
-                                  id: "36",
-                                  operator: "+",
-                                  args: [
-                                    {
-                                      type: "ref",
-                                      id: "38",
-                                      refId: "2",
-                                    },
-                                    {
-                                      type: "number",
-                                      id: "37",
-                                      value: 1,
-                                    },
-                                  ],
-                                },
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                    children: [
-                      {
-                        type: "ui text",
-                        id: "41",
                         text: "Increment",
                       },
                     ],
                   },
                   {
                     type: "ui element",
-                    id: "42",
+                    id: "32",
                     name: "button",
                     props: [
                       {
                         type: "ui prop",
-                        id: "43",
+                        id: "33",
                         name: "onClick",
                         value: {
                           type: "function",
-                          id: "44",
+                          id: "34",
                           params: [],
                           body: [
                             {
                               type: "return",
-                              id: "45",
+                              id: "35",
                               arg: {
                                 type: "state change",
-                                id: "51",
+                                id: "42",
                                 state: {
                                   type: "ref",
-                                  id: "52",
+                                  id: "43",
                                   refId: "2",
                                 },
-                                body: {
-                                  type: "nary",
-                                  id: "48",
-                                  operator: "+",
-                                  args: [
-                                    {
-                                      type: "ref",
-                                      id: "50",
-                                      refId: "2",
+                                body: [
+                                  {
+                                    type: "return",
+                                    id: "38",
+                                    arg: {
+                                      type: "nary",
+                                      id: "39",
+                                      operator: "+",
+                                      args: [
+                                        {
+                                          type: "ref",
+                                          id: "41",
+                                          refId: "2",
+                                        },
+                                        {
+                                          type: "number",
+                                          id: "40",
+                                          value: 1,
+                                        },
+                                      ],
                                     },
-                                    {
-                                      type: "number",
-                                      id: "49",
-                                      value: 1,
-                                    },
-                                  ],
-                                },
+                                  },
+                                ],
                               },
                             },
                           ],
@@ -1579,53 +1541,59 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                     children: [
                       {
                         type: "ui text",
-                        id: "53",
+                        id: "44",
                         text: "Increment",
                       },
                     ],
                   },
                   {
                     type: "ui element",
-                    id: "54",
+                    id: "45",
                     name: "button",
                     props: [
                       {
                         type: "ui prop",
-                        id: "55",
+                        id: "46",
                         name: "onClick",
                         value: {
                           type: "function",
-                          id: "56",
+                          id: "47",
                           params: [],
                           body: [
                             {
                               type: "return",
-                              id: "57",
+                              id: "48",
                               arg: {
                                 type: "state change",
-                                id: "63",
+                                id: "55",
                                 state: {
                                   type: "ref",
-                                  id: "64",
+                                  id: "56",
                                   refId: "2",
                                 },
-                                body: {
-                                  type: "nary",
-                                  id: "60",
-                                  operator: "+",
-                                  args: [
-                                    {
-                                      type: "ref",
-                                      id: "62",
-                                      refId: "2",
+                                body: [
+                                  {
+                                    type: "return",
+                                    id: "51",
+                                    arg: {
+                                      type: "nary",
+                                      id: "52",
+                                      operator: "+",
+                                      args: [
+                                        {
+                                          type: "ref",
+                                          id: "54",
+                                          refId: "2",
+                                        },
+                                        {
+                                          type: "number",
+                                          id: "53",
+                                          value: 1,
+                                        },
+                                      ],
                                     },
-                                    {
-                                      type: "number",
-                                      id: "61",
-                                      value: 1,
-                                    },
-                                  ],
-                                },
+                                  },
+                                ],
                               },
                             },
                           ],
@@ -1635,23 +1603,85 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                     children: [
                       {
                         type: "ui text",
-                        id: "65",
+                        id: "57",
                         text: "Increment",
                       },
                     ],
                   },
                   {
                     type: "ui element",
-                    id: "66",
+                    id: "58",
+                    name: "button",
+                    props: [
+                      {
+                        type: "ui prop",
+                        id: "59",
+                        name: "onClick",
+                        value: {
+                          type: "function",
+                          id: "60",
+                          params: [],
+                          body: [
+                            {
+                              type: "return",
+                              id: "61",
+                              arg: {
+                                type: "state change",
+                                id: "68",
+                                state: {
+                                  type: "ref",
+                                  id: "69",
+                                  refId: "2",
+                                },
+                                body: [
+                                  {
+                                    type: "return",
+                                    id: "64",
+                                    arg: {
+                                      type: "nary",
+                                      id: "65",
+                                      operator: "+",
+                                      args: [
+                                        {
+                                          type: "ref",
+                                          id: "67",
+                                          refId: "2",
+                                        },
+                                        {
+                                          type: "number",
+                                          id: "66",
+                                          value: 1,
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                    children: [
+                      {
+                        type: "ui text",
+                        id: "70",
+                        text: "Increment",
+                      },
+                    ],
+                  },
+                  {
+                    type: "ui element",
+                    id: "71",
                     name: "div",
                     props: [],
                     children: [
                       {
                         type: "ui expression",
-                        id: "67",
+                        id: "72",
                         expression: {
                           type: "ref",
-                          id: "68",
+                          id: "73",
                           refId: "2",
                         },
                       },
@@ -1797,7 +1827,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                           {
                             type: "object",
                             id: "15",
-                            properties: [
+                            props: [
                               {
                                 type: "property",
                                 id: "16",
@@ -1843,7 +1873,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                                     {
                                       type: "object",
                                       id: "25",
-                                      properties: [
+                                      props: [
                                         {
                                           type: "property",
                                           id: "26",
