@@ -36,15 +36,16 @@ export class Interpreter {
 
   private stateSymbol = Symbol("state")
 
-  private scopeStack: Map<string, any>[] = []
+  private globalScope: Scope = {
+    values: new Map(),
+  }
+
+  private currentScope: Scope = this.globalScope
 
   interpret(node: ProgramNode) {
-    this.pushScope()
     for (const statement of node.body) {
       this.interpretStatement(statement)
     }
-
-    // leave the global scope on the stack so the program can continue
   }
 
   interpretComponentCall(node: ComponentCallNode) {
@@ -69,33 +70,28 @@ export class Interpreter {
     return React.createElement(component, props)
   }
 
-  private pushScope() {
-    this.scopeStack.push(new Map())
-  }
+  private newScope() {
+    const parent = this.currentScope
 
-  private popScope() {
-    this.scopeStack.pop()
-  }
-
-  private getScope() {
-    const currentScope = this.scopeStack[this.scopeStack.length - 1]
-
-    if (!currentScope) {
-      throw new Error("No scope found")
+    this.currentScope = {
+      values: new Map(),
+      parent: parent,
     }
+  }
 
-    return currentScope
+  private getScopeValues(): Map<string, any> {
+    return this.currentScope.values
   }
 
   private interpretComponent(node: ComponentNode): React.FC {
-    const scope = this.getScope()
+    const scope = this.getScopeValues()
     const component = (props: any) => {
       console.log("calling component", node.id)
-      this.pushScope()
+      this.newScope()
       if (node.props) {
         for (let i = 0; i < node.props.length; i++) {
           const prop = node.props[i]!
-          this.getScope().set(prop.id, props[prop.name])
+          this.getScopeValues().set(prop.id, props[prop.name])
         }
       }
 
@@ -103,13 +99,11 @@ export class Interpreter {
         this.interpretStatementList(node.body)
       } catch (error) {
         if (error instanceof ReturnValue) {
-          this.popScope()
           return error.value
         } else {
           throw error
         }
       }
-      this.popScope()
     }
     if (node.name) {
       component.displayName = node.name
@@ -120,11 +114,10 @@ export class Interpreter {
   }
 
   private interpretStatementList(code: StatementNode[]) {
-    this.pushScope()
+    this.newScope()
     for (const statement of code) {
       this.interpretStatement(statement)
     }
-    this.popScope()
   }
 
   interpretStatement(node: StatementNode): any {
@@ -146,7 +139,7 @@ export class Interpreter {
   }
 
   private interpretVariableDeclaration(node: VarStatement) {
-    const scope = this.getScope()
+    const scope = this.getScopeValues()
     scope.set(node.id, this.interpretExpression(node.value))
   }
 
@@ -155,9 +148,8 @@ export class Interpreter {
       return
     }
 
-    const scope = this.getScope()
+    const scope = this.getScopeValues()
     const stateArray = React.useState(this.interpretExpression(node.value))
-    console.log("---- SET stateArray", stateArray, this.scopeStack)
     scope.set(node.id, {
       stateArray,
       type: this.stateSymbol,
@@ -259,18 +251,17 @@ export class Interpreter {
 
   private resolveValueById(nodeId: string) {
     let value
-    let scope = this.getScope()
-    let scopeIndex = this.scopeStack.length - 1
-    while (!scope.has(nodeId) && scopeIndex > 0) {
-      scopeIndex--
-      scope = this.scopeStack[scopeIndex] as any
+    let scope = this.currentScope
+
+    while (!scope.values.has(nodeId) && scope.parent) {
+      scope = scope.parent
     }
 
-    if (!scope.has(nodeId)) {
+    if (!scope.values.has(nodeId)) {
       throw new Error(`Unable to resolve ${nodeId}`)
     }
 
-    value = scope.get(nodeId)
+    value = scope.values.get(nodeId)
 
     return value
   }
@@ -290,27 +281,25 @@ export class Interpreter {
   }
 
   private interpretFunction(node: FunctionNode): any {
-    const scope = this.getScope()
+    const scope = this.getScopeValues()
     const func = (...args: any[]) => {
       console.log("calling function", node.id)
-      this.pushScope()
+      this.newScope()
       if (node.params) {
         for (let i = 0; i < node.params.length; i++) {
           const param = node.params[i]!
-          this.getScope().set(param.id, args[i])
+          this.getScopeValues().set(param.id, args[i])
         }
       }
       try {
         this.interpretStatementList(node.body)
       } catch (error) {
         if (error instanceof ReturnValue) {
-          this.popScope()
           return error.value
         } else {
           throw error
         }
       }
-      this.popScope()
     }
     if (node.name) {
       Object.defineProperty(func, "name", { value: node.name })
@@ -388,4 +377,9 @@ export class ReturnValue extends Error {
   constructor(public value: any) {
     super()
   }
+}
+
+export type Scope = {
+  values: Map<string, any>
+  parent?: Scope
 }
