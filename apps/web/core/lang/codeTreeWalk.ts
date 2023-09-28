@@ -1,9 +1,11 @@
 import {
   CodeNode,
   ComponentNode,
+  ElseIfNode,
   ExpressionNode,
   FunctionCallNode,
   FunctionNode,
+  IfStatementNode,
   LiteralNode,
   NAryExpression,
   PathAccessNode,
@@ -21,6 +23,7 @@ import {
   UIPropNode,
   UISpreadPropNode,
   UITextNode,
+  UnaryExpressionNode,
   VarStatement,
 } from "./codeTree"
 
@@ -64,6 +67,8 @@ export class CodeTreeWalk {
       this.walkVariableDeclaration(node)
     } else if (node.type === "return") {
       this.walkReturnStatement(node)
+    } else if (node.type === "if") {
+      this.walkIfStatement(node)
     } else if (node.type === "function") {
       this.walkFunctionDeclaration(node)
     } else if (node.type === "component") {
@@ -90,6 +95,8 @@ export class CodeTreeWalk {
       this.walkFunctionDeclaration(node)
     } else if (node.type === "nary") {
       this.walkNAryExpression(node)
+    } else if (node.type === "unary") {
+      this.walkUnaryExpression(node)
     } else if (node.type === "state change") {
       this.walkStateChangeDeclaration(node)
     } else if (
@@ -303,6 +310,49 @@ export class CodeTreeWalk {
     node.args.forEach((child) => {
       this.walkExpression(child)
     })
+
+    this.parentNodeStack.pop()
+  }
+
+  private walkIfStatement(node: IfStatementNode) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
+
+    this.walkExpression(node.test)
+
+    node.then.forEach((child) => {
+      this.walkStatement(child)
+    })
+
+    node.elseIf?.forEach((child) => {
+      this.walkElseIfStatement(child)
+    })
+
+    node.else?.forEach((child) => {
+      this.walkStatement(child)
+    })
+
+    this.parentNodeStack.pop()
+  }
+
+  private walkElseIfStatement(node: ElseIfNode) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
+
+    this.walkExpression(node.test)
+
+    node.then.forEach((child) => {
+      this.walkStatement(child)
+    })
+
+    this.parentNodeStack.pop()
+  }
+
+  private walkUnaryExpression(node: UnaryExpressionNode) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push(node)
+
+    this.walkExpression(node.arg)
 
     this.parentNodeStack.pop()
   }

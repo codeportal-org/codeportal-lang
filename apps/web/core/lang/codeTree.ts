@@ -9,6 +9,7 @@ export type SpecialNodes =
   | UIStyleNode
   | ParamDeclaration
   | ObjectProperty
+  | ElseIfNode
 
 export type CodeMeta = {
   parentId?: string
@@ -79,6 +80,7 @@ export type ExpressionNode =
   | ObjectNode
   | NAryExpression
   | StateChangeNode
+  | UnaryExpressionNode
 
 export type LiteralNode = StringLiteral | NumberLiteral | BooleanLiteral
 
@@ -305,6 +307,16 @@ export type BooleanLiteral = {
   type: "boolean"
   id: string
   value: boolean
+  meta?: CodeMeta
+}
+
+export type UnaryOperator = "!" | "-"
+
+export type UnaryExpressionNode = {
+  type: "unary"
+  id: string
+  operator: UnaryOperator
+  arg: ExpressionNode
   meta?: CodeMeta
 }
 

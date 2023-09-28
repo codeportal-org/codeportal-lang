@@ -1,5 +1,6 @@
 import { Parser } from "acorn"
 import acornJSXParser from "acorn-jsx"
+import { writeFileSync } from "fs"
 
 import { ASTtoCTTransformer } from "./astTransformer"
 import { ProgramNode } from "./codeTree"
@@ -163,6 +164,399 @@ describe("CodeTreeWalk", () => {
               },
             },
           ],
+        },
+      ],
+    } satisfies ProgramNode)
+  })
+
+  it("should walk all the nodes in a Code Tree containing an if-elseIf-else chain and + and - unary expressions", () => {
+    const codeTreeWalker = new CodeTreeWalk()
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+        function calc() {
+          let x = 0
+
+          if (x === 0) {
+            return 0
+          } else if (x === 1) {
+            return 1
+          } else if (x === 2) {
+            return 2
+          } else if (x === 3) {
+            return +3
+          } else {
+            return -1
+          }
+        }
+      `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    let count = 0
+    codeTreeWalker.full(codeTree as ProgramNode, (node, parent) => {
+      node.meta = { extras: { count, parentCount: parent?.meta?.extras?.count ?? null } }
+      count += 1
+    })
+
+    // writeFileSync("./codeTree-file.ts", JSON.stringify(codeTree, null, 2))
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      id: "0",
+      idCounter: 31,
+      meta: {
+        extras: {
+          count: 0,
+          parentCount: null,
+        },
+      },
+      body: [
+        {
+          type: "function",
+          id: "1",
+          name: "calc",
+          params: [],
+          body: [
+            {
+              type: "var",
+              id: "2",
+              name: "x",
+              value: {
+                type: "number",
+                id: "3",
+                value: 0,
+                meta: {
+                  extras: {
+                    count: 3,
+                    parentCount: 2,
+                  },
+                },
+              },
+              meta: {
+                extras: {
+                  count: 2,
+                  parentCount: 1,
+                },
+              },
+            },
+            {
+              type: "if",
+              id: "4",
+              test: {
+                type: "nary",
+                id: "5",
+                operator: "==",
+                args: [
+                  {
+                    type: "ref",
+                    id: "7",
+                    refId: "2",
+                    meta: {
+                      extras: {
+                        count: 6,
+                        parentCount: 5,
+                      },
+                    },
+                  },
+                  {
+                    type: "number",
+                    id: "6",
+                    value: 0,
+                    meta: {
+                      extras: {
+                        count: 7,
+                        parentCount: 5,
+                      },
+                    },
+                  },
+                ],
+                meta: {
+                  extras: {
+                    count: 5,
+                    parentCount: 4,
+                  },
+                },
+              },
+              then: [
+                {
+                  type: "return",
+                  id: "8",
+                  arg: {
+                    type: "number",
+                    id: "9",
+                    value: 0,
+                    meta: {
+                      extras: {
+                        count: 9,
+                        parentCount: 8,
+                      },
+                    },
+                  },
+                  meta: {
+                    extras: {
+                      count: 8,
+                      parentCount: 4,
+                    },
+                  },
+                },
+              ],
+              elseIf: [
+                {
+                  type: "else if",
+                  id: "10",
+                  test: {
+                    type: "nary",
+                    id: "11",
+                    operator: "==",
+                    args: [
+                      {
+                        type: "ref",
+                        id: "13",
+                        refId: "2",
+                        meta: {
+                          extras: {
+                            count: 12,
+                            parentCount: 11,
+                          },
+                        },
+                      },
+                      {
+                        type: "number",
+                        id: "12",
+                        value: 1,
+                        meta: {
+                          extras: {
+                            count: 13,
+                            parentCount: 11,
+                          },
+                        },
+                      },
+                    ],
+                    meta: {
+                      extras: {
+                        count: 11,
+                        parentCount: 10,
+                      },
+                    },
+                  },
+                  then: [
+                    {
+                      type: "return",
+                      id: "14",
+                      arg: {
+                        type: "number",
+                        id: "15",
+                        value: 1,
+                        meta: {
+                          extras: {
+                            count: 15,
+                            parentCount: 14,
+                          },
+                        },
+                      },
+                      meta: {
+                        extras: {
+                          count: 14,
+                          parentCount: 10,
+                        },
+                      },
+                    },
+                  ],
+                  meta: {
+                    extras: {
+                      count: 10,
+                      parentCount: 4,
+                    },
+                  },
+                },
+                {
+                  type: "else if",
+                  id: "16",
+                  test: {
+                    type: "nary",
+                    id: "17",
+                    operator: "==",
+                    args: [
+                      {
+                        type: "ref",
+                        id: "19",
+                        refId: "2",
+                        meta: {
+                          extras: {
+                            count: 18,
+                            parentCount: 17,
+                          },
+                        },
+                      },
+                      {
+                        type: "number",
+                        id: "18",
+                        value: 2,
+                        meta: {
+                          extras: {
+                            count: 19,
+                            parentCount: 17,
+                          },
+                        },
+                      },
+                    ],
+                    meta: {
+                      extras: {
+                        count: 17,
+                        parentCount: 16,
+                      },
+                    },
+                  },
+                  then: [
+                    {
+                      type: "return",
+                      id: "20",
+                      arg: {
+                        type: "number",
+                        id: "21",
+                        value: 2,
+                        meta: {
+                          extras: {
+                            count: 21,
+                            parentCount: 20,
+                          },
+                        },
+                      },
+                      meta: {
+                        extras: {
+                          count: 20,
+                          parentCount: 16,
+                        },
+                      },
+                    },
+                  ],
+                  meta: {
+                    extras: {
+                      count: 16,
+                      parentCount: 4,
+                    },
+                  },
+                },
+                {
+                  type: "else if",
+                  id: "22",
+                  test: {
+                    type: "nary",
+                    id: "23",
+                    operator: "==",
+                    args: [
+                      {
+                        type: "ref",
+                        id: "25",
+                        refId: "2",
+                        meta: {
+                          extras: {
+                            count: 24,
+                            parentCount: 23,
+                          },
+                        },
+                      },
+                      {
+                        type: "number",
+                        id: "24",
+                        value: 3,
+                        meta: {
+                          extras: {
+                            count: 25,
+                            parentCount: 23,
+                          },
+                        },
+                      },
+                    ],
+                    meta: {
+                      extras: {
+                        count: 23,
+                        parentCount: 22,
+                      },
+                    },
+                  },
+                  then: [
+                    {
+                      type: "return",
+                      id: "26",
+                      arg: {
+                        type: "number",
+                        id: "27",
+                        value: 3,
+                        meta: {
+                          extras: {
+                            count: 27,
+                            parentCount: 26,
+                          },
+                        },
+                      },
+                      meta: {
+                        extras: {
+                          count: 26,
+                          parentCount: 22,
+                        },
+                      },
+                    },
+                  ],
+                  meta: {
+                    extras: {
+                      count: 22,
+                      parentCount: 4,
+                    },
+                  },
+                },
+              ],
+              else: [
+                {
+                  type: "return",
+                  id: "28",
+                  arg: {
+                    type: "unary",
+                    id: "29",
+                    operator: "-",
+                    arg: {
+                      type: "number",
+                      id: "30",
+                      value: 1,
+                      meta: {
+                        extras: {
+                          count: 30,
+                          parentCount: 29,
+                        },
+                      },
+                    },
+                    meta: {
+                      extras: {
+                        count: 29,
+                        parentCount: 28,
+                      },
+                    },
+                  },
+                  meta: {
+                    extras: {
+                      count: 28,
+                      parentCount: 4,
+                    },
+                  },
+                },
+              ],
+              meta: {
+                extras: {
+                  count: 4,
+                  parentCount: 1,
+                },
+              },
+            },
+          ],
+          meta: {
+            extras: {
+              count: 1,
+              parentCount: 0,
+            },
+          },
         },
       ],
     } satisfies ProgramNode)
