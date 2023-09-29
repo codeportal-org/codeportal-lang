@@ -349,13 +349,11 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
           </>
         )}
         {node.children && (
-          <div
-            className={cn("flex flex-col gap-1.5 border-l border-l-slate-200", indentationClass)}
-          >
-            {node.children.map((node) => {
-              return <ExpressionView node={node} key={node.id} />
-            })}
-          </div>
+          <NodeList nodeId={node.id}>
+            {node.children.map((node) => (
+              <ExpressionView node={node} key={node.id} />
+            ))}
+          </NodeList>
         )}
       </div>
     )
