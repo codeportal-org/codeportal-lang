@@ -18,7 +18,7 @@ import {
   useSensors,
 } from "@dnd-kit/core"
 import { atom, useAtom } from "jotai"
-import { Square, Type } from "lucide-react"
+import { ChevronDown, ChevronRight, Square, Type } from "lucide-react"
 import React, { PointerEvent } from "react"
 import ContentEditable from "react-contenteditable"
 import { createPortal } from "react-dom"
@@ -196,11 +196,11 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
             {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
           </div>
         </div>
-        <StatementList>
+        <NodeList nodeId={node.id}>
           {node.body.map((node) => {
             return <StatementView nodeId={node.id} key={node.id} />
           })}
-        </StatementList>
+        </NodeList>
       </>
     )
   } else if (node.type === "function") {
@@ -426,11 +426,11 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
       </div>
 
       {Array.isArray(node.body) ? (
-        <StatementList>
+        <NodeList nodeId={node.id}>
           {node.body.map((node) => {
             return <StatementView nodeId={node.id} key={node.id} />
           })}
-        </StatementList>
+        </NodeList>
       ) : (
         <ExpressionView node={node.body} />
       )}
@@ -455,18 +455,50 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
   )
 }
 
-const StatementList = ({
+const NodeList = ({
+  nodeId,
   children,
   className,
 }: {
+  nodeId: string
   children: React.ReactNode
   className?: string
 }) => {
+  const node = useNode<CodeNode>(nodeId)
+  const [isOpen, setIsOpen] = React.useState(true)
+  const containerID = React.useId()
+
+  const isHovered = node.meta?.ui?.isHovered
+
+  const toggleOpen = () => {
+    setIsOpen(!isOpen)
+  }
+
   return (
-    <div
-      className={cn("flex flex-col gap-1 border-l border-l-slate-200", indentationClass, className)}
-    >
-      {children}
+    <div className={cn("relative border-l border-l-slate-200", indentationClass, className)}>
+      <div className="pb-1">{/* spacer */}</div>
+      <button
+        aria-expanded={isOpen}
+        aria-controls={containerID}
+        className={`cursor-pointer ${
+          isOpen
+            ? `absolute left-0 top-0 ${isHovered ? "block" : "hidden"}`
+            : "hover:bg-code-empty-expression rounded"
+        }`}
+        onClick={toggleOpen}
+      >
+        {isOpen ? (
+          <ChevronDown className="text-gray-400 hover:text-gray-500" />
+        ) : (
+          <ChevronRight className="text-gray-400 hover:text-gray-500" />
+        )}
+      </button>
+      <div
+        id={containerID}
+        className={cn("flex-col items-start gap-1", isOpen ? "flex" : "hidden")}
+      >
+        {children}
+      </div>
     </div>
   )
 }
@@ -506,6 +538,8 @@ const DraggableNodeContainer = ({
 
   if (!node) return null
 
+  console.log("listeners", Object.keys(listeners as any))
+
   return (
     <div
       className={cn(
@@ -520,6 +554,12 @@ const DraggableNodeContainer = ({
       }}
       {...listeners}
       {...attributes}
+      onMouseOver={() => {
+        codeDB?.hoverNode(nodeId)
+      }}
+      onMouseLeave={() => {
+        codeDB?.hoverNodeOff(nodeId)
+      }}
     >
       {isDroppedOnNode && (
         <div
@@ -566,11 +606,11 @@ export const FunctionView = ({ node }: { node: FunctionNode }) => {
           {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
         </div>
       </div>
-      <StatementList>
+      <NodeList nodeId={node.id}>
         {node.body.map((node) => {
           return <StatementView nodeId={node.id} key={node.id} />
         })}
-      </StatementList>
+      </NodeList>
     </>
   )
 }
@@ -584,22 +624,23 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
         <span className="text-code-keyword">if</span>
         <ExpressionView node={node.test} />
       </div>
-      <StatementList>
+      <NodeList nodeId={node.id}>
         {node.then.map((node) => {
           return <StatementView nodeId={node.id} key={node.id} />
         })}
-      </StatementList>
+      </NodeList>
+      {/* Missing else if TODO */}
       {node.else && (
         <>
           <div className="pt-1">{/* spacer */}</div>
           <div className="flex flex-row gap-1.5">
             <span className="text-code-keyword">else</span>
           </div>
-          <StatementList>
+          <NodeList nodeId={node.id}>
             {node.else.map((node) => {
               return <StatementView nodeId={node.id} key={node.id} />
             })}
-          </StatementList>
+          </NodeList>
         </>
       )}
     </div>
