@@ -304,7 +304,7 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
   let uiNodeView: React.ReactNode
 
   if (node.type === "ui text") {
-    uiNodeView = <UITextView node={node} />
+    uiNodeView = <UITextView nodeId={node.id} />
   } else if (node.type === "ui element") {
     uiNodeView = (
       <div className="flex flex-col">
@@ -534,13 +534,13 @@ const DraggableNodeContainer = ({
   )
 }
 
-export const UITextView = ({ node }: { node: UITextNode }) => {
+export const UITextView = ({ nodeId }: { nodeId: string }) => {
   const codeDB = useCodeDB()
-  const [text, setText] = React.useState(node.text)
+  const node = useNode<UITextNode>(nodeId)
 
-  React.useEffect(() => {
-    codeDB?.updateUIText(node.id, text)
-  }, [text])
+  function handleChange(event: React.ChangeEvent<any>) {
+    codeDB?.updateUIText(nodeId, event.target.value)
+  }
 
   return (
     <div className="flex gap-1.5">
@@ -548,9 +548,9 @@ export const UITextView = ({ node }: { node: UITextNode }) => {
         <Type size={16} className="text-code-name" />
       </div>
       <TextareaAutosize
-        className="text-code-ui-text w-full max-w-lg resize-none rounded border-none border-slate-300 bg-gray-100 px-2 py-0 focus-visible:outline-none focus-visible:ring-1"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        className="text-code-ui-text w-full max-w-lg resize-none rounded border-none border-slate-300 bg-gray-100 px-2 py-0 focus-visible:bg-gray-200 focus-visible:outline-none focus-visible:ring-0"
+        value={node.text}
+        onChange={handleChange}
       />
     </div>
   )
@@ -606,7 +606,7 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-export const EditableNodeName = ({ nodeId, disabled }: { nodeId: string; disabled?: boolean }) => {
+export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
   const codeDB = useCodeDB()
 
   const node = useNode<VarStatement>(nodeId)
@@ -637,9 +637,8 @@ export const EditableNodeName = ({ nodeId, disabled }: { nodeId: string; disable
       <ContentEditable
         tagName="span"
         role="textbox"
-        className="text-code-name inline-block h-full px-1 outline-none focus-visible:bg-gray-200 focus-visible:shadow-sm"
+        className="text-code-name inline-block h-full px-1 outline-none focus-visible:bg-gray-200"
         html={node.name}
-        disabled={disabled}
         onChange={handleChange}
       />
     </span>
