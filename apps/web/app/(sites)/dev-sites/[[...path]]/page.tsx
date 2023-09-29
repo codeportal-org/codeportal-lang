@@ -9,8 +9,10 @@ import React from "react"
 
 import { DevClientComp } from "./DevClientComp"
 
+export type DevSitePageProps = Omit<SitePageProps, "isDev">
+
 export async function generateMetadata(
-  { params, searchParams }: SitePageProps,
+  { params, searchParams }: DevSitePageProps,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   if (!params.path[0]) {
@@ -25,7 +27,7 @@ export async function generateMetadata(
   )
 }
 
-export default async function DevSitePage({ params, searchParams }: SitePageProps) {
+export default async function DevSitePage({ params, searchParams }: DevSitePageProps) {
   if (!params.path[0]) {
     return notFound()
   }
