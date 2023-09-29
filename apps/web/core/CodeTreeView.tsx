@@ -20,8 +20,10 @@ import {
 import { atom, useAtom } from "jotai"
 import { Square, Type } from "lucide-react"
 import React, { PointerEvent } from "react"
+import ContentEditable from "react-contenteditable"
 import { createPortal } from "react-dom"
 import TextareaAutosize from "react-textarea-autosize"
+import sanitizeHtml from "sanitize-html"
 
 import { cn, isTouchEnabled } from "@/lib/utils"
 
@@ -31,6 +33,7 @@ import {
   CodeNode,
   ExpressionNode,
   FunctionNode,
+  IfStatementNode,
   NAryExpression,
   NumberLiteral,
   ProgramNode,
@@ -202,6 +205,8 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
     )
   } else if (node.type === "function") {
     statementView = <FunctionView node={node} />
+  } else if (node.type === "if") {
+    statementView = <IfStatementView nodeId={node.id} />
   } else if (node.type === "var") {
     statementView = <VariableStatementView nodeId={node.id} />
   } else if (node.type === "return") {
@@ -256,20 +261,12 @@ export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
 
 export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<StateStatement>(nodeId)
+  const codeDB = useCodeDB()
 
   return (
     <div className="flex flex-row gap-1.5">
       <span className="text-code-keyword ">state</span>
-      <span
-        className={cn(
-          "text-code-name rounded-md bg-gray-100 px-1 transition-all hover:bg-gray-200",
-          {
-            "bg-gray-200": node.meta?.ui?.isHovered,
-          },
-        )}
-      >
-        {node.name}
-      </span>
+      <EditableNodeName nodeId={nodeId} />
       <span className="text-code-symbol">=</span>
 
       <ExpressionView node={node.value} />
@@ -466,7 +463,9 @@ const StatementList = ({
   className?: string
 }) => {
   return (
-    <div className={cn("flex flex-col border-l border-l-slate-200", indentationClass, className)}>
+    <div
+      className={cn("flex flex-col gap-1 border-l border-l-slate-200", indentationClass, className)}
+    >
       {children}
     </div>
   )
@@ -573,6 +572,77 @@ export const FunctionView = ({ node }: { node: FunctionNode }) => {
         })}
       </StatementList>
     </>
+  )
+}
+
+export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<IfStatementNode>(nodeId)
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex flex-row gap-1.5">
+        <span className="text-code-keyword">if</span>
+        <ExpressionView node={node.test} />
+      </div>
+      <StatementList>
+        {node.then.map((node) => {
+          return <StatementView nodeId={node.id} key={node.id} />
+        })}
+      </StatementList>
+      {node.else && (
+        <>
+          <div className="pt-1">{/* spacer */}</div>
+          <div className="flex flex-row gap-1.5">
+            <span className="text-code-keyword">else</span>
+          </div>
+          <StatementList>
+            {node.else.map((node) => {
+              return <StatementView nodeId={node.id} key={node.id} />
+            })}
+          </StatementList>
+        </>
+      )}
+    </div>
+  )
+}
+
+export const EditableNodeName = ({ nodeId, disabled }: { nodeId: string; disabled?: boolean }) => {
+  const codeDB = useCodeDB()
+
+  const node = useNode<VarStatement>(nodeId)
+
+  function handleChange(event: React.ChangeEvent<any>) {
+    const valueWithoutWhitespace = event.target.value.replace(/(?:\r\n|\r|\n)/g, "")
+
+    const sanitizedValue = sanitizeHtml(valueWithoutWhitespace, {
+      allowedTags: [],
+      allowedAttributes: {},
+    })
+
+    codeDB?.updateNodeName(nodeId, sanitizedValue)
+  }
+
+  return (
+    <span
+      className={cn("overflow-hidden rounded-md bg-gray-100 transition-all hover:bg-gray-200", {
+        "bg-gray-200": node.meta?.ui?.isHovered,
+      })}
+      onMouseOver={() => {
+        codeDB?.hoverNode(nodeId)
+      }}
+      onMouseLeave={() => {
+        codeDB?.hoverNodeOff(nodeId)
+      }}
+    >
+      <ContentEditable
+        tagName="span"
+        role="textbox"
+        className="text-code-name inline-block h-full px-1 outline-none focus-visible:bg-gray-200 focus-visible:shadow-sm"
+        html={node.name}
+        disabled={disabled}
+        onChange={handleChange}
+      />
+    </span>
   )
 }
 

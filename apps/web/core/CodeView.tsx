@@ -18,6 +18,14 @@ const testCode = `
 function App() {
   const [count, setCount] = React.useState(0)
 
+  if (count === 0) {
+    return (
+      <div className="p-2">
+        <div>Count: {count}</div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <button onClick={() => {setCount(c => {return c + 1})}}>+</button>

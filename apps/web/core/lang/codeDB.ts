@@ -7,6 +7,7 @@ import {
   StatementNode,
   UIElementNode,
   UINode,
+  VarStatement,
   statementTypes,
   uiNodeTypes,
 } from "./codeTree"
@@ -232,6 +233,17 @@ export class CodeDB {
     }
 
     Object.assign(node, newNode)
+
+    this.notifyNodeChange(nodeId)
+  }
+
+  updateNodeName(nodeId: string, name: string) {
+    const node = this.getNodeByID<VarStatement>(nodeId)
+    if (!node) {
+      return
+    }
+
+    node.name = name
 
     this.notifyNodeChange(nodeId)
   }
