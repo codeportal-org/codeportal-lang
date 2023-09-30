@@ -25,14 +25,14 @@ describe("CodeTreeWalk", () => {
     )
 
     let count = 0
-    codeTreeWalker.full(codeTree as ProgramNode, (node, parent) => {
-      node.meta = { extras: { count } }
+    codeTreeWalker.full(codeTree as ProgramNode, (node, parentMeta) => {
+      node.meta = { extras: { count, parentProp: parentMeta?.property ?? null } }
       count += 1
     })
 
     expect(codeTree).toStrictEqual({
       type: "program",
-      meta: { extras: { count: 0 } },
+      meta: { extras: { count: 0, parentProp: null } },
       id: "0",
       idCounter: 6,
       body: [
@@ -40,29 +40,29 @@ describe("CodeTreeWalk", () => {
           type: "component",
           name: "App",
           id: "1",
-          meta: { extras: { count: 1 } },
+          meta: { extras: { count: 1, parentProp: "body" } },
           body: [
             {
               type: "var",
               id: "2",
-              meta: { extras: { count: 2 } },
+              meta: { extras: { count: 2, parentProp: "body" } },
               name: "x",
               value: {
                 type: "number",
                 id: "3",
-                meta: { extras: { count: 3 } },
+                meta: { extras: { count: 3, parentProp: "value" } },
                 value: 0,
               },
             },
             {
               type: "return",
-              meta: { extras: { count: 4 } },
+              meta: { extras: { count: 4, parentProp: "body" } },
               id: "4",
               arg: {
                 type: "ui element",
                 id: "5",
                 name: "div",
-                meta: { extras: { count: 5 } },
+                meta: { extras: { count: 5, parentProp: "arg" } },
                 props: [],
               },
             },
@@ -92,8 +92,8 @@ describe("CodeTreeWalk", () => {
     )
 
     let count = 0
-    codeTreeWalker.full(codeTree as ProgramNode, (node, parent) => {
-      node.meta = { extras: { count, parentCount: parent?.meta?.extras?.count ?? null } }
+    codeTreeWalker.full(codeTree as ProgramNode, (node, parentMeta) => {
+      node.meta = { extras: { count, parentCount: parentMeta?.parent.meta?.extras?.count ?? null } }
       count += 1
     })
 
@@ -197,8 +197,8 @@ describe("CodeTreeWalk", () => {
     )
 
     let count = 0
-    codeTreeWalker.full(codeTree as ProgramNode, (node, parent) => {
-      node.meta = { extras: { count, parentCount: parent?.meta?.extras?.count ?? null } }
+    codeTreeWalker.full(codeTree as ProgramNode, (node, parentMeta) => {
+      node.meta = { extras: { count, parentCount: parentMeta?.parent.meta?.extras?.count ?? null } }
       count += 1
     })
 

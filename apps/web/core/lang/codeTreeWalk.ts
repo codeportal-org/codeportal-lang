@@ -27,16 +27,24 @@ import {
   VarStatement,
 } from "./codeTree"
 
+export type ParentMeta = {
+  parent: CodeNode
+  /**
+   * The property name of the parent node that this node is a child of.
+   */
+  property: string
+}
+
 export class CodeTreeWalk {
-  parentNodeStack: CodeNode[] = []
-  callback: (node: CodeNode, parent: CodeNode | undefined) => void = () => {}
+  parentNodeStack: ParentMeta[] = []
+  callback: (node: CodeNode, parentMeta: ParentMeta | undefined) => void = () => {}
 
   reset() {
     this.parentNodeStack = []
     this.callback = () => {}
   }
 
-  full(code: ProgramNode, callback: (node: CodeNode, parent: CodeNode | undefined) => void) {
+  full(code: ProgramNode, callback: (node: CodeNode, parentMeta: ParentMeta | undefined) => void) {
     this.callback = callback
     if (code.type === "program") {
       this.walkProgram(code)
@@ -45,13 +53,13 @@ export class CodeTreeWalk {
     this.reset()
   }
 
-  private currentParentNode(): CodeNode | undefined {
+  private currentParentNode(): ParentMeta | undefined {
     return this.parentNodeStack[this.parentNodeStack.length - 1]
   }
 
   private walkProgram(node: ProgramNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({ parent: node, property: "body" })
 
     node.body.forEach((child) => {
       this.walkStatement(child)
@@ -133,7 +141,10 @@ export class CodeTreeWalk {
 
   private walkUIExpression(node: UIExpressionNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "expression",
+    })
 
     this.walkExpression(node.expression)
 
@@ -142,7 +153,10 @@ export class CodeTreeWalk {
 
   private walkUIElement(node: UIElementNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "props",
+    })
 
     node.props?.forEach((child) => {
       if (child.type === "ui prop") {
@@ -161,7 +175,10 @@ export class CodeTreeWalk {
 
   private walkUIPropNode(node: UIPropNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "value",
+    })
 
     this.walkExpression(node.value)
 
@@ -170,7 +187,10 @@ export class CodeTreeWalk {
 
   private walkUISpreadPropNode(node: UISpreadPropNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "arg",
+    })
 
     this.walkExpression(node.arg)
 
@@ -179,7 +199,10 @@ export class CodeTreeWalk {
 
   private walkReturnStatement(code: ReturnStatementNode) {
     this.callback(code, this.currentParentNode())
-    this.parentNodeStack.push(code)
+    this.parentNodeStack.push({
+      parent: code,
+      property: "arg",
+    })
 
     this.walkExpression(code.arg)
 
@@ -188,7 +211,10 @@ export class CodeTreeWalk {
 
   private walkVariableDeclaration(code: VarStatement) {
     this.callback(code, this.currentParentNode())
-    this.parentNodeStack.push(code)
+    this.parentNodeStack.push({
+      parent: code,
+      property: "value",
+    })
 
     this.walkExpression(code.value)
 
@@ -197,7 +223,10 @@ export class CodeTreeWalk {
 
   private walkFunctionDeclaration(node: FunctionNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "body",
+    })
 
     node.body.forEach((child) => {
       this.walkStatement(child)
@@ -208,13 +237,27 @@ export class CodeTreeWalk {
 
   private walkFunctionCall(node: FunctionCallNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
 
     if (node.callee.type === "path access") {
+      this.parentNodeStack.push({
+        parent: node,
+        property: "callee",
+      })
       this.walkPathAccess(node.callee)
+      this.parentNodeStack.pop()
     } else if (node.callee.type === "ref") {
+      this.parentNodeStack.push({
+        parent: node,
+        property: "callee",
+      })
       this.walkRef(node.callee)
+      this.parentNodeStack.pop()
     }
+
+    this.parentNodeStack.push({
+      parent: node,
+      property: "args",
+    })
 
     node.args.forEach((child) => {
       this.walkExpression(child)
@@ -229,7 +272,10 @@ export class CodeTreeWalk {
 
   private walkPathAccess(node: PathAccessNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "path",
+    })
 
     node.path.forEach((child) => {
       this.walkExpression(child)
@@ -240,7 +286,10 @@ export class CodeTreeWalk {
 
   private walkStateDeclaration(node: StateStatement) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "value",
+    })
 
     this.walkExpression(node.value)
 
@@ -249,39 +298,61 @@ export class CodeTreeWalk {
 
   private walkStateChangeDeclaration(node: StateChangeNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
 
+    this.parentNodeStack.push({
+      parent: node,
+      property: "state",
+    })
     this.walkRef(node.state)
+    this.parentNodeStack.pop()
 
     if (Array.isArray(node.body)) {
+      this.parentNodeStack.push({
+        parent: node,
+        property: "body",
+      })
       node.body.forEach((child) => {
         this.walkStatement(child)
       })
+      this.parentNodeStack.pop()
     } else {
+      this.parentNodeStack.push({
+        parent: node,
+        property: "body",
+      })
       this.walkExpression(node.body)
+      this.parentNodeStack.pop()
     }
-
-    this.parentNodeStack.pop()
   }
 
   private walkComponent(node: ComponentNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
 
+    this.parentNodeStack.push({
+      parent: node,
+      property: "props",
+    })
     node.props?.forEach((child) => {
       this.walkPropDeclaration(child)
     })
+    this.parentNodeStack.pop()
 
+    this.parentNodeStack.push({
+      parent: node,
+      property: "body",
+    })
     node.body.forEach((child) => {
       this.walkStatement(child)
     })
-
     this.parentNodeStack.pop()
   }
 
   private walkPropDeclaration(node: UIPropDeclaration) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "value",
+    })
 
     this.walkExpression(node.value)
 
@@ -290,7 +361,10 @@ export class CodeTreeWalk {
 
   private walkUIFragment(node: UIFragmentNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "children",
+    })
 
     node.children?.forEach((child) => {
       this.walkUI(child)
@@ -305,7 +379,10 @@ export class CodeTreeWalk {
 
   private walkNAryExpression(node: NAryExpression) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "args",
+    })
 
     node.args.forEach((child) => {
       this.walkExpression(child)
@@ -316,28 +393,47 @@ export class CodeTreeWalk {
 
   private walkIfStatement(node: IfStatementNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
-
+    this.parentNodeStack.push({
+      parent: node,
+      property: "test",
+    })
     this.walkExpression(node.test)
+    this.parentNodeStack.pop()
 
+    this.parentNodeStack.push({
+      parent: node,
+      property: "then",
+    })
     node.then.forEach((child) => {
       this.walkStatement(child)
     })
+    this.parentNodeStack.pop()
 
+    this.parentNodeStack.push({
+      parent: node,
+      property: "elseIf",
+    })
     node.elseIf?.forEach((child) => {
       this.walkElseIfStatement(child)
     })
+    this.parentNodeStack.pop()
 
+    this.parentNodeStack.push({
+      parent: node,
+      property: "else",
+    })
     node.else?.forEach((child) => {
       this.walkStatement(child)
     })
-
     this.parentNodeStack.pop()
   }
 
   private walkElseIfStatement(node: ElseIfNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "test",
+    })
 
     this.walkExpression(node.test)
 
@@ -350,7 +446,10 @@ export class CodeTreeWalk {
 
   private walkUnaryExpression(node: UnaryExpressionNode) {
     this.callback(node, this.currentParentNode())
-    this.parentNodeStack.push(node)
+    this.parentNodeStack.push({
+      parent: node,
+      property: "arg",
+    })
 
     this.walkExpression(node.arg)
 
