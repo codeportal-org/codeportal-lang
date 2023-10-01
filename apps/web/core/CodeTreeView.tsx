@@ -167,6 +167,8 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
           {draggedNode ? (
             uiNodeTypes.includes(draggedNode.type) ? (
               <UINodeView nodeId={draggedNode.id} isOverlay={true} />
+            ) : draggedNode.type === "empty" ? (
+              <EmptyNode nodeId={draggedNode.id} />
             ) : (
               <StatementView nodeId={draggedNode.id} isOverlay={true} />
             )
@@ -548,6 +550,8 @@ const DraggableNodeContainer = ({
   const isDroppedOnNode = !isOverlay && nodeId === droppedOnNodeId
   const isDraggedNode = !isOverlay && nodeId === draggedNodeId
 
+  const isSelected = node.meta?.ui?.isSelected
+
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
     data: { type: node.type, kind } satisfies DropData,
@@ -587,11 +591,11 @@ const DraggableNodeContainer = ({
         codeDB?.selectNodeOff(nodeId)
       }}
     >
-      {isDroppedOnNode && (
+      {(isDroppedOnNode || isSelected) && (
         <div
           className={cn("absolute left-0 top-0 h-full w-1 opacity-50", {
             "bg-lime-600": !isDraggedNode,
-            "bg-gray-300": isDraggedNode,
+            "bg-gray-300": isDraggedNode || isSelected,
           })}
         />
       )}
