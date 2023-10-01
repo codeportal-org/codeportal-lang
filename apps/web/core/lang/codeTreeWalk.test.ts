@@ -595,8 +595,6 @@ describe("CodeTreeWalk", () => {
       count += 1
     })
 
-    writeFileSync("./codeTree-file.ts", JSON.stringify(codeTree, null, 2))
-
     expect(codeTree).toStrictEqual({
       type: "program",
       id: "0",
