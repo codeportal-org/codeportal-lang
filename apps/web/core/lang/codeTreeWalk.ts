@@ -165,6 +165,12 @@ export class CodeTreeWalk {
         this.walkUISpreadPropNode(child)
       }
     })
+    this.parentNodeStack.pop()
+
+    this.parentNodeStack.push({
+      parent: node,
+      property: "children",
+    })
 
     node.children?.forEach((child) => {
       this.walkUI(child)

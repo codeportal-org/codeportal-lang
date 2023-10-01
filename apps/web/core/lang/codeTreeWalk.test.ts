@@ -561,4 +561,191 @@ describe("CodeTreeWalk", () => {
       ],
     } satisfies ProgramNode)
   })
+
+  it("should walk all the nodes in a Code Tree containing a nested JSX structure", () => {
+    const codeTreeWalker = new CodeTreeWalk()
+    const transformer = new ASTtoCTTransformer()
+
+    const codeTree = transformer.transform(
+      Parser.extend(acornJSXParser()).parse(
+        `
+      function App() {
+        return <div>
+          <div>
+            <h1>Header</h1>
+            <p>Paragraph</p>
+            <div>Some text</div>
+          </div>
+        </div>
+      }
+    `,
+        { ecmaVersion: "latest" },
+      ) as any,
+    )
+
+    let count = 0
+    codeTreeWalker.full(codeTree as ProgramNode, (node, parentMeta) => {
+      node.meta = {
+        extras: {
+          count,
+          parentCount: parentMeta?.parent.meta?.extras?.count ?? null,
+          parentProperty: parentMeta?.property ?? null,
+        },
+      }
+      count += 1
+    })
+
+    writeFileSync("./codeTree-file.ts", JSON.stringify(codeTree, null, 2))
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      id: "0",
+      idCounter: 11,
+      meta: {
+        extras: {
+          count: 0,
+          parentCount: null,
+          parentProperty: null,
+        },
+      },
+      body: [
+        {
+          type: "component",
+          id: "1",
+          name: "App",
+          body: [
+            {
+              type: "return",
+              id: "2",
+              arg: {
+                type: "ui element",
+                id: "3",
+                name: "div",
+                props: [],
+                children: [
+                  {
+                    type: "ui element",
+                    id: "4",
+                    name: "div",
+                    props: [],
+                    children: [
+                      {
+                        type: "ui element",
+                        id: "5",
+                        name: "h1",
+                        props: [],
+                        children: [
+                          {
+                            type: "ui text",
+                            id: "6",
+                            text: "Header",
+                            meta: {
+                              extras: {
+                                count: 6,
+                                parentCount: 5,
+                                parentProperty: "children",
+                              },
+                            },
+                          },
+                        ],
+                        meta: {
+                          extras: {
+                            count: 5,
+                            parentCount: 4,
+                            parentProperty: "children",
+                          },
+                        },
+                      },
+                      {
+                        type: "ui element",
+                        id: "7",
+                        name: "p",
+                        props: [],
+                        children: [
+                          {
+                            type: "ui text",
+                            id: "8",
+                            text: "Paragraph",
+                            meta: {
+                              extras: {
+                                count: 8,
+                                parentCount: 7,
+                                parentProperty: "children",
+                              },
+                            },
+                          },
+                        ],
+                        meta: {
+                          extras: {
+                            count: 7,
+                            parentCount: 4,
+                            parentProperty: "children",
+                          },
+                        },
+                      },
+                      {
+                        type: "ui element",
+                        id: "9",
+                        name: "div",
+                        props: [],
+                        children: [
+                          {
+                            type: "ui text",
+                            id: "10",
+                            text: "Some text",
+                            meta: {
+                              extras: {
+                                count: 10,
+                                parentCount: 9,
+                                parentProperty: "children",
+                              },
+                            },
+                          },
+                        ],
+                        meta: {
+                          extras: {
+                            count: 9,
+                            parentCount: 4,
+                            parentProperty: "children",
+                          },
+                        },
+                      },
+                    ],
+                    meta: {
+                      extras: {
+                        count: 4,
+                        parentCount: 3,
+                        parentProperty: "children",
+                      },
+                    },
+                  },
+                ],
+                meta: {
+                  extras: {
+                    count: 3,
+                    parentCount: 2,
+                    parentProperty: "arg",
+                  },
+                },
+              },
+              meta: {
+                extras: {
+                  count: 2,
+                  parentCount: 1,
+                  parentProperty: "body",
+                },
+              },
+            },
+          ],
+          meta: {
+            extras: {
+              count: 1,
+              parentCount: 0,
+              parentProperty: "body",
+            },
+          },
+        },
+      ],
+    } satisfies ProgramNode)
+  })
 })
