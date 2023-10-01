@@ -13,6 +13,7 @@ export type SpecialNodes =
 
 export type CodeMeta = {
   parentId?: string
+  parentProperty?: string
   extras?: Record<string, any>
   ui?: {
     isHovered: boolean
@@ -53,6 +54,7 @@ export type StatementNode =
   | AssignmentStatement
   | TryStatementNode
   | IfStatementNode
+  | EmptyNode
 
 export const expressionTypes = [
   "string",
@@ -81,6 +83,7 @@ export type ExpressionNode =
   | NAryExpression
   | StateChangeNode
   | UnaryExpressionNode
+  | EmptyNode
 
 export type LiteralNode = StringLiteral | NumberLiteral | BooleanLiteral
 
@@ -90,6 +93,7 @@ export type UINode =
   | UIFragmentNode
   | UIExpressionNode
   | ComponentCallNode
+  | EmptyNode
 
 export const uiNodeTypes = ["ui element", "ui fragment", "ui text", "ui expression"]
 
@@ -184,6 +188,13 @@ export type ReturnStatementNode = {
   type: "return"
   id: string
   arg: ExpressionNode
+  meta?: CodeMeta
+}
+
+export type EmptyNode = {
+  type: "empty"
+  kind: "statement" | "ui" | "expression"
+  id: string
   meta?: CodeMeta
 }
 

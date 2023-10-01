@@ -2,6 +2,7 @@ import { createNanoEvents } from "nanoevents"
 
 import {
   CodeNode,
+  EmptyNode,
   FunctionNode,
   ProgramNode,
   StatementNode,
@@ -42,7 +43,7 @@ export class CodeDB {
    * Loads the code tree into the CodeDB.
    */
   load(programNode: ProgramNode) {
-    this.codeTreeWalker.full(programNode, (node, parent) => {
+    this.codeTreeWalker.full(programNode, (node, parentMeta) => {
       if (!node.meta) {
         node.meta = {
           ui: {
@@ -52,13 +53,16 @@ export class CodeDB {
         }
       }
 
-      // attach parent to all nodes
-      node.meta.parentId = parent?.id
+      // attach the parent id to all nodes
+      node.meta.parentId = parentMeta?.parent.id
+      node.meta.parentProperty = parentMeta?.property
 
       // add an id to all nodes
       if (!node.id) {
         node.id = this.idCounter.toString()
         this.idCounter++
+      } else {
+        this.idCounter = Math.max(this.idCounter, parseInt(node.id) + 1)
       }
 
       // add nodes to map
@@ -226,6 +230,26 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
+  selectNode(nodeId: string) {
+    const node = this.getNodeByID(nodeId)
+    if (!node || !node.meta?.ui) {
+      return
+    }
+
+    node.meta.ui.isSelected = true
+    this.notifyNodeChange(nodeId)
+  }
+
+  selectNodeOff(nodeId: string) {
+    const node = this.getNodeByID(nodeId)
+    if (!node || !node.meta?.ui) {
+      return
+    }
+
+    node.meta.ui.isSelected = false
+    this.notifyNodeChange(nodeId)
+  }
+
   updateNode(nodeId: string, newNode: CodeNode) {
     const node = this.getNodeByID(nodeId)
     if (!node) {
@@ -272,5 +296,103 @@ export class CodeDB {
     })
 
     return newCodeTree
+  }
+
+  newEmptyNode(kind: EmptyNode["kind"]) {
+    const id = this.idCounter.toString()
+    this.idCounter++
+    const newNode = {
+      id,
+      type: "empty",
+      kind,
+      meta: {
+        ui: {
+          isHovered: false,
+          isSelected: false,
+        },
+      },
+    } as EmptyNode
+
+    this.nodeMap.set(newNode.id, newNode)
+
+    return newNode
+  }
+
+  insertNodeBefore(nodeId: string, newNode: CodeNode) {
+    const node = this.getNodeByID(nodeId)
+    if (!node) {
+      return
+    }
+
+    if (!node.meta?.parentId) {
+      throw new Error("Node must have a parent")
+    }
+
+    const parent = this.getNodeByID(node.meta.parentId)
+
+    if (!parent) {
+      throw new Error("Node must have a parent")
+    }
+
+    const parentProperty = node.meta.parentProperty
+
+    if (!parentProperty) {
+      throw new Error("Node must have a parent property")
+    }
+
+    const nodeList = (parent as any)[parentProperty] as any[]
+
+    const index = nodeList.indexOf(node)
+
+    if (index === -1) {
+      throw new Error("Node must be in its parent")
+    }
+
+    ;(parent as any)[parentProperty].splice(index, 0, newNode)
+
+    if (newNode.meta) {
+      newNode.meta.parentId = parent.id
+      newNode.meta.parentProperty = parentProperty
+    } else {
+      throw new Error("New node must have meta")
+    }
+
+    this.notifyNodeChange(newNode.id)
+    this.notifyNodeChange(parent.id)
+  }
+
+  insertNodeAfter(nodeId: string, newNode: CodeNode) {
+    const node = this.getNodeByID(nodeId)
+    if (!node) {
+      return
+    }
+
+    if (!node.meta?.parentId) {
+      throw new Error("Node must have a parent")
+    }
+
+    const parent = this.getNodeByID(node.meta.parentId)
+
+    if (!parent) {
+      throw new Error("Node must have a parent")
+    }
+
+    const parentProperty = node.meta.parentProperty
+
+    if (!parentProperty) {
+      throw new Error("Node must have a parent property")
+    }
+
+    const nodeList = (parent as any)[parentProperty] as any[]
+
+    const index = nodeList.indexOf(node)
+
+    if (index === -1) {
+      throw new Error("Node must be in its parent")
+    }
+
+    ;(parent as any)[parentProperty].splice(index + 1, 0, newNode)
+
+    this.notifyNodeChange(parent.id)
   }
 }

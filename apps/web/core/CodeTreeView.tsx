@@ -166,7 +166,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
         <DragOverlay>
           {draggedNode ? (
             uiNodeTypes.includes(draggedNode.type) ? (
-              <UINodeView node={draggedNode as UINode} isOverlay={true} />
+              <UINodeView nodeId={draggedNode.id} isOverlay={true} />
             ) : (
               <StatementView nodeId={draggedNode.id} isOverlay={true} />
             )
@@ -196,11 +196,7 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
             {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
           </div>
         </div>
-        <NodeList nodeId={node.id}>
-          {node.body.map((node) => {
-            return <StatementView nodeId={node.id} key={node.id} />
-          })}
-        </NodeList>
+        <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
       </>
     )
   } else if (node.type === "function") {
@@ -220,6 +216,8 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
     statementView = <StateStatementView nodeId={node.id} />
   } else if (node.type === "state change") {
     statementView = <StateChangeView node={node} />
+  } else if (node.type === "empty" && node.kind === "statement") {
+    statementView = <EmptyNode nodeId={node.id} />
   } else {
     statementView = (
       <div>
@@ -244,7 +242,7 @@ export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
       <span className="text-code-keyword">var</span>
       <span
         className={cn(
-          "text-code-name rounded-md bg-gray-100 px-1 transition-all hover:bg-gray-200",
+          "text-code-name rounded-md bg-gray-100 px-1 transition-colors hover:bg-gray-200",
           {
             "bg-gray-200": node.meta?.ui?.isHovered,
           },
@@ -292,14 +290,14 @@ export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
   } else if (node.type === "state change") {
     return <StateChangeView node={node} />
   } else if (uiNodeTypes.includes(node.type)) {
-    return <UINodeView node={node as UINode} />
+    return <UINodeView nodeId={node.id} />
   } else {
     return <div>unknown expression type: {node.type}</div>
   }
 }
 
-export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: boolean }) => {
-  const nodeId = node.id
+export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
+  const node = useNode<UINode>(nodeId)
 
   let uiNodeView: React.ReactNode
 
@@ -349,11 +347,7 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
           </>
         )}
         {node.children && (
-          <NodeList nodeId={node.id}>
-            {node.children.map((node) => (
-              <ExpressionView node={node} key={node.id} />
-            ))}
-          </NodeList>
+          <NodeList nodeId={node.id} nodes={node.children} Component={UINodeView} />
         )}
       </div>
     )
@@ -365,6 +359,8 @@ export const UINodeView = ({ node, isOverlay }: { node: UINode; isOverlay?: bool
         {"}"}
       </div>
     )
+  } else if (node.type === "empty" && node.kind === "ui") {
+    uiNodeView = <EmptyNode nodeId={node.id} />
   } else {
     uiNodeView = (
       <div>
@@ -399,9 +395,12 @@ export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
 
   return (
     <span
-      className={cn("text-code-name rounded-md bg-gray-100 px-1 transition-all hover:bg-gray-200", {
-        "bg-gray-200": referencedNode.meta?.ui?.isHovered,
-      })}
+      className={cn(
+        "text-code-name rounded-md bg-gray-100 px-1 transition-colors hover:bg-gray-200",
+        {
+          "bg-gray-200": referencedNode.meta?.ui?.isHovered,
+        },
+      )}
       onMouseOver={() => {
         codeDB?.hoverNode(node.refId)
       }}
@@ -424,11 +423,7 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
       </div>
 
       {Array.isArray(node.body) ? (
-        <NodeList nodeId={node.id}>
-          {node.body.map((node) => {
-            return <StatementView nodeId={node.id} key={node.id} />
-          })}
-        </NodeList>
+        <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
       ) : (
         <ExpressionView node={node.body} />
       )}
@@ -455,14 +450,17 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
 
 const NodeList = ({
   nodeId,
-  children,
+  nodes,
+  Component,
   className,
 }: {
   nodeId: string
-  children: React.ReactNode
+  nodes: CodeNode[]
+  Component: React.FC<{ nodeId: string }>
   className?: string
 }) => {
   const node = useNode<CodeNode>(nodeId)
+  const codeDB = useCodeDB()
   const [isOpen, setIsOpen] = React.useState(true)
   const containerID = React.useId()
 
@@ -472,32 +470,61 @@ const NodeList = ({
     setIsOpen(!isOpen)
   }
 
+  const handleSpacerClick = (nodeId: string) => {
+    const newNode = codeDB?.newEmptyNode(uiNodeTypes.includes(node.type) ? "ui" : "statement")!
+
+    if (nodeId === "<end>") {
+      codeDB?.insertNodeAfter(nodes[nodes.length - 1]!.id, newNode)
+    } else {
+      codeDB?.insertNodeBefore(nodeId, newNode)
+    }
+  }
+
   return (
-    <div className={cn("relative border-l border-l-slate-200", indentationClass, className)}>
-      <div className="pb-1">{/* spacer */}</div>
+    <div
+      className={cn("relative border-l border-l-slate-200", indentationClass, className, {
+        "pt-6": !isOpen,
+      })}
+    >
       <button
         aria-expanded={isOpen}
         aria-controls={containerID}
-        className={`cursor-pointer ${
-          isOpen
-            ? `absolute left-0 top-0 ${isHovered ? "block" : "hidden"}`
-            : "hover:bg-code-empty-expression rounded"
+        className={`absolute left-0 top-0 cursor-pointer ${
+          isOpen ? (isHovered ? "block" : "hidden") : ""
         }`}
         onClick={toggleOpen}
       >
         {isOpen ? (
-          <ChevronDown className="text-gray-400 hover:text-gray-500" />
+          <ChevronDown className="text-gray-400 transition-colors hover:text-gray-500" />
         ) : (
-          <ChevronRight className="text-gray-400 hover:text-gray-500" />
+          <ChevronRight className="text-gray-400 transition-colors hover:text-gray-500" />
         )}
       </button>
-      <div
-        id={containerID}
-        className={cn("flex-col items-start gap-1", isOpen ? "flex" : "hidden")}
-      >
-        {children}
+      <div id={containerID} className={cn("flex-col items-start", isOpen ? "flex" : "hidden")}>
+        {nodes.map((node) => (
+          <React.Fragment key={node.id}>
+            <NodeListSpacer nodeId={node.id} onClick={handleSpacerClick} />
+            <Component nodeId={node.id} />
+          </React.Fragment>
+        ))}
+        <NodeListSpacer nodeId="<end>" onClick={handleSpacerClick} />
       </div>
     </div>
+  )
+}
+
+const NodeListSpacer = ({
+  nodeId,
+  onClick,
+}: {
+  nodeId: string
+  onClick: (nodeId: string) => void
+}) => {
+  return (
+    <button
+      className="w-full pb-1 transition-colors hover:bg-gray-100"
+      onClick={() => onClick(nodeId)}
+    />
   )
 }
 
@@ -514,7 +541,6 @@ const DraggableNodeContainer = ({
 }) => {
   const codeDB = useCodeDB()
   const node = useNode(nodeId)
-  const hasParent = node.meta?.parentId !== undefined
 
   const [draggedNodeId] = useAtom(draggedNodeIdAtom)
   const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
@@ -525,18 +551,14 @@ const DraggableNodeContainer = ({
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
     data: { type: node.type, kind } satisfies DropData,
-    disabled: !hasParent,
   })
 
   const droppable = useDroppable({
     id: nodeId,
     data: { type: node.type, kind } satisfies DropData,
-    disabled: !hasParent,
   })
 
   if (!node) return null
-
-  console.log("listeners", Object.keys(listeners as any))
 
   return (
     <div
@@ -557,6 +579,12 @@ const DraggableNodeContainer = ({
       }}
       onMouseLeave={() => {
         codeDB?.hoverNodeOff(nodeId)
+      }}
+      onFocus={() => {
+        codeDB?.selectNode(nodeId)
+      }}
+      onBlur={() => {
+        codeDB?.selectNodeOff(nodeId)
       }}
     >
       {isDroppedOnNode && (
@@ -604,11 +632,7 @@ export const FunctionView = ({ node }: { node: FunctionNode }) => {
           {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
         </div>
       </div>
-      <NodeList nodeId={node.id}>
-        {node.body.map((node) => {
-          return <StatementView nodeId={node.id} key={node.id} />
-        })}
-      </NodeList>
+      <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
     </>
   )
 }
@@ -622,11 +646,7 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
         <span className="text-code-keyword">if</span>
         <ExpressionView node={node.test} />
       </div>
-      <NodeList nodeId={node.id}>
-        {node.then.map((node) => {
-          return <StatementView nodeId={node.id} key={node.id} />
-        })}
-      </NodeList>
+      <NodeList nodeId={node.id} nodes={node.then} Component={StatementView} />
       {/* Missing else if TODO */}
       {node.else && (
         <>
@@ -634,11 +654,7 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
           <div className="flex flex-row gap-1.5">
             <span className="text-code-keyword">else</span>
           </div>
-          <NodeList nodeId={node.id}>
-            {node.else.map((node) => {
-              return <StatementView nodeId={node.id} key={node.id} />
-            })}
-          </NodeList>
+          <NodeList nodeId={node.id} nodes={node.else} Component={StatementView} />
         </>
       )}
     </div>
@@ -663,7 +679,7 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
 
   return (
     <span
-      className={cn("overflow-hidden rounded-md bg-gray-100 transition-all hover:bg-gray-200", {
+      className={cn("overflow-hidden rounded-md bg-gray-100 transition-colors hover:bg-gray-200", {
         "bg-gray-200": node.meta?.ui?.isHovered,
       })}
       onMouseOver={() => {
@@ -681,6 +697,16 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
         onChange={handleChange}
       />
     </span>
+  )
+}
+
+export const EmptyNode = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode(nodeId)
+
+  return (
+    <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
+      <span className="text-code-name-light">...</span>
+    </button>
   )
 }
 
