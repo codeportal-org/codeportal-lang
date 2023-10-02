@@ -177,6 +177,10 @@ export class Interpreter {
   interpretUINode(node: UINode): React.ReactNode {
     let children: React.ReactNode[]
 
+    if (node.type === "empty") {
+      return null
+    }
+
     if (node.type === "ui text") {
       return node.text
     }
@@ -188,9 +192,11 @@ export class Interpreter {
     if (!node.children || node.children.length === 0) {
       children = []
     } else {
-      children = node.children.map((child) => {
-        return this.interpretUINode(child)
-      })
+      children = node.children
+        .map((child) => {
+          return this.interpretUINode(child)
+        })
+        .filter((child) => child !== null)
     }
 
     if (node.type === "ui element") {
