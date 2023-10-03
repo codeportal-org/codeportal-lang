@@ -584,7 +584,11 @@ const DraggableNodeContainer = ({
       onMouseLeave={() => {
         codeDB?.hoverNodeOff(nodeId)
       }}
-      onFocus={() => {
+      onFocus={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
         codeDB?.selectNode(nodeId)
       }}
       onBlur={() => {
