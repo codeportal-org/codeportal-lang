@@ -198,6 +198,7 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
             {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
           </div>
         </div>
+        <div className="pt-1">{/* spacer */}</div>
         <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
       </>
     )
@@ -323,33 +324,33 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
           )}
         </div>
         {node.props && (
-          <>
-            <div className={indentationClass}>
-              <div className={cn("flex flex-col gap-1.5 text-gray-500", indentationClass)}>
-                {node.props.map((prop) =>
-                  prop.type === "ui prop" ? (
-                    <div key={prop.id} className="flex flex-wrap gap-2">
-                      <div className="col-span-1">{prop.name}:</div>
-                      <div className="col-span-4">
-                        <ExpressionView node={prop.value} />
-                      </div>
+          <div className={indentationClass}>
+            <div className={cn("flex flex-col gap-1.5 text-gray-500", indentationClass)}>
+              {node.props.map((prop) =>
+                prop.type === "ui prop" ? (
+                  <div key={prop.id} className="flex flex-wrap gap-2">
+                    <div className="col-span-1">{prop.name}:</div>
+                    <div className="col-span-4">
+                      <ExpressionView node={prop.value} />
                     </div>
-                  ) : (
-                    <div key={prop.id} className="flex flex-wrap gap-2">
-                      <div className="col-span-1">... spread</div>
-                      <div className="col-span-4">
-                        <ExpressionView node={prop.arg} />
-                      </div>
+                  </div>
+                ) : (
+                  <div key={prop.id} className="flex flex-wrap gap-2">
+                    <div className="col-span-1">... spread</div>
+                    <div className="col-span-4">
+                      <ExpressionView node={prop.arg} />
                     </div>
-                  ),
-                )}
-              </div>
+                  </div>
+                ),
+              )}
             </div>
-            <div className="pt-1">{/* spacer */}</div>
-          </>
+          </div>
         )}
         {node.children && (
-          <NodeList nodeId={node.id} nodes={node.children} Component={UINodeView} />
+          <>
+            <div className="pt-1">{/* spacer */}</div>
+            <NodeList nodeId={node.id} nodes={node.children} Component={UINodeView} />
+          </>
         )}
       </div>
     )
@@ -425,7 +426,10 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
       </div>
 
       {Array.isArray(node.body) ? (
-        <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
+        <>
+          <div className="pt-1">{/* spacer */}</div>
+          <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
+        </>
       ) : (
         <ExpressionView node={node.body} />
       )}
@@ -570,6 +574,7 @@ const DraggableNodeContainer = ({
         "relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
         {
           "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
+          "w-full": !isOverlay && kind === "statement",
         },
       )}
       ref={(ref) => {
@@ -640,6 +645,7 @@ export const FunctionView = ({ node }: { node: FunctionNode }) => {
           {/* ({node.props.map((param: any) => param.name).join(", ")}) */}
         </div>
       </div>
+      <div className="pt-1">{/* spacer */}</div>
       <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
     </>
   )
@@ -654,6 +660,7 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
         <span className="text-code-keyword">if</span>
         <ExpressionView node={node.test} />
       </div>
+      <div className="pt-1">{/* spacer */}</div>
       <NodeList nodeId={node.id} nodes={node.then} Component={StatementView} />
       {/* Missing else if TODO */}
       {node.else && (
@@ -662,6 +669,7 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
           <div className="flex flex-row gap-1.5">
             <span className="text-code-keyword">else</span>
           </div>
+          <div className="pt-1">{/* spacer */}</div>
           <NodeList nodeId={node.id} nodes={node.else} Component={StatementView} />
         </>
       )}
@@ -710,11 +718,14 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
 
 export const EmptyNode = ({ nodeId }: { nodeId: string }) => {
   const node = useNode(nodeId)
+  const isSelected = node.meta?.ui?.isSelected
 
   return (
-    <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
-      <span className="text-code-name-light">...</span>
-    </button>
+    <div className="w-full">
+      <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
+        {isSelected ? <div>Editing</div> : <span className="text-code-name-light">...</span>}
+      </button>
+    </div>
   )
 }
 
