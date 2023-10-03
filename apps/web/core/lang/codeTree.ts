@@ -40,6 +40,8 @@ export const statementTypes = [
   "function call",
   "assignment",
   "try",
+  "if",
+  "empty",
 ] as const
 
 export type StatementNode =
@@ -68,6 +70,10 @@ export const expressionTypes = [
   "path access",
   "object",
   "nary",
+  "unary",
+  "function call",
+  "component call",
+  "empty",
 ] as const
 
 export type ExpressionNode =
