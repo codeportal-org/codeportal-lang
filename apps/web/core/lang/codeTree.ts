@@ -42,6 +42,7 @@ export const statementTypes = [
   "try",
   "if",
   "empty",
+  "state change",
 ] as const
 
 export type StatementNode =

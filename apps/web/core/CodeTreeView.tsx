@@ -214,7 +214,7 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
     statementView = (
       <div className="flex flex-row gap-1.5">
         <span className="text-code-keyword">return</span>
-        <ExpressionView node={node.arg} />
+        <ExpressionView nodeId={node.arg.id} />
       </div>
     )
   } else if (node.type === "state") {
@@ -257,7 +257,7 @@ export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
       </span>
       <span className="text-code-symbol">=</span>
 
-      <ExpressionView node={node.value} />
+      <ExpressionView nodeId={node.value.id} />
     </div>
   )
 }
@@ -272,12 +272,14 @@ export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
       <EditableNodeName nodeId={nodeId} />
       <span className="text-code-symbol">=</span>
 
-      <ExpressionView node={node.value} />
+      <ExpressionView nodeId={node.value.id} />
     </div>
   )
 }
 
-export const ExpressionView = ({ node }: { node: ExpressionNode }) => {
+export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<ExpressionNode>(nodeId)
+
   if (!node) return null
 
   if (node.type === "string") {
@@ -333,14 +335,14 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
                   <div key={prop.id} className="flex flex-wrap gap-2">
                     <div className="col-span-1">{prop.name}:</div>
                     <div className="col-span-4">
-                      <ExpressionView node={prop.value} />
+                      <ExpressionView nodeId={prop.value.id} />
                     </div>
                   </div>
                 ) : (
                   <div key={prop.id} className="flex flex-wrap gap-2">
                     <div className="col-span-1">... spread</div>
                     <div className="col-span-4">
-                      <ExpressionView node={prop.arg} />
+                      <ExpressionView nodeId={prop.arg.id} />
                     </div>
                   </div>
                 ),
@@ -360,7 +362,7 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
     uiNodeView = (
       <div className="flex flex-row gap-1.5">
         {"{"}
-        <ExpressionView node={node.expression} />
+        <ExpressionView nodeId={node.expression.id} />
         {"}"}
       </div>
     )
@@ -427,13 +429,13 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
         <span className="text-code-symbol">to</span>
       </div>
 
-      {Array.isArray(node.body) ? (
+      {node.body.length === 1 && node.body[0]!.type === "return" ? (
+        <ExpressionView nodeId={node.body[0]?.arg.id} />
+      ) : (
         <>
           <div className="pt-1">{/* spacer */}</div>
           <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
         </>
-      ) : (
-        <ExpressionView node={node.body} />
       )}
     </div>
   )
@@ -441,11 +443,11 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
 
 const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
   return (
-    <div className="flex flex-row flex-wrap items-start gap-1.5">
+    <div className="flex flex-row flex-wrap items-start gap-1.5 border-2 border-transparent">
       {node.args.map((arg, idx) => {
         return (
           <React.Fragment key={arg.id}>
-            <ExpressionView node={arg} />
+            <ExpressionView nodeId={arg.id} />
             {idx < node.args.length - 1 && (
               <span className="text-code-symbol">{node.operator}</span>
             )}
@@ -666,7 +668,7 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
     <div className="flex flex-col">
       <div className="flex flex-row gap-1.5">
         <span className="text-code-keyword">if</span>
-        <ExpressionView node={node.test} />
+        <ExpressionView nodeId={node.test.id} />
       </div>
       <div className="pt-1">{/* spacer */}</div>
       <NodeList nodeId={node.id} nodes={node.then} Component={StatementView} />
