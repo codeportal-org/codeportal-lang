@@ -134,7 +134,9 @@ export class CodeDB {
       !statementTypes.includes(node.type as any) ||
       !statementTypes.includes(target.type as any)
     ) {
-      throw new Error("This method can only move statement nodes")
+      throw new Error(
+        `This method can only move statement nodes, attempted to move ${node.type} to ${target.type}`,
+      )
     }
 
     if (!target.meta?.parentId) {
@@ -148,21 +150,25 @@ export class CodeDB {
       throw new Error("Node and target must have parents")
     }
 
-    const nodeIndex = nodeParent.body.indexOf(node)
-    const targetIndex = targetParent.body.indexOf(target)
+    const nodeParentProperty = node.meta?.parentProperty!
+    const targetParentProperty = target.meta?.parentProperty!
+
+    const nodeIndex = (nodeParent as any)[nodeParentProperty].indexOf(node)
+    const targetIndex = (targetParent as any)[targetParentProperty].indexOf(target)
 
     if (nodeIndex === -1 || targetIndex === -1) {
       throw new Error("Node and target must be in their parents")
     }
 
     // remove node from parent
-    nodeParent.body.splice(nodeIndex, 1)
+    ;(nodeParent as any)[nodeParentProperty].splice(nodeIndex, 1)
 
     // add node to parent at target index
-    targetParent.body.splice(targetIndex, 0, node)
+    ;(targetParent as any)[targetParentProperty].splice(targetIndex, 0, node)
 
     // update parent
     node.meta!.parentId = targetParent.id
+    node.meta!.parentProperty = targetParentProperty
 
     // notify changes
     this.notifyNodeChange(nodeParent.id)
