@@ -557,6 +557,7 @@ const DraggableNodeContainer = ({
   const isDraggedNode = !isOverlay && nodeId === draggedNodeId
 
   const isSelected = node.meta?.ui?.isSelected
+  const isHovered = node.meta?.ui?.isHovered
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
@@ -585,7 +586,12 @@ const DraggableNodeContainer = ({
       }}
       {...listeners}
       {...attributes}
-      onMouseOver={() => {
+      onMouseOver={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+        console.log("hovering", nodeId)
         codeDB?.hoverNode(nodeId)
       }}
       onMouseLeave={() => {
@@ -602,11 +608,11 @@ const DraggableNodeContainer = ({
         codeDB?.selectNodeOff(nodeId)
       }}
     >
-      {(isDroppedOnNode || isSelected) && (
+      {(isDroppedOnNode || isSelected || isHovered) && (
         <div
           className={cn("absolute left-[-5px] top-0 h-full w-1 opacity-50", {
             "bg-lime-600": !isDraggedNode,
-            "bg-gray-300": isDraggedNode || isSelected,
+            "bg-gray-300": isDraggedNode || isSelected || isHovered,
           })}
         />
       )}
@@ -723,24 +729,24 @@ export const EmptyNode = ({ nodeId }: { nodeId: string }) => {
   const isSelected = node.meta?.ui?.isSelected
 
   return (
-    // <Popover.Root>
-    //   <Popover.Trigger asChild>
-    <div className="w-full">
-      <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
-        <span className="text-code-name-light">...</span>
-      </button>
-    </div>
-    //   </Popover.Trigger>
-    //   <Popover.Anchor />
-    //   <Popover.Portal>
-    //     <Popover.Content>
-    //       <Popover.Close />
-    //       <Popover.Arrow />
-    //     </Popover.Content>
-    //   </Popover.Portal>
-    // </Popover.Root>
+    <Popover.Root>
+      <Popover.Trigger asChild>
+        <div className="w-full">
+          <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
+            <span className="text-code-name-light">...</span>
+          </button>
+        </div>
+      </Popover.Trigger>
+      <Popover.Anchor />
+      <Popover.Portal>
+        <Popover.Content>
+          <Popover.Close />
+          <Popover.Arrow />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
     // <div className="w-full">
-    //   <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
+    // <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
     //     {isSelected ? (
     //       <Command label="Command Menu">
     //         <Command.Input />

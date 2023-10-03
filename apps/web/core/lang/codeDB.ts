@@ -25,6 +25,9 @@ export class CodeDB {
 
   idCounter = 0
 
+  selectedNodeIds: string[] = []
+  hoveredNodeId: string | undefined = undefined
+
   codeTreeWalker = new CodeTreeWalk()
 
   nodeMap = new Map<string, CodeNode>()
@@ -216,7 +219,18 @@ export class CodeDB {
       return
     }
 
+    if (this.hoveredNodeId !== undefined) {
+      const prevHoveredNode = this.getNodeByID(this.hoveredNodeId)
+      if (!prevHoveredNode) {
+        throw new Error("Previous hovered node not found")
+      }
+
+      prevHoveredNode.meta!.ui!.isHovered = false
+      this.notifyNodeChange(prevHoveredNode.id)
+    }
+
     node.meta.ui.isHovered = true
+    this.hoveredNodeId = nodeId
     this.notifyNodeChange(nodeId)
   }
 
@@ -227,6 +241,9 @@ export class CodeDB {
     }
 
     node.meta.ui.isHovered = false
+    if (this.hoveredNodeId === nodeId) {
+      this.hoveredNodeId = undefined
+    }
     this.notifyNodeChange(nodeId)
   }
 
@@ -236,17 +253,30 @@ export class CodeDB {
       return
     }
 
+    if (this.selectedNodeIds.length > 0) {
+      const prevSelectedNode = this.getNodeByID(this.selectedNodeIds[0]!)
+      if (!prevSelectedNode) {
+        throw new Error("Previous selected node not found")
+      }
+
+      prevSelectedNode.meta!.ui!.isSelected = false
+      this.selectedNodeIds.pop()
+      this.notifyNodeChange(prevSelectedNode.id)
+    }
+
     node.meta.ui.isSelected = true
+    this.selectedNodeIds.push(nodeId)
     this.notifyNodeChange(nodeId)
   }
 
   selectNodeOff(nodeId: string) {
     const node = this.getNodeByID(nodeId)
     if (!node || !node.meta?.ui) {
-      return
+      throw new Error("Node not found")
     }
 
     node.meta.ui.isSelected = false
+    this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
     this.notifyNodeChange(nodeId)
   }
 
