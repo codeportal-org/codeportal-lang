@@ -161,7 +161,16 @@ export class CodeDB {
     }
 
     // remove node from parent
-    ;(nodeParent as any)[nodeParentProperty].splice(nodeIndex, 1)
+    const nodeParentList = (nodeParent as any)[nodeParentProperty] as any[]
+    nodeParentList.splice(nodeIndex, 1)
+
+    if (nodeParentList.length === 0) {
+      // Always leave an empty statement for UX reasons
+      const emptyStatement = this.newEmptyNode("statement")
+      nodeParentList.push(emptyStatement)
+      emptyStatement.meta!.parentId = nodeParent.id
+      emptyStatement.meta!.parentProperty = nodeParentProperty
+    }
 
     // add node to parent at target index
     ;(targetParent as any)[targetParentProperty].splice(targetIndex, 0, node)
