@@ -17,6 +17,8 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
+import * as Popover from "@radix-ui/react-popover"
+import { Command } from "carloslfu-cmdk-internal"
 import { atom, useAtom } from "jotai"
 import { ChevronDown, ChevronRight, Square, Type } from "lucide-react"
 import React, { PointerEvent } from "react"
@@ -602,7 +604,7 @@ const DraggableNodeContainer = ({
     >
       {(isDroppedOnNode || isSelected) && (
         <div
-          className={cn("absolute left-0 top-0 h-full w-1 opacity-50", {
+          className={cn("absolute left-[-5px] top-0 h-full w-1 opacity-50", {
             "bg-lime-600": !isDraggedNode,
             "bg-gray-300": isDraggedNode || isSelected,
           })}
@@ -721,11 +723,45 @@ export const EmptyNode = ({ nodeId }: { nodeId: string }) => {
   const isSelected = node.meta?.ui?.isSelected
 
   return (
+    // <Popover.Root>
+    //   <Popover.Trigger asChild>
     <div className="w-full">
       <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
-        {isSelected ? <div>Editing</div> : <span className="text-code-name-light">...</span>}
+        <span className="text-code-name-light">...</span>
       </button>
     </div>
+    //   </Popover.Trigger>
+    //   <Popover.Anchor />
+    //   <Popover.Portal>
+    //     <Popover.Content>
+    //       <Popover.Close />
+    //       <Popover.Arrow />
+    //     </Popover.Content>
+    //   </Popover.Portal>
+    // </Popover.Root>
+    // <div className="w-full">
+    //   <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
+    //     {isSelected ? (
+    //       <Command label="Command Menu">
+    //         <Command.Input />
+    //         <Command.List>
+    //           <Command.Empty>No results found.</Command.Empty>
+
+    //           <Command.Group heading="Letters">
+    //             <Command.Item>a</Command.Item>
+    //             <Command.Item>b</Command.Item>
+    //             <Command.Separator />
+    //             <Command.Item>c</Command.Item>
+    //           </Command.Group>
+
+    //           <Command.Item>Apple</Command.Item>
+    //         </Command.List>
+    //       </Command>
+    //     ) : (
+    //       <span className="text-code-name-light">...</span>
+    //     )}
+    //   </button>
+    // </div>
   )
 }
 
