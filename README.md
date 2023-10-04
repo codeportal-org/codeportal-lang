@@ -3,7 +3,7 @@
 </div>
 
 <div align="center"><strong>CodePortal (Alpha) 🚀</strong></div>
-<div align="center">The full-stack programming platform for indie hackers and makers.<br />A place for all your creations. Simple, powerful, and flexible!</div>
+<div align="center">The full-stack programming platform for makers and product teams.<br />A place for all your creations. Simple, powerful, and flexible!</div>
 <br />
 <div align="center">
 <a href="https://codeportal.io">Website</a>
@@ -13,7 +13,7 @@
 
 ## Introduction
 
-CodePortal is an open-source full-stack, AI-first, web-based programming platform with the primary goal of improving how we build software. With CodePortal, you can create, edit, and publish web apps, widgets, and APIs in a simple and intuitive editor, all without installing or configuring anything.
+CodePortal is an open-source full-stack AI-first programming platform designed for product teams and makers who are frustrated with the limitations of traditional programming and tooling. CodePortal makes it easier for all team members to make changes to your products, eliminating handoffs and increasing velocity. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
 
 Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and editor are heavily focused on developer experience, and supporting multiple views of a program. Additionally, they are thought from the ground up to work hand in hand with generative AI.
 

@@ -22,13 +22,14 @@ export default function Home() {
       <main>
         <div className="mx-auto flex max-w-4xl flex-col items-center px-2 text-gray-700">
           <h1 className="mb-8 mt-10 text-center text-3xl font-bold sm:text-5xl">
-            Turn ideas into reality <span className="text-primary-500">— faster!</span>
+            Build, and iterate ideas <span className="text-primary-500">— faster!</span>
           </h1>
 
           <p className="mx-2 mb-8 max-w-3xl text-center text-lg sm:text-xl">
-            CodePortal is the open-source full-stack programming platform for indie hackers and
-            makers! Build, launch, and scale your products all in one place without the headaches of
-            traditional programming.
+            CodePortal is designed for product teams and makers who are frustrated with the
+            limitations of traditional programming and tooling. It is a full-stack AI-first platform
+            that makes it easier for all team members to make changes to your products, eliminating
+            handoffs and increasing velocity.
           </p>
           <div className="mb-16 flex justify-center">
             <EarlyAccessButton>Join our closed alpha!</EarlyAccessButton>
@@ -38,7 +39,7 @@ export default function Home() {
 
           <div className="max-w-2xl px-2">
             <h2 className="mb-6 mt-16 text-center text-2xl font-bold sm:text-4xl">
-              Streamline development
+              Streamline product development
             </h2>
 
             <ul className="mb-8 list-none pl-4 sm:pl-5">
@@ -85,6 +86,7 @@ export default function Home() {
         <div className="p-2 text-center">
           Copyright © 2023 LikableApps, Inc. All rights reserved.
         </div>
+
         <div className="p-2 text-center">
           Made by{" "}
           <a
@@ -94,15 +96,6 @@ export default function Home() {
             className="underline"
           >
             Carlos Galarza
-          </a>
-          -
-          <a
-            href="https://github.com/codeportal-org/codeportal"
-            target="_blank"
-            rel="noreferrer"
-            className="underline"
-          >
-            Github
           </a>
         </div>
       </footer>
