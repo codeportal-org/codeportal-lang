@@ -108,6 +108,10 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   const handleDragEnd = () => {
     console.log("drag end", draggedNodeKind)
     if (draggedNodeKind === "statement" || draggedNodeKind === "ui node") {
+      if (!droppedOnNode || !draggedNode) {
+        return
+      }
+
       codeDB?.moveChildListNode(draggedNode! as StatementNode, droppedOnNode! as StatementNode)
     }
 

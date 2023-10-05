@@ -176,7 +176,6 @@ export class CodeDB {
       nodeParentList.push(emptyStatement)
       emptyStatement.meta!.parentId = nodeParent.id
       emptyStatement.meta!.parentProperty = nodeParentProperty
-      this.notifyNodeChange(emptyStatement.id)
     }
 
     // update parent
@@ -414,6 +413,8 @@ export class CodeDB {
     } as EmptyNode
 
     this.nodeMap.set(newNode.id, newNode)
+
+    this.notifyNodeChange(newNode.id)
 
     return newNode
   }
