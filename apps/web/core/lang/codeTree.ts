@@ -419,3 +419,48 @@ export type StateChangeNode = {
   body: StatementNode[]
   meta?: CodeMeta
 }
+
+export type NormalizedNode = {
+  id: string
+  type: CodeNode["type"]
+  [key: string]: any
+}
+
+export const nodeTypeMeta: Record<
+  CodeNode["type"],
+  { childLists: string[]; expressions: string[] }
+> = {
+  program: { childLists: ["body"], expressions: [] },
+  component: { childLists: ["body", "props"], expressions: [] },
+  "component call": { childLists: ["children", "props"], expressions: [] },
+  "ui element": { childLists: ["children", "props"], expressions: ["style"] },
+  "ui fragment": { childLists: ["children"], expressions: [] },
+  "ui expression": { childLists: [], expressions: ["expression"] },
+  "ui prop declaration": { childLists: [], expressions: ["value"] },
+  "ui prop": { childLists: [], expressions: ["value"] },
+  "ui spread prop": { childLists: [], expressions: ["arg"] },
+  "ui style": { childLists: [], expressions: ["value"] },
+  return: { childLists: [], expressions: ["arg"] },
+  assignment: { childLists: [], expressions: ["left", "right"] },
+  state: { childLists: [], expressions: ["value"] },
+  print: { childLists: [], expressions: ["arg"] },
+  unary: { childLists: [], expressions: ["arg"] },
+  nary: { childLists: ["args"], expressions: [] },
+  function: { childLists: ["params", "body"], expressions: [] },
+  "function call": { childLists: ["args"], expressions: [] },
+  object: { childLists: ["props"], expressions: [] },
+  "state change": { childLists: ["body"], expressions: [] },
+  if: { childLists: ["then", "elseIf", "else"], expressions: [] },
+  "else if": { childLists: ["then"], expressions: [] },
+  try: { childLists: ["body", "catch", "finally"], expressions: [] },
+  "path access": { childLists: ["path"], expressions: [] },
+  var: { childLists: [], expressions: ["value"] },
+  property: { childLists: [], expressions: ["name", "value"] },
+  "ui text": { childLists: [], expressions: [] },
+  empty: { childLists: [], expressions: [] },
+  param: { childLists: [], expressions: [] },
+  ref: { childLists: [], expressions: [] },
+  string: { childLists: [], expressions: [] },
+  number: { childLists: [], expressions: [] },
+  boolean: { childLists: [], expressions: [] },
+}

@@ -4,11 +4,13 @@ import {
   CodeNode,
   EmptyNode,
   FunctionNode,
+  NormalizedNode,
   ProgramNode,
   StatementNode,
   UIElementNode,
   UINode,
   VarStatement,
+  nodeTypeMeta,
   statementTypes,
   uiNodeTypes,
 } from "./codeTree"
@@ -312,15 +314,45 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
-  updateNode(nodeId: string, newNode: CodeNode) {
+  /**
+   * Syncs the node state and CodeDB's state.
+   */
+  updateNode(nodeId: string, newNode: NormalizedNode) {
     const node = this.getNodeByID(nodeId)
     if (!node) {
       return
     }
 
-    Object.assign(node, newNode)
+    const properties = Object.keys(newNode)
+
+    // This is necessary because CodeDB instances rely on object references
+    for (const property of properties) {
+      if (nodeTypeMeta[node.type].childLists.includes(property)) {
+        // get current CodeDB node's children, in case the node was serialized like in the dev sites case
+        ;((node as any)[property] as CodeNode[]) = (newNode[property] as CodeNode[]).map((child) =>
+          this.getNodeByID(child.id),
+        )
+      } else if (nodeTypeMeta[node.type].expressions.includes(property)) {
+        // get current CodeDB node's children, in case the node was serialized like in the dev sites case
+        ;(node as any)[property] = this.getNodeByID(newNode[property].id)
+      } else {
+        ;(node as any)[property] = newNode[property]
+      }
+    }
 
     this.notifyNodeChange(nodeId)
+
+    // sync CodeDB's state
+    if (node.meta?.ui?.isSelected) {
+      this.selectNode(nodeId)
+    } else if (this.selectedNodeIds.includes(nodeId)) {
+      this.selectNodeOff(nodeId)
+    }
+    if (node.meta?.ui?.isHovered) {
+      this.hoverNode(nodeId)
+    } else if (this.hoveredNodeId === nodeId) {
+      this.hoverNodeOff(nodeId)
+    }
   }
 
   updateNodeName(nodeId: string, name: string) {
