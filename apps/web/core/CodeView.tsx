@@ -91,15 +91,6 @@ const CodeContainer = React.forwardRef<
     codeDB?.reset()
     codeDB?.load(testCodeTree)
 
-    console.log("-----  loaded", codeDB?.codeTree)
-
-    codeDB?.onNodeChange(({ nodeId }) => {
-      if (nodeId === "29") {
-        const node: UITextNode = codeDB.getNodeByID("29")
-        console.log("-----  node change!!!!!!!", node.text)
-      }
-    })
-
     codeDB?.onNodeChange(({ nodeId }) => {
       const node = codeDB.getNodeByID(nodeId)
 
