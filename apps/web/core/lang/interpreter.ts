@@ -79,6 +79,8 @@ export class Interpreter {
       values: new Map(),
       parent: parent,
     }
+
+    return this.currentScope
   }
 
   private getScopeValues(): Map<string, any> {
@@ -86,6 +88,8 @@ export class Interpreter {
   }
 
   private interpretComponent(node: ComponentNode): React.FC {
+    this.currentScope = this.globalScope
+
     const scope = this.getScopeValues()
     const component = (props: any) => {
       console.log("calling component", node.id)
@@ -97,15 +101,7 @@ export class Interpreter {
         }
       }
 
-      try {
-        this.interpretStatementList(node.body)
-      } catch (error) {
-        if (error instanceof ReturnValue) {
-          return error.value
-        } else {
-          throw error
-        }
-      }
+      return this.interpretStatementList(node.body)
     }
     if (node.name) {
       component.displayName = node.name
@@ -115,10 +111,21 @@ export class Interpreter {
     return component
   }
 
-  private interpretStatementList(code: StatementNode[]) {
-    this.newScope()
-    for (const statement of code) {
-      this.interpretStatement(statement)
+  private interpretStatementList(statements: StatementNode[]) {
+    const prevScope = this.newScope()
+
+    try {
+      for (const statement of statements) {
+        this.interpretStatement(statement)
+      }
+    } catch (error) {
+      if (error instanceof ReturnValue) {
+        return error.value
+      } else {
+        throw error
+      }
+    } finally {
+      this.currentScope = prevScope
     }
   }
 
@@ -165,15 +172,8 @@ export class Interpreter {
 
     const stateWrapper = this.resolveValueById(node.state.refId) as StateWrapper
 
-    try {
-      this.interpretStatementList(node.body)
-    } catch (error) {
-      if (error instanceof ReturnValue) {
-        stateWrapper.stateArray[1](error.value)
-      } else {
-        throw error
-      }
-    }
+    const result = this.interpretStatementList(node.body)
+    stateWrapper.stateArray[1](result)
   }
 
   interpretUINode(node: UINode): React.ReactNode {
@@ -204,7 +204,14 @@ export class Interpreter {
     if (node.type === "ui element") {
       const TagName = node.name
 
-      const props: Record<string, any> = { key: node.id, style: node.style }
+      const props: Record<string, any> = {
+        key: node.id,
+        style: node.style,
+      }
+
+      if (this.isDevSite) {
+        props["data-codeportal-node-id"] = node.id
+      }
 
       if (node.props) {
         for (const prop of node.props) {
@@ -299,15 +306,8 @@ export class Interpreter {
           this.getScopeValues().set(param.id, args[i])
         }
       }
-      try {
-        this.interpretStatementList(node.body)
-      } catch (error) {
-        if (error instanceof ReturnValue) {
-          return error.value
-        } else {
-          throw error
-        }
-      }
+
+      return this.interpretStatementList(node.body)
     }
     if (node.name) {
       Object.defineProperty(func, "name", { value: node.name })
