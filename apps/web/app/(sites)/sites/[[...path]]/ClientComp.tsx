@@ -6,7 +6,7 @@ import React from "react"
 import { ASTtoCTTransformer } from "@/core/lang/astTransformer"
 import { CodeDB } from "@/core/lang/codeDB"
 import { CodeProcessor } from "@/core/lang/codeProcessor"
-import { CodeNode, ComponentCallNode } from "@/core/lang/codeTree"
+import { CodeNode, ComponentCallNode, UINode } from "@/core/lang/codeTree"
 import { Interpreter } from "@/core/lang/interpreter"
 import { MainModule, ThemeConfig } from "@/db/schema"
 
@@ -54,6 +54,8 @@ export function ClientComp({
       _codeDB.codeTree = testCodeTree
     }
 
+    // interpret the initial code
+    interpreter.interpret(_codeDB.codeTree!)
     return _codeDB
   })
 
@@ -82,12 +84,13 @@ export function ClientComp({
       return
     }
 
-    console.log("--- handleCodeChange", node)
     codeDB.updateNode(node.id, node)
+    ;(window as any).codeDB = codeDB
+
     forceUpdate()
   }
 
-  interpreter.interpret(codeDB?.codeTree!)
+  ;(window as any).handleCodeChange = handleCodeChange
 
   const componentCallNode = {
     id: "test",
@@ -99,7 +102,12 @@ export function ClientComp({
     },
   } satisfies ComponentCallNode
 
-  return <>{interpreter.interpretComponentCall(componentCallNode)}</>
+  return (
+    <>
+      {interpreter.interpretComponentCall(componentCallNode)}
+      <AugmentedEditorUI codeDB={codeDB} />
+    </>
+  )
 
   // return (
   //   <>
@@ -111,4 +119,85 @@ export function ClientComp({
   //     `}</style>
   //   </>
   // )
+}
+
+function AugmentedEditorUI({ codeDB }: { codeDB: CodeDB }) {
+  const [hoveredNode, setHoveredNode] = React.useState<UINode | null>(null)
+  const [hoveredRect, setHoveredRect] = React.useState<{
+    x: number
+    y: Number
+    width: number
+    height: number
+  } | null>(null)
+
+  React.useEffect(() => {
+    const unsubscribeNodeChangeHandler = codeDB.onNodeChange(({ nodeId }) => {
+      if (codeDB.hoveredNodeId) {
+        setHoveredNode(codeDB.getNodeByID<UINode>(codeDB.hoveredNodeId))
+        const element = document.querySelector(
+          `[data-codeportal-node-id="${codeDB.hoveredNodeId}"]`,
+        )
+        if (element) {
+          setHoveredRect({
+            x: element.getBoundingClientRect().x,
+            y: element.getBoundingClientRect().y,
+            width: element.getBoundingClientRect().width,
+            height: element.getBoundingClientRect().height,
+          })
+        } else {
+          setHoveredRect(null)
+        }
+      } else {
+        setHoveredRect(null)
+      }
+    })
+
+    return () => {
+      unsubscribeNodeChangeHandler()
+    }
+  }, [])
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        display: "none",
+        left: 0,
+        top: 0,
+        zIndex: 9999,
+        pointerEvents: "none",
+        border: "2px dashed rgb(60, 135, 256)",
+        backgroundColor: "rgb(90, 160, 240, 0.4)",
+        borderRadius: 6,
+        ...(hoveredRect
+          ? {
+              display: "block",
+              transform: `translate(${hoveredRect.x}px, ${hoveredRect.y}px)`,
+              width: hoveredRect.width,
+              height: hoveredRect.height,
+            }
+          : {}),
+      }}
+    >
+      {hoveredNode?.type === "ui element" && (
+        <div
+          style={{
+            position: "absolute",
+            top: -20,
+            left: 6,
+            height: 20,
+            backgroundColor: "rgb(60, 135, 256)",
+            color: "white",
+            borderRadius: 4,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 4px",
+          }}
+        >
+          {hoveredNode.name}
+        </div>
+      )}
+    </div>
+  )
 }
