@@ -420,12 +420,6 @@ export type StateChangeNode = {
   meta?: CodeMeta
 }
 
-export type NormalizedNode = {
-  id: string
-  type: CodeNode["type"]
-  [key: string]: any
-}
-
 export const nodeTypeMeta: Record<
   CodeNode["type"],
   { childLists: string[]; expressions: string[] }
@@ -433,7 +427,7 @@ export const nodeTypeMeta: Record<
   program: { childLists: ["body"], expressions: [] },
   component: { childLists: ["body", "props"], expressions: [] },
   "component call": { childLists: ["children", "props"], expressions: [] },
-  "ui element": { childLists: ["children", "props"], expressions: ["style"] },
+  "ui element": { childLists: ["children", "props", "style"], expressions: [] },
   "ui fragment": { childLists: ["children"], expressions: [] },
   "ui expression": { childLists: [], expressions: ["expression"] },
   "ui prop declaration": { childLists: [], expressions: ["value"] },

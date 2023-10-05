@@ -4,7 +4,6 @@ import {
   CodeNode,
   EmptyNode,
   FunctionNode,
-  NormalizedNode,
   ProgramNode,
   StatementNode,
   UIElementNode,
@@ -131,15 +130,17 @@ export class CodeDB {
    * @param node Node to be moved.
    * @param target Node to be moved to, the node will be moved before this node.
    */
-  moveStatementNode(node: StatementNode, target: StatementNode) {
+  moveChildListNode(node: StatementNode, target: StatementNode) {
     if (
-      !statementTypes.includes(node.type as any) ||
-      !statementTypes.includes(target.type as any)
+      !(statementTypes.includes(node.type as any) || uiNodeTypes.includes(node.type as any)) ||
+      !(statementTypes.includes(target.type as any) || uiNodeTypes.includes(target.type as any))
     ) {
       throw new Error(
-        `This method can only move statement nodes, attempted to move ${node.type} to ${target.type}`,
+        `This method can only move statement or UI nodes, attempted to move ${node.type} to ${target.type}`,
       )
     }
+
+    const kind = statementTypes.includes(node.type as any) ? "statement" : "ui"
 
     if (!target.meta?.parentId) {
       throw new Error("Target node must have a parent")
@@ -171,10 +172,11 @@ export class CodeDB {
 
     // Always leave an empty statement for UX reasons
     if (nodeParentList.length === 0) {
-      const emptyStatement = this.newEmptyNode("statement")
+      const emptyStatement = this.newEmptyNode(kind)
       nodeParentList.push(emptyStatement)
       emptyStatement.meta!.parentId = nodeParent.id
       emptyStatement.meta!.parentProperty = nodeParentProperty
+      this.notifyNodeChange(emptyStatement.id)
     }
 
     // update parent
@@ -182,52 +184,9 @@ export class CodeDB {
     node.meta!.parentProperty = targetParentProperty
 
     // notify changes
+    this.notifyNodeChange(node.id)
     this.notifyNodeChange(nodeParent.id)
     this.notifyNodeChange(targetParent.id)
-    this.notifyNodeChange(node.id)
-  }
-
-  /**
-   * Moves a UI node before a target statement node in the code tree.
-   * @param node Node to be moved.
-   * @param target Node to be moved to, the node will be moved before this node.
-   */
-  moveUINode(node: UINode, target: UINode) {
-    if (!node.meta?.parentId || !target.meta?.parentId) {
-      throw new Error("Node and target must have parents")
-    }
-
-    const nodeParent = this.getNodeByID(node.meta?.parentId!) as UIElementNode
-    const targetParent = this.getNodeByID(target.meta?.parentId!) as UIElementNode
-
-    if (!nodeParent || !targetParent) {
-      throw new Error("Node and target must have parents")
-    }
-
-    if (!nodeParent.children || !targetParent.children) {
-      throw new Error("Node and target must have children")
-    }
-
-    const nodeIndex = nodeParent.children.indexOf(node)
-    const targetIndex = targetParent.children.indexOf(target)
-
-    if (nodeIndex === -1 || targetIndex === -1) {
-      throw new Error("Node and target must be in their parents")
-    }
-
-    // remove node from parent
-    nodeParent.children.splice(nodeIndex, 1)
-
-    // add node to parent at target index
-    targetParent.children.splice(targetIndex, 0, node)
-
-    // update parent
-    node.meta!.parentId = targetParent.id
-
-    // notify changes
-    this.notifyNodeChange(nodeParent.id)
-    this.notifyNodeChange(targetParent.id)
-    this.notifyNodeChange(node.id)
   }
 
   hoverNode(nodeId: string) {
@@ -317,9 +276,17 @@ export class CodeDB {
   /**
    * Syncs the node state and CodeDB's state.
    */
-  updateNode(nodeId: string, newNode: NormalizedNode) {
+  updateNode(nodeId: string, newNode: CodeNode | null) {
     const node = this.getNodeByID(nodeId)
+
+    if (!newNode) {
+      // remove node
+      this.removeNode(nodeId)
+      return
+    }
+
     if (!node) {
+      this.nodeMap.set(nodeId, newNode)
       return
     }
 
@@ -329,14 +296,14 @@ export class CodeDB {
     for (const property of properties) {
       if (nodeTypeMeta[node.type].childLists.includes(property)) {
         // get current CodeDB node's children, in case the node was serialized like in the dev sites case
-        ;((node as any)[property] as CodeNode[]) = (newNode[property] as CodeNode[]).map((child) =>
-          this.getNodeByID(child.id),
+        ;((node as any)[property] as CodeNode[]) = ((newNode as any)[property] as CodeNode[]).map(
+          (child) => this.getNodeByID(child.id),
         )
       } else if (nodeTypeMeta[node.type].expressions.includes(property)) {
         // get current CodeDB node's children, in case the node was serialized like in the dev sites case
-        ;(node as any)[property] = this.getNodeByID(newNode[property].id)
+        ;(node as any)[property] = this.getNodeByID((newNode as any)[property].id)
       } else {
-        ;(node as any)[property] = newNode[property]
+        ;(node as any)[property] = (newNode as any)[property]
       }
     }
 
@@ -364,6 +331,45 @@ export class CodeDB {
     node.name = name
 
     this.notifyNodeChange(nodeId)
+  }
+
+  removeNode(nodeId: string) {
+    const node = this.getNodeByID(nodeId)
+    if (!node) {
+      return
+    }
+
+    if (node.meta?.parentId) {
+      const parent = this.getNodeByID(node.meta.parentId)
+
+      if (!parent) {
+        throw new Error("Node must have a parent")
+      }
+
+      const parentProperty = node.meta.parentProperty
+
+      if (!parentProperty) {
+        throw new Error("Node must have a parent property")
+      }
+
+      if (nodeTypeMeta[parent.type].childLists.includes(parentProperty)) {
+        const nodeList = (parent as any)[parentProperty] as any[]
+
+        const index = nodeList.indexOf(node)
+
+        if (index === -1) {
+          throw new Error("Node must be in its parent")
+        }
+
+        nodeList.splice(index, 1)
+      } else if (nodeTypeMeta[parent.type].expressions.includes(parentProperty)) {
+        ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
+      }
+
+      this.notifyNodeChange(parent.id)
+    }
+
+    this.nodeMap.delete(nodeId)
   }
 
   updateUIText(nodeId: string, text: string) {
