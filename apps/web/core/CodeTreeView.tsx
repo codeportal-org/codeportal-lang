@@ -610,11 +610,12 @@ const DraggableNodeContainer = ({
         codeDB?.selectNodeOff(nodeId)
       }}
     >
-      {(isDroppedOnNode || isSelected || isHovered) && (
+      {(isDroppedOnNode || isSelected || isHovered) && !isOverlay && (
         <div
-          className={cn("absolute left-[-5px] top-0 h-full w-1 opacity-50", {
-            "bg-lime-600": !isDraggedNode,
-            "bg-gray-300": isDraggedNode || isSelected || isHovered,
+          className={cn("absolute left-[-5px] top-0 h-full w-1 rounded opacity-50", {
+            "bg-lime-600": !isDraggedNode && isDroppedOnNode,
+            "bg-gray-300": isDraggedNode || isHovered,
+            "bg-blue-500": isSelected,
           })}
         />
       )}
