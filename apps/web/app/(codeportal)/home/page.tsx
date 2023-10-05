@@ -26,10 +26,10 @@ export default function Home() {
           </h1>
 
           <p className="mx-2 mb-8 max-w-3xl text-center text-lg sm:text-xl">
-            CodePortal is designed for product teams and makers who are frustrated with the
-            limitations of traditional programming and tooling. It is a full-stack AI-first platform
-            that makes it easier for all team members to make changes to your products, eliminating
-            handoffs and increasing velocity.
+            CodePortal is a full-stack AI-first programming platform for makers and product teams
+            who are frustrated with the limitations of traditional programming and tooling. It makes
+            it easier for all team members to make changes to their products, reducing friction,
+            eliminating handoffs and increasing velocity.
           </p>
           <div className="mb-16 flex justify-center">
             <EarlyAccessButton>Join our closed alpha!</EarlyAccessButton>
