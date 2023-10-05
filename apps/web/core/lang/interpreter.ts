@@ -43,6 +43,8 @@ export class Interpreter {
   private currentScope: Scope = this.globalScope
 
   interpret(node: ProgramNode) {
+    this.currentScope = this.globalScope
+
     for (const statement of node.body) {
       this.interpretStatement(statement)
     }
