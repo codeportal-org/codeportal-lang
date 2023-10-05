@@ -22,10 +22,10 @@ type StateWrapper = {
 }
 
 export class Interpreter {
-  isDev: boolean = false
+  isDevSite: boolean = false
 
-  constructor(isDev?: boolean) {
-    this.isDev = isDev ?? false
+  constructor(isDevSite?: boolean) {
+    this.isDevSite = isDevSite ?? false
   }
 
   reactMode: "client" | "server" = "client"

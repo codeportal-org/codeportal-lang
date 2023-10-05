@@ -9,7 +9,7 @@ import React from "react"
 
 import { DevClientComp } from "./DevClientComp"
 
-export type DevSitePageProps = Omit<SitePageProps, "isDev">
+export type DevSitePageProps = Omit<SitePageProps, "isDevSite">
 
 export async function generateMetadata(
   { params, searchParams }: DevSitePageProps,
@@ -40,7 +40,7 @@ export default async function DevSitePage({ params, searchParams }: DevSitePageP
   const SitePageComp = await SitePage({
     params: { ...params, path: newPath },
     searchParams,
-    isDev: true,
+    isDevSite: true,
   })
 
   return (

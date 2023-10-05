@@ -36,49 +36,49 @@ const codeChangesChannel = new BroadcastChannel("code-changes")
 export function ClientComp({
   mainModule,
   theme,
-  isDev,
+  isDevSite,
 }: {
   mainModule: MainModule | null
   theme: ThemeConfig | null
-  isDev: boolean
+  isDevSite: boolean
 }) {
   const [, forceUpdate] = React.useReducer((x) => x + 1, 0)
-  const [interpreter] = React.useState(() => new Interpreter(isDev))
+  const [interpreter] = React.useState(() => new Interpreter(isDevSite))
 
   const [codeDB] = React.useState<CodeDB>(() => {
     const _codeDB = new CodeDB()
-    if (isDev) {
-      _codeDB.load(mainModule?.code)
+    if (isDevSite) {
+      _codeDB.load(testCodeTree)
     } else {
       // set it directly to avoid loading
-      _codeDB.codeTree = mainModule?.code
+      _codeDB.codeTree = testCodeTree
     }
 
     return _codeDB
   })
 
   React.useEffect(() => {
-    // const messageListener = (event: MessageEvent) => {
-    //   if (event.data.type === "codeChange") {
-    //     codeChangesChannel.postMessage(event.data)
-    //     handleCodeChange(event.data.node)
-    //   }
-    // }
-    // window.addEventListener("message", messageListener)
-    // const codeChangeListener = (event: MessageEvent) => {
-    //   if (event.data.type === "codeChange") {
-    //     handleCodeChange(event.data.node)
-    //   }
-    // }
-    // codeChangesChannel.addEventListener("message", codeChangeListener)
-    // return () => {
-    //   window.removeEventListener("message", messageListener)
-    //   codeChangesChannel.removeEventListener("message", codeChangeListener)
-    // }
+    const messageListener = (event: MessageEvent) => {
+      if (event.data.type === "codeChange") {
+        codeChangesChannel.postMessage(event.data)
+        handleCodeChange(event.data.node)
+      }
+    }
+    window.addEventListener("message", messageListener)
+    const codeChangeListener = (event: MessageEvent) => {
+      if (event.data.type === "codeChange") {
+        handleCodeChange(event.data.node)
+      }
+    }
+    codeChangesChannel.addEventListener("message", codeChangeListener)
+    return () => {
+      window.removeEventListener("message", messageListener)
+      codeChangesChannel.removeEventListener("message", codeChangeListener)
+    }
   }, [])
 
   const handleCodeChange = (node: CodeNode) => {
-    if (!isDev) {
+    if (!isDevSite) {
       return
     }
 
@@ -87,9 +87,7 @@ export function ClientComp({
     forceUpdate()
   }
 
-  interpreter.interpret(testCodeTree)
-
-  console.log("-----  loaded", testCodeTree)
+  interpreter.interpret(codeDB?.codeTree!)
 
   const componentCallNode = {
     id: "test",

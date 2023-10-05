@@ -13,7 +13,7 @@ import { ClientComp } from "./ClientComp"
 export type SitePageProps = {
   params: { path: string[] }
   searchParams: { [key: string]: string | string[] | undefined }
-  isDev?: boolean
+  isDevSite?: boolean
 }
 
 export async function generateMetadata(
@@ -40,7 +40,7 @@ export async function generateMetadata(
   }
 }
 
-export async function SitePage({ params, searchParams, isDev }: SitePageProps) {
+export async function SitePage({ params, searchParams, isDevSite }: SitePageProps) {
   console.log("SitePage", params, searchParams)
 
   const path = params.path
@@ -55,7 +55,7 @@ export async function SitePage({ params, searchParams, isDev }: SitePageProps) {
     return notFound()
   }
 
-  return <ClientComp mainModule={app.mainModule} theme={app.theme} isDev={isDev ?? false} />
+  return <ClientComp mainModule={app.mainModule} theme={app.theme} isDevSite={isDevSite ?? false} />
 }
 
 export default SitePage
