@@ -262,6 +262,23 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
+  removeHover() {
+    if (this.hoveredNodeId === undefined) {
+      return
+    }
+
+    const nodeId = this.hoveredNodeId
+
+    const node = this.getNodeByID(nodeId)
+    if (!node || !node.meta?.ui) {
+      throw new Error("Node not found")
+    }
+
+    node.meta.ui.isHovered = false
+    this.hoveredNodeId = undefined
+    this.notifyNodeChange(nodeId)
+  }
+
   selectNode(nodeId: string) {
     const node = this.getNodeByID(nodeId)
     if (!node || !node.meta?.ui) {

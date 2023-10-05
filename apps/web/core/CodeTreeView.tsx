@@ -530,10 +530,18 @@ const NodeListSpacer = ({
   nodeId: string
   onClick: (nodeId: string) => void
 }) => {
+  const codeDB = useCodeDB()
+
   return (
     <button
       className="w-full pb-1 transition-colors hover:bg-gray-100"
-      onClick={() => onClick(nodeId)}
+      onClick={() => {
+        onClick(nodeId)
+      }}
+      onMouseOver={(event) => {
+        event.preventDefault()
+        codeDB?.removeHover()
+      }}
     />
   )
 }
