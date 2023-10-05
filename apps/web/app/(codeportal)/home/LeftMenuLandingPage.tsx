@@ -37,7 +37,7 @@ export const LeftMenuLandingPage = () => {
                 href="https://github.com/codeportal-org/codeportal"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2 px-2 py-1 text-gray-800 hover:bg-gray-200"
+                className="flex items-center justify-center gap-2 px-2 py-1 text-gray-800 transition-colors hover:bg-gray-200"
               >
                 <GitHubLogoIcon width={24} height={24} />
                 Star us!
@@ -58,7 +58,7 @@ export const LeftMenuLandingPage = () => {
               href="https://github.com/codeportal-org/codeportal"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center gap-2 rounded-md bg-gray-100 px-2 py-1 text-gray-800 hover:bg-gray-200"
+              className="flex items-center justify-center gap-2 rounded-md bg-gray-100 px-2 py-1 text-gray-800 transition-colors hover:bg-gray-200"
             >
               <GitHubLogoIcon width={24} height={24} />
               Star us!
