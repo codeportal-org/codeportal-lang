@@ -342,6 +342,16 @@ export class CodeDB {
       return
     }
 
+    this.nodeMap.delete(nodeId)
+    if (this.selectedNodeIds.includes(nodeId)) {
+      this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
+    }
+    if (this.hoveredNodeId === nodeId) {
+      this.hoveredNodeId = undefined
+    }
+
+    this.notifyNodeChange(nodeId)
+
     if (node.meta?.parentId) {
       const parent = this.getNodeByID(node.meta.parentId)
 
@@ -378,14 +388,6 @@ export class CodeDB {
       }
 
       this.notifyNodeChange(parent.id)
-    }
-
-    this.nodeMap.delete(nodeId)
-    if (this.selectedNodeIds.includes(nodeId)) {
-      this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
-    }
-    if (this.hoveredNodeId === nodeId) {
-      this.hoveredNodeId = undefined
     }
   }
 
