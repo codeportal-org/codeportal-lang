@@ -279,8 +279,7 @@ export class CodeDB {
     const node = this.getNodeByID(nodeId)
 
     if (!newNode) {
-      // remove node
-      this.removeNode(nodeId)
+      this.deleteNode(nodeId)
       return
     }
 
@@ -332,7 +331,12 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
-  removeNode(nodeId: string) {
+  deleteNode(nodeId: string) {
+    // temporal limit
+    if (nodeId === "0" || nodeId === "1") {
+      return
+    }
+
     const node = this.getNodeByID(nodeId)
     if (!node) {
       return
@@ -361,6 +365,14 @@ export class CodeDB {
         }
 
         nodeList.splice(index, 1)
+
+        // Always leave an empty statement for UX reasons
+        if (nodeList.length === 0) {
+          const emptyStatement = this.newEmptyNode("statement")
+          nodeList.push(emptyStatement)
+          emptyStatement.meta!.parentId = parent.id
+          emptyStatement.meta!.parentProperty = parentProperty
+        }
       } else if (nodeTypeMeta[parent.type].expressions.includes(parentProperty)) {
         ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
       }
@@ -369,6 +381,12 @@ export class CodeDB {
     }
 
     this.nodeMap.delete(nodeId)
+    if (this.selectedNodeIds.includes(nodeId)) {
+      this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
+    }
+    if (this.hoveredNodeId === nodeId) {
+      this.hoveredNodeId = undefined
+    }
   }
 
   updateUIText(nodeId: string, text: string) {

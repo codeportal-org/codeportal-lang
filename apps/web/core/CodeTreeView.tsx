@@ -537,7 +537,8 @@ const NodeListSpacer = ({
   return (
     <button
       className="w-full pb-1 transition-colors hover:bg-gray-100"
-      onClick={() => {
+      onClick={(event) => {
+        event.preventDefault()
         onClick(nodeId)
       }}
       onMouseOver={(event) => {
@@ -609,7 +610,7 @@ const DraggableNodeContainer = ({
       onMouseLeave={() => {
         codeDB?.hoverNodeOff(nodeId)
       }}
-      onFocus={(event) => {
+      onClick={(event) => {
         if (event.defaultPrevented) {
           return
         }
@@ -618,6 +619,15 @@ const DraggableNodeContainer = ({
       }}
       onBlur={() => {
         codeDB?.selectNodeOff(nodeId)
+      }}
+      onKeyDown={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+        if (event.key === "Backspace") {
+          codeDB?.deleteNode(nodeId)
+        }
       }}
     >
       {(isDroppedOnNode || isSelected || isHovered) && !isOverlay && (
