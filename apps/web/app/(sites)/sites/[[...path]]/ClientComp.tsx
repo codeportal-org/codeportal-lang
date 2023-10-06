@@ -137,11 +137,11 @@ function AugmentedEditorUI({ codeDB }: { codeDB: CodeDB }) {
   React.useEffect(() => {
     const unsubscribeNodeChangeHandler = codeDB.onNodeChange(({ nodeId }) => {
       if (codeDB.hoveredNodeId) {
-        setHoveredNode(codeDB.getNodeByID<UINode>(codeDB.hoveredNodeId))
         const element = document.querySelector(
           `[data-codeportal-node-id="${codeDB.hoveredNodeId}"]`,
         )
         if (element) {
+          setHoveredNode(codeDB.getNodeByID<UINode>(codeDB.hoveredNodeId))
           setHoveredRect({
             x: element.getBoundingClientRect().x,
             y: element.getBoundingClientRect().y,
@@ -149,9 +149,11 @@ function AugmentedEditorUI({ codeDB }: { codeDB: CodeDB }) {
             height: element.getBoundingClientRect().height,
           })
         } else {
+          setHoveredNode(null)
           setHoveredRect(null)
         }
       } else {
+        setHoveredNode(null)
         setHoveredRect(null)
       }
     })

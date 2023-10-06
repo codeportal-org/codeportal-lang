@@ -344,40 +344,31 @@ export class CodeDB {
 
     if (node.meta?.parentId) {
       const parent = this.getNodeByID(node.meta.parentId)
-
-      if (!parent) {
-        return
-      }
-
       const parentProperty = node.meta.parentProperty
 
-      if (!parentProperty) {
-        return
-      }
+      if (parent && parentProperty) {
+        if (nodeTypeMeta[parent.type].childLists.includes(parentProperty)) {
+          const nodeList = (parent as any)[parentProperty] as any[]
 
-      if (nodeTypeMeta[parent.type].childLists.includes(parentProperty)) {
-        const nodeList = (parent as any)[parentProperty] as any[]
+          const index = nodeList.indexOf(node)
 
-        const index = nodeList.indexOf(node)
+          if (index !== -1) {
+            nodeList.splice(index, 1)
 
-        if (index === -1) {
-          return
+            // Always leave an empty statement for UX reasons
+            if (nodeList.length === 0) {
+              const emptyStatement = this.newEmptyNode("statement")
+              nodeList.push(emptyStatement)
+              emptyStatement.meta!.parentId = parent.id
+              emptyStatement.meta!.parentProperty = parentProperty
+            }
+          }
+        } else if (nodeTypeMeta[parent.type].expressions.includes(parentProperty)) {
+          ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
         }
 
-        nodeList.splice(index, 1)
-
-        // Always leave an empty statement for UX reasons
-        if (nodeList.length === 0) {
-          const emptyStatement = this.newEmptyNode("statement")
-          nodeList.push(emptyStatement)
-          emptyStatement.meta!.parentId = parent.id
-          emptyStatement.meta!.parentProperty = parentProperty
-        }
-      } else if (nodeTypeMeta[parent.type].expressions.includes(parentProperty)) {
-        ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
+        this.notifyNodeChange(parent.id)
       }
-
-      this.notifyNodeChange(parent.id)
     }
 
     this.nodeMap.delete(nodeId)
