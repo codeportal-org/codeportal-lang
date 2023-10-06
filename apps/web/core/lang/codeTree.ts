@@ -420,41 +420,68 @@ export type StateChangeNode = {
   meta?: CodeMeta
 }
 
+export type NodeKind = "statement" | "expression" | "special"
+
 export const nodeTypeMeta: Record<
   CodeNode["type"],
-  { childLists: string[]; expressions: string[] }
+  {
+    childLists: string[]
+    expressions: string[]
+    kinds: NodeKind[]
+  }
 > = {
-  program: { childLists: ["body"], expressions: [] },
-  component: { childLists: ["body", "props"], expressions: [] },
-  "component call": { childLists: ["children", "props"], expressions: [] },
-  "ui element": { childLists: ["children", "props", "style"], expressions: [] },
-  "ui fragment": { childLists: ["children"], expressions: [] },
-  "ui expression": { childLists: [], expressions: ["expression"] },
-  "ui prop declaration": { childLists: [], expressions: ["value"] },
-  "ui prop": { childLists: [], expressions: ["value"] },
-  "ui spread prop": { childLists: [], expressions: ["arg"] },
-  "ui style": { childLists: [], expressions: ["value"] },
-  return: { childLists: [], expressions: ["arg"] },
-  assignment: { childLists: [], expressions: ["left", "right"] },
-  state: { childLists: [], expressions: ["value"] },
-  print: { childLists: [], expressions: ["arg"] },
-  unary: { childLists: [], expressions: ["arg"] },
-  nary: { childLists: ["args"], expressions: [] },
-  function: { childLists: ["params", "body"], expressions: [] },
-  "function call": { childLists: ["args"], expressions: [] },
-  object: { childLists: ["props"], expressions: [] },
-  "state change": { childLists: ["body"], expressions: [] },
-  if: { childLists: ["then", "elseIf", "else"], expressions: [] },
-  "else if": { childLists: ["then"], expressions: [] },
-  try: { childLists: ["body", "catch", "finally"], expressions: [] },
-  "path access": { childLists: ["path"], expressions: [] },
-  var: { childLists: [], expressions: ["value"] },
-  property: { childLists: [], expressions: ["name", "value"] },
-  "ui text": { childLists: [], expressions: [] },
-  empty: { childLists: [], expressions: [] },
-  param: { childLists: [], expressions: [] },
-  ref: { childLists: [], expressions: [] },
-  string: { childLists: [], expressions: [] },
-  number: { childLists: [], expressions: [] },
-  boolean: { childLists: [], expressions: [] },
+  program: { kinds: ["special"], childLists: ["body"], expressions: [] },
+  component: { kinds: ["statement"], childLists: ["body", "props"], expressions: [] },
+  "component call": { kinds: ["expression"], childLists: ["children", "props"], expressions: [] },
+  "ui element": {
+    kinds: ["expression"],
+    childLists: ["children", "props", "style"],
+    expressions: [],
+  },
+  "ui fragment": { kinds: ["expression"], childLists: ["children"], expressions: [] },
+  "ui expression": { kinds: ["expression"], childLists: [], expressions: ["expression"] },
+  "ui prop declaration": { kinds: ["special"], childLists: [], expressions: ["value"] },
+  "ui prop": { kinds: ["special"], childLists: [], expressions: ["value"] },
+  "ui spread prop": { kinds: ["special"], childLists: [], expressions: ["arg"] },
+  "ui style": { kinds: ["special"], childLists: [], expressions: ["value"] },
+  return: { kinds: ["statement"], childLists: [], expressions: ["arg"] },
+  assignment: { kinds: ["statement"], childLists: [], expressions: ["left", "right"] },
+  state: { kinds: ["statement"], childLists: [], expressions: ["value"] },
+  print: { kinds: ["statement"], childLists: [], expressions: ["arg"] },
+  unary: { kinds: ["statement"], childLists: [], expressions: ["arg"] },
+  nary: { kinds: ["statement"], childLists: ["args"], expressions: [] },
+  function: { kinds: ["statement"], childLists: ["params", "body"], expressions: [] },
+  "function call": { kinds: ["statement", "expression"], childLists: ["args"], expressions: [] },
+  object: { kinds: ["statement"], childLists: ["props"], expressions: [] },
+  "state change": { kinds: ["statement"], childLists: ["body"], expressions: [] },
+  if: { kinds: ["statement"], childLists: ["then", "elseIf", "else"], expressions: [] },
+  "else if": { kinds: ["statement"], childLists: ["then"], expressions: [] },
+  try: { kinds: ["statement"], childLists: ["body", "catch", "finally"], expressions: [] },
+  "path access": { kinds: ["expression"], childLists: ["path"], expressions: [] },
+  var: { kinds: ["statement"], childLists: [], expressions: ["value"] },
+  property: { kinds: ["statement"], childLists: [], expressions: ["name", "value"] },
+  "ui text": { kinds: ["statement"], childLists: [], expressions: [] },
+  empty: { kinds: ["statement", "expression"], childLists: [], expressions: [] },
+  param: { kinds: ["statement"], childLists: [], expressions: [] },
+  ref: { kinds: ["statement"], childLists: [], expressions: [] },
+  string: { kinds: ["expression"], childLists: [], expressions: [] },
+  number: { kinds: ["expression"], childLists: [], expressions: [] },
+  boolean: { kinds: ["expression"], childLists: [], expressions: [] },
+}
+
+export const isNodeKind = (node: CodeNode, kind: NodeKind) => {
+  return nodeTypeMeta[node.type].kinds.includes(kind)
+}
+
+/**
+ * Returns true if the node types have common kinds.
+ */
+export const areNodeTypesCompatible = (
+  nodeType1: CodeNode["type"],
+  nodeType2: CodeNode["type"],
+) => {
+  const kinds1 = nodeTypeMeta[nodeType1].kinds
+  const kinds2 = nodeTypeMeta[nodeType2].kinds
+
+  return kinds1.some((kind) => kinds2.includes(kind))
 }

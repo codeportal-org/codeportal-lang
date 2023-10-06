@@ -17,7 +17,6 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import * as Popover from "@radix-ui/react-popover"
 import { Command } from "carloslfu-cmdk-internal"
 import { atom, useAtom } from "jotai"
 import { ChevronDown, ChevronRight, Square, Type } from "lucide-react"
@@ -47,20 +46,17 @@ import {
   UINode,
   UITextNode,
   VarStatement,
+  areNodeTypesCompatible,
+  isNodeKind,
   statementTypes,
   uiNodeTypes,
 } from "./lang/codeTree"
 
-type NodeKind = "statement" | "ui node"
-
-type DropData = { type: CodeNode["type"]; kind: NodeKind }
+type DropData = { type: CodeNode["type"] }
 
 const draggedNodeIdAtom = atom<string | null>(null)
-const draggedNodeKindAtom = atom<NodeKind | null>(null)
-const draggedNodeRectAtom = atom<ClientRect | null>(null)
 
 const droppedOnNodeIdAtom = atom<string | null>(null)
-const droppedOnNodeRectAtom = atom<ClientRect | null>(null)
 
 export const indentationClass = "pl-6"
 
@@ -85,7 +81,6 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   const [isCodeLoadedInDB, setIsCodeLoadedInDB] = React.useState(() => codeDB?.isCodeLoaded)
 
   const [draggedNodeId, setDraggedNodeId] = useAtom(draggedNodeIdAtom)
-  const [draggedNodeKind, setDraggedNodeKind] = useAtom(draggedNodeKindAtom)
 
   const [droppedOnNodeId, setDroppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
 
@@ -96,7 +91,6 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
     console.log("drag start")
 
     setDraggedNodeId(active.id as string)
-    setDraggedNodeKind((active.data.current as DropData).kind)
     setDroppedOnNodeId(null)
   }
 
@@ -106,17 +100,14 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   }
 
   const handleDragEnd = () => {
-    console.log("drag end", draggedNodeKind)
-    if (draggedNodeKind === "statement" || draggedNodeKind === "ui node") {
-      if (!droppedOnNode || !draggedNode) {
-        return
-      }
-
-      codeDB?.moveChildListNode(draggedNode! as StatementNode, droppedOnNode! as StatementNode)
+    console.log("drag end")
+    if (!droppedOnNode || !draggedNode) {
+      return
     }
 
+    codeDB?.moveChildListNode(draggedNode! as StatementNode, droppedOnNode! as StatementNode)
+
     setDraggedNodeId(null)
-    setDraggedNodeKind(null)
 
     setDroppedOnNodeId(null)
   }
@@ -124,7 +115,6 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   const handleDragCancel = () => {
     console.log("drag cancel")
     setDraggedNodeId(null)
-    setDraggedNodeKind(null)
 
     setDroppedOnNodeId(null)
   }
@@ -234,7 +224,7 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
   }
 
   return (
-    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay} kind="statement">
+    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
       {statementView}
       {/* {node.type === "expression" && <ExpressionView node={node.expression} />} */}
     </DraggableNodeContainer>
@@ -379,7 +369,7 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
   }
 
   return (
-    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay} kind="ui node">
+    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
       {uiNodeView}
     </DraggableNodeContainer>
   )
@@ -533,9 +523,16 @@ const NodeListSpacer = ({
   onClick: (nodeId: string) => void
 }) => {
   const codeDB = useCodeDB()
+  const node = useNode<CodeNode>(nodeId)
+
+  // const {setNodeRef} = useDroppable({
+  //   id: nodeId,
+  //   data: { type: node.type, kind } satisfies DropData,
+  // })
 
   return (
     <button
+      // ref={setNodeRef}
       className="w-full pb-1 transition-colors hover:bg-gray-100"
       onClick={(event) => {
         event.preventDefault()
@@ -553,9 +550,7 @@ const DraggableNodeContainer = ({
   nodeId,
   isOverlay,
   children,
-  kind,
 }: {
-  kind: "statement" | "ui node"
   nodeId: string
   isOverlay?: boolean
   children: React.ReactNode
@@ -574,12 +569,12 @@ const DraggableNodeContainer = ({
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
-    data: { type: node.type, kind } satisfies DropData,
+    data: { type: node.type } satisfies DropData,
   })
 
   const droppable = useDroppable({
     id: nodeId,
-    data: { type: node.type, kind } satisfies DropData,
+    data: { type: node.type } satisfies DropData,
   })
 
   if (!node) return null
@@ -590,7 +585,7 @@ const DraggableNodeContainer = ({
         "relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
         {
           "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
-          "w-full": !isOverlay && kind === "statement",
+          "w-full": !isOverlay && isNodeKind(node, "statement"),
         },
       )}
       ref={(ref) => {
@@ -824,7 +819,7 @@ const closestTopRightCorner =
         continue
       }
 
-      if (activeData.kind !== droppableContainerData.kind) {
+      if (!areNodeTypesCompatible(activeData.type, droppableContainerData.type)) {
         continue
       }
 
