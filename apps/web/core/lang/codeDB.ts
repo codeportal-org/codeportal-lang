@@ -357,7 +357,9 @@ export class CodeDB {
 
             // Always leave an empty statement for UX reasons
             if (nodeList.length === 0) {
-              const emptyStatement = this.newEmptyNode("statement")
+              const emptyStatement = this.newEmptyNode(
+                nodeTypeMeta[parent.type].kinds.includes("statement") ? "statement" : "ui",
+              )
               nodeList.push(emptyStatement)
               emptyStatement.meta!.parentId = parent.id
               emptyStatement.meta!.parentProperty = parentProperty
