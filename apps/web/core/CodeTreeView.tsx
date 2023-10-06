@@ -621,11 +621,7 @@ const DraggableNodeContainer = ({
         codeDB?.selectNodeOff(nodeId)
       }}
       onKeyDown={(event) => {
-        if (event.defaultPrevented) {
-          return
-        }
-        event.preventDefault()
-        if (event.key === "Backspace") {
+        if (event.key === "Backspace" && event.target === event.currentTarget) {
           codeDB?.deleteNode(nodeId)
         }
       }}
@@ -751,46 +747,28 @@ export const EmptyNode = ({ nodeId }: { nodeId: string }) => {
   const node = useNode(nodeId)
   const isSelected = node.meta?.ui?.isSelected
 
+  const [value, setValue] = React.useState("")
+
   return (
-    <Popover.Root>
-      <Popover.Trigger asChild>
-        <div className="w-full">
-          <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
+    <div className="w-full">
+      {/* <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
             <span className="text-code-name-light">...</span>
-          </button>
-        </div>
-      </Popover.Trigger>
-      <Popover.Anchor />
-      <Popover.Portal>
-        <Popover.Content>
-          <Popover.Close />
-          <Popover.Arrow />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
-    // <div className="w-full">
-    // <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
-    //     {isSelected ? (
-    //       <Command label="Command Menu">
-    //         <Command.Input />
-    //         <Command.List>
-    //           <Command.Empty>No results found.</Command.Empty>
+          </button> */}
+      <input type="text" className="border border-gray-300" />
+      {/* <Command loop={true}>
+        <Command.Input className="border-0 p-0" />
+        <input type="text" className="border border-gray-300" />
 
-    //           <Command.Group heading="Letters">
-    //             <Command.Item>a</Command.Item>
-    //             <Command.Item>b</Command.Item>
-    //             <Command.Separator />
-    //             <Command.Item>c</Command.Item>
-    //           </Command.Group>
-
-    //           <Command.Item>Apple</Command.Item>
-    //         </Command.List>
-    //       </Command>
-    //     ) : (
-    //       <span className="text-code-name-light">...</span>
-    //     )}
-    //   </button>
-    // </div>
+        <Command.List>
+          <Command.Empty>No results found.</Command.Empty>
+          <Command.Item>a</Command.Item>
+          <Command.Item>b</Command.Item>
+          <Command.Separator />
+          <Command.Item>c</Command.Item>
+          <Command.Item>Apple</Command.Item>
+        </Command.List>
+      </Command> */}
+    </div>
   )
 }
 
