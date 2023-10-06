@@ -200,7 +200,7 @@ export type ReturnStatementNode = {
 
 export type EmptyNode = {
   type: "empty"
-  kind: "statement" | "ui" | "expression"
+  kind: NodeKind
   id: string
   meta?: CodeMeta
 }
@@ -420,7 +420,7 @@ export type StateChangeNode = {
   meta?: CodeMeta
 }
 
-export type NodeKind = "statement" | "expression" | "special"
+export type NodeKind = "statement" | "expression" | "special" | "ui"
 
 export const nodeTypeMeta: Record<
   CodeNode["type"],
@@ -432,14 +432,18 @@ export const nodeTypeMeta: Record<
 > = {
   program: { kinds: ["special"], childLists: ["body"], expressions: [] },
   component: { kinds: ["statement"], childLists: ["body", "props"], expressions: [] },
-  "component call": { kinds: ["expression"], childLists: ["children", "props"], expressions: [] },
+  "component call": {
+    kinds: ["expression", "ui"],
+    childLists: ["children", "props"],
+    expressions: [],
+  },
   "ui element": {
-    kinds: ["expression"],
+    kinds: ["expression", "ui"],
     childLists: ["children", "props", "style"],
     expressions: [],
   },
-  "ui fragment": { kinds: ["expression"], childLists: ["children"], expressions: [] },
-  "ui expression": { kinds: ["expression"], childLists: [], expressions: ["expression"] },
+  "ui fragment": { kinds: ["expression", "ui"], childLists: ["children"], expressions: [] },
+  "ui expression": { kinds: ["expression", "ui"], childLists: [], expressions: ["expression"] },
   "ui prop declaration": { kinds: ["special"], childLists: [], expressions: ["value"] },
   "ui prop": { kinds: ["special"], childLists: [], expressions: ["value"] },
   "ui spread prop": { kinds: ["special"], childLists: [], expressions: ["arg"] },

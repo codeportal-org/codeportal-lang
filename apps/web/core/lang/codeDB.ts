@@ -140,8 +140,6 @@ export class CodeDB {
       )
     }
 
-    const kind = statementTypes.includes(node.type as any) ? "statement" : "ui"
-
     if (!target.meta?.parentId) {
       throw new Error("Target node must have a parent")
     }
@@ -172,7 +170,9 @@ export class CodeDB {
 
     // Always leave an empty statement for UX reasons
     if (nodeParentList.length === 0) {
-      const emptyStatement = this.newEmptyNode(kind)
+      const emptyStatement = this.newEmptyNode(
+        nodeTypeMeta[node.type].kinds.includes("statement") ? "statement" : "ui",
+      )
       nodeParentList.push(emptyStatement)
       emptyStatement.meta!.parentId = nodeParent.id
       emptyStatement.meta!.parentProperty = nodeParentProperty
