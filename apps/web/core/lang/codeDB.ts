@@ -342,27 +342,17 @@ export class CodeDB {
       return
     }
 
-    this.nodeMap.delete(nodeId)
-    if (this.selectedNodeIds.includes(nodeId)) {
-      this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
-    }
-    if (this.hoveredNodeId === nodeId) {
-      this.hoveredNodeId = undefined
-    }
-
-    this.notifyNodeChange(nodeId)
-
     if (node.meta?.parentId) {
       const parent = this.getNodeByID(node.meta.parentId)
 
       if (!parent) {
-        throw new Error("Node must have a parent")
+        return
       }
 
       const parentProperty = node.meta.parentProperty
 
       if (!parentProperty) {
-        throw new Error("Node must have a parent property")
+        return
       }
 
       if (nodeTypeMeta[parent.type].childLists.includes(parentProperty)) {
@@ -371,7 +361,7 @@ export class CodeDB {
         const index = nodeList.indexOf(node)
 
         if (index === -1) {
-          throw new Error("Node must be in its parent")
+          return
         }
 
         nodeList.splice(index, 1)
@@ -389,6 +379,16 @@ export class CodeDB {
 
       this.notifyNodeChange(parent.id)
     }
+
+    this.nodeMap.delete(nodeId)
+    if (this.selectedNodeIds.includes(nodeId)) {
+      this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
+    }
+    if (this.hoveredNodeId === nodeId) {
+      this.hoveredNodeId = undefined
+    }
+
+    this.notifyNodeChange(nodeId)
   }
 
   updateUIText(nodeId: string, text: string) {
