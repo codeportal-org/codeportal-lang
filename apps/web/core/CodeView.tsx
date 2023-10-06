@@ -94,7 +94,7 @@ const CodeContainer = React.forwardRef<
     codeDB?.onNodeChange(({ nodeId }) => {
       const node = codeDB.getNodeByID(nodeId)
 
-      editorEvents.notifyCodeChange(node)
+      editorEvents.notifyCodeChange(nodeId, node ?? null)
     })
   }, [])
 

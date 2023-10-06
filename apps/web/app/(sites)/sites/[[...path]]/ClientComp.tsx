@@ -3,6 +3,7 @@
 import Script from "next/script"
 import React from "react"
 
+import { CodeChangeMessage } from "@/core/CodeChangeMessage"
 import { ASTtoCTTransformer } from "@/core/lang/astTransformer"
 import { CodeDB } from "@/core/lang/codeDB"
 import { CodeProcessor } from "@/core/lang/codeProcessor"
@@ -60,31 +61,34 @@ export function ClientComp({
   })
 
   React.useEffect(() => {
-    const messageListener = (event: MessageEvent) => {
+    // Main entry point for the dev sites, the Iframe
+    const messageListener = (event: MessageEvent<CodeChangeMessage>) => {
       if (event.data.type === "codeChange") {
         codeChangesChannel.postMessage(event.data)
-        handleCodeChange(event.data.node)
+        handleCodeChange(event.data.nodeId, event.data.node)
       }
     }
     window.addEventListener("message", messageListener)
-    const codeChangeListener = (event: MessageEvent) => {
+
+    const codeChangeListener = (event: MessageEvent<CodeChangeMessage>) => {
       if (event.data.type === "codeChange") {
-        handleCodeChange(event.data.node)
+        handleCodeChange(event.data.nodeId, event.data.node)
       }
     }
     codeChangesChannel.addEventListener("message", codeChangeListener)
+
     return () => {
       window.removeEventListener("message", messageListener)
       codeChangesChannel.removeEventListener("message", codeChangeListener)
     }
   }, [])
 
-  const handleCodeChange = (node: CodeNode) => {
+  const handleCodeChange = (nodeId: string, node: CodeNode | null) => {
     if (!isDevSite) {
       return
     }
 
-    codeDB.updateNode(node.id, node)
+    codeDB.updateNode(nodeId, node)
     ;(window as any).codeDB = codeDB
 
     forceUpdate()

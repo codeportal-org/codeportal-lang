@@ -1,3 +1,4 @@
+import { CodeChangeMessage } from "./CodeChangeMessage"
 import { CodeNode } from "./lang/codeTree"
 
 class EditorEvents {
@@ -11,12 +12,18 @@ class EditorEvents {
     this.devIframe?.contentWindow?.postMessage({ type: "refresh" }, "*")
   }
 
-  notifyCodeChange(node: CodeNode) {
-    const newNode = { ...node }
+  notifyCodeChange(nodeId: string, node: CodeNode | null) {
+    let newNode = node
 
-    delete newNode.meta
+    if (node && node.meta) {
+      newNode = { ...node }
+      delete newNode.meta
+    }
 
-    this.devIframe?.contentWindow?.postMessage({ type: "codeChange", node }, "*")
+    this.devIframe?.contentWindow?.postMessage(
+      { type: "codeChange", nodeId, node } satisfies CodeChangeMessage,
+      "*",
+    )
   }
 }
 
