@@ -142,6 +142,7 @@ export class Interpreter {
       throw new ReturnValue(this.interpretExpression(node.arg))
     } else if (node.type === "print") {
       console.log(this.interpretExpression(node.arg))
+    } else if (node.type === "empty") {
     } else {
       throw new Error(`Statement type ${node.type} is not implemented`)
     }
