@@ -507,6 +507,14 @@ export class CodeDB {
 
     ;(parent as any)[parentProperty].splice(index + 1, 0, newNode)
 
+    if (newNode.meta) {
+      newNode.meta.parentId = parent.id
+      newNode.meta.parentProperty = parentProperty
+    } else {
+      throw new Error("New node must have meta")
+    }
+
+    this.notifyNodeChange(newNode.id)
     this.notifyNodeChange(parent.id)
   }
 }
