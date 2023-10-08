@@ -517,4 +517,49 @@ export class CodeDB {
     this.notifyNodeChange(newNode.id)
     this.notifyNodeChange(parent.id)
   }
+
+  replaceNodeInList(nodeId: string, newNode: CodeNode) {
+    const node = this.getNodeByID(nodeId)
+    if (!node) {
+      return
+    }
+
+    if (!node.meta?.parentId) {
+      throw new Error("Node must have a parent")
+    }
+
+    const parent = this.getNodeByID(node.meta.parentId)
+
+    if (!parent) {
+      throw new Error("Node must have a parent")
+    }
+
+    const parentProperty = node.meta.parentProperty
+
+    if (!parentProperty) {
+      throw new Error("Node must have a parent property")
+    }
+
+    const nodeList = (parent as any)[parentProperty] as any[]
+
+    const index = nodeList.indexOf(node)
+
+    if (index === -1) {
+      throw new Error("Node must be in its parent")
+    }
+
+    ;(parent as any)[parentProperty].splice(index, 1, newNode)
+
+    this.nodeMap.delete(nodeId)
+
+    if (newNode.meta) {
+      newNode.meta.parentId = parent.id
+      newNode.meta.parentProperty = parentProperty
+    } else {
+      throw new Error("New node must have meta")
+    }
+
+    this.notifyNodeChange(newNode.id)
+    this.notifyNodeChange(parent.id)
+  }
 }
