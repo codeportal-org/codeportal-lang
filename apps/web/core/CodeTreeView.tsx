@@ -1,3 +1,4 @@
+import { Combobox, ComboboxItem, ComboboxPopover, ComboboxProvider } from "@ariakit/react"
 import {
   ClientRect,
   CollisionDescriptor,
@@ -17,9 +18,9 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
-import { Command } from "carloslfu-cmdk-internal"
 import { atom, useAtom } from "jotai"
 import { ChevronDown, ChevronRight, Square, Type } from "lucide-react"
+import { matchSorter } from "match-sorter"
 import React, { PointerEvent } from "react"
 import ContentEditable from "react-contenteditable"
 import { createPortal } from "react-dom"
@@ -32,6 +33,7 @@ import { CodeDB } from "./lang/codeDB"
 import { useCodeDB, useNode } from "./lang/codeDBContext"
 import {
   CodeNode,
+  EmptyNode,
   ExpressionNode,
   FunctionNode,
   IfStatementNode,
@@ -47,6 +49,7 @@ import {
   UITextNode,
   VarStatement,
   areNodeTypesCompatible,
+  baseNodeMetaList,
   isNodeKind,
   statementTypes,
   uiNodeTypes,
@@ -162,7 +165,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
             uiNodeTypes.includes(draggedNode.type) ? (
               <UINodeView nodeId={draggedNode.id} isOverlay={true} />
             ) : draggedNode.type === "empty" ? (
-              <EmptyNode nodeId={draggedNode.id} />
+              <EmptyNodeView nodeId={draggedNode.id} />
             ) : (
               <StatementView nodeId={draggedNode.id} isOverlay={true} />
             )
@@ -214,7 +217,7 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
   } else if (node.type === "state change") {
     statementView = <StateChangeView node={node} />
   } else if (node.type === "empty" && node.kind === "statement") {
-    statementView = <EmptyNode nodeId={node.id} />
+    statementView = <EmptyNodeView nodeId={node.id} />
   } else {
     statementView = (
       <div>
@@ -359,7 +362,7 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
       </div>
     )
   } else if (node.type === "empty" && node.kind === "ui") {
-    uiNodeView = <EmptyNode nodeId={node.id} />
+    uiNodeView = <EmptyNodeView nodeId={node.id} />
   } else {
     uiNodeView = (
       <div>
@@ -738,31 +741,50 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-export const EmptyNode = ({ nodeId }: { nodeId: string }) => {
-  const node = useNode(nodeId)
+export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<EmptyNode>(nodeId)
   const isSelected = node.meta?.ui?.isSelected
 
-  const [value, setValue] = React.useState("")
+  const kind = node.kind
+
+  const [searchValue, setSearchValue] = React.useState("")
+  const matches = React.useMemo(
+    () => matchSorter(baseNodeMetaList, searchValue, { keys: ["title"] }),
+    [searchValue],
+  )
 
   return (
-    <div className="w-full">
-      {/* <button className="flex cursor-pointer flex-row items-center gap-1.5 rounded-sm bg-gray-100 px-1 transition-colors hover:bg-gray-200">
-            <span className="text-code-name-light">...</span>
-          </button> */}
-      <input type="text" className="border border-gray-300" />
-      {/* <Command loop={true}>
-        <Command.Input className="border-0 p-0" />
-        <input type="text" className="border border-gray-300" />
-
-        <Command.List>
-          <Command.Empty>No results found.</Command.Empty>
-          <Command.Item>a</Command.Item>
-          <Command.Item>b</Command.Item>
-          <Command.Separator />
-          <Command.Item>c</Command.Item>
-          <Command.Item>Apple</Command.Item>
-        </Command.List>
-      </Command> */}
+    <div>
+      <ComboboxProvider
+        setValue={(value) => {
+          React.startTransition(() => setSearchValue(value))
+        }}
+        focusLoop={true}
+      >
+        <Combobox
+          placeholder="..."
+          className="border-0 p-0 pl-1 focus-visible:ring-0"
+          autoFocus
+          autoSelect
+        />
+        <ComboboxPopover
+          gutter={8}
+          sameWidth
+          className="z-50 rounded-sm border border-gray-300 bg-white px-1 py-1"
+        >
+          {matches.length ? (
+            matches.map((match) => (
+              <ComboboxItem
+                key={match.title}
+                value={match.title}
+                className="rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
+              />
+            ))
+          ) : (
+            <div className="no-results">No results found</div>
+          )}
+        </ComboboxPopover>
+      </ComboboxProvider>
     </div>
   )
 }

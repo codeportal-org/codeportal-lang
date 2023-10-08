@@ -13,6 +13,7 @@
     "test:ci": "jest --ci"
   },
   "dependencies": {
+    "@ariakit/react": "^0.3.3",
     "@clerk/nextjs": "^4.23.5",
     "@codeportal/lang-core": "workspace:*",
     "@dnd-kit/core": "^6.0.8",
@@ -48,6 +49,7 @@
     "jotai": "^2.2.2",
     "lucide-react": "^0.274.0",
     "luxon": "^3.3.0",
+    "match-sorter": "^6.3.1",
     "minisearch": "^6.1.0",
     "mysql2": "^3.6.0",
     "nanoevents": "^8.0.0",

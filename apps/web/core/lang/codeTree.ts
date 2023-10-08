@@ -428,6 +428,8 @@ export const nodeTypeMeta: Record<
     childLists: string[]
     expressions: string[]
     kinds: NodeKind[]
+    title?: string
+    description?: string
   }
 > = {
   program: { kinds: ["special"], childLists: ["body"], expressions: [] },
@@ -458,20 +460,37 @@ export const nodeTypeMeta: Record<
   "function call": { kinds: ["statement", "expression"], childLists: ["args"], expressions: [] },
   object: { kinds: ["statement"], childLists: ["props"], expressions: [] },
   "state change": { kinds: ["statement"], childLists: ["body"], expressions: [] },
-  if: { kinds: ["statement"], childLists: ["then", "elseIf", "else"], expressions: [] },
+  if: {
+    title: "Conditional (if)",
+    description:
+      "Conditional block (if, if-else). This block lets you control the flow of your program based on certain conditions",
+    kinds: ["statement"],
+    childLists: ["then", "elseIf", "else"],
+    expressions: [],
+  },
   "else if": { kinds: ["statement"], childLists: ["then"], expressions: [] },
   try: { kinds: ["statement"], childLists: ["body", "catch", "finally"], expressions: [] },
   "path access": { kinds: ["expression"], childLists: ["path"], expressions: [] },
   var: { kinds: ["statement"], childLists: [], expressions: ["value"] },
   property: { kinds: ["statement"], childLists: [], expressions: ["name", "value"] },
   "ui text": { kinds: ["statement"], childLists: [], expressions: [] },
-  empty: { kinds: ["statement", "expression"], childLists: [], expressions: [] },
-  param: { kinds: ["statement"], childLists: [], expressions: [] },
-  ref: { kinds: ["statement"], childLists: [], expressions: [] },
+  empty: {
+    title: "Empty block",
+    description: "This node is used to represent an empty block or an empty expression",
+    kinds: ["statement", "expression"],
+    childLists: [],
+    expressions: [],
+  },
+  param: { kinds: ["special"], childLists: [], expressions: [] },
+  ref: { kinds: ["expression"], childLists: [], expressions: [] },
   string: { kinds: ["expression"], childLists: [], expressions: [] },
   number: { kinds: ["expression"], childLists: [], expressions: [] },
   boolean: { kinds: ["expression"], childLists: [], expressions: [] },
 }
+
+export const baseNodeTypeList: CodeNode["type"][] = ["if", "empty"]
+
+export const baseNodeMetaList = baseNodeTypeList.map((type) => nodeTypeMeta[type])
 
 export const isNodeKind = (node: CodeNode, kind: NodeKind) => {
   return nodeTypeMeta[node.type].kinds.includes(kind)
