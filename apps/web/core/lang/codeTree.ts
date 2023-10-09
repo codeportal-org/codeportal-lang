@@ -445,6 +445,7 @@ export const nodeTypeMeta: Record<
     expressions: [],
   },
   "ui fragment": { kinds: ["expression", "ui"], childLists: ["children"], expressions: [] },
+  "ui text": { kinds: ["expression", "ui"], childLists: [], expressions: [] },
   "ui expression": { kinds: ["expression", "ui"], childLists: [], expressions: ["expression"] },
   "ui prop declaration": { kinds: ["special"], childLists: [], expressions: ["value"] },
   "ui prop": { kinds: ["special"], childLists: [], expressions: ["value"] },
@@ -473,7 +474,6 @@ export const nodeTypeMeta: Record<
   "path access": { kinds: ["expression"], childLists: ["path"], expressions: [] },
   var: { kinds: ["statement"], childLists: [], expressions: ["value"] },
   property: { kinds: ["statement"], childLists: [], expressions: ["name", "value"] },
-  "ui text": { kinds: ["statement"], childLists: [], expressions: [] },
   empty: {
     title: "Empty block",
     description: "This node is used to represent an empty block or an empty expression",
