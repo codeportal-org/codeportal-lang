@@ -3,6 +3,7 @@ import {
   ClientRect,
   CollisionDescriptor,
   CollisionDetection,
+  DragEndEvent,
   DragStartEvent,
   KeyboardSensor,
   useDraggable,
@@ -88,7 +89,6 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   const [droppedOnNodeId, setDroppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
 
   const draggedNode = draggedNodeId ? codeDB?.getNodeByID(draggedNodeId) : null
-  const droppedOnNode = droppedOnNodeId ? codeDB?.getNodeByID(droppedOnNodeId) : null
 
   const handleDragStart = ({ active }: DragStartEvent) => {
     console.log("drag start")
@@ -98,17 +98,26 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   }
 
   function handleDragOver({ active, over }: DragOverEvent) {
-    console.log("drag over")
+    console.log("drag over", over?.id)
     setDroppedOnNodeId(over?.id as string)
   }
 
-  const handleDragEnd = () => {
-    console.log("drag end")
-    if (!droppedOnNode || !draggedNode) {
+  const handleDragEnd = ({ over }: DragEndEvent) => {
+    if (!droppedOnNodeId || !draggedNode) {
       return
     }
 
-    codeDB?.moveChildListNode(draggedNode! as StatementNode, droppedOnNode! as StatementNode)
+    const [targetParentId, targetProperty, targetIndexStr] = droppedOnNodeId.split("-")
+
+    const targetIndex = Number(targetIndexStr)
+    const targetParent = codeDB?.getNodeByID(targetParentId!)
+
+    codeDB?.moveNodeFromListToList(
+      draggedNode! as StatementNode,
+      targetParent! as StatementNode,
+      targetProperty!,
+      targetIndex,
+    )
 
     setDraggedNodeId(null)
 
@@ -196,7 +205,12 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
           </div>
         </div>
         <div className="pt-1">{/* spacer */}</div>
-        <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
+        <NodeList
+          nodeId={node.id}
+          parentProperty="body"
+          nodes={node.body}
+          Component={StatementView}
+        />
       </>
     )
   } else if (node.type === "function") {
@@ -348,7 +362,12 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
         {node.children && (
           <>
             <div className="pt-1">{/* spacer */}</div>
-            <NodeList nodeId={node.id} nodes={node.children} Component={UINodeView} />
+            <NodeList
+              nodeId={node.id}
+              parentProperty="children"
+              nodes={node.children}
+              Component={UINodeView}
+            />
           </>
         )}
       </div>
@@ -429,7 +448,12 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
       ) : (
         <>
           <div className="pt-1">{/* spacer */}</div>
-          <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
+          <NodeList
+            nodeId={node.id}
+            parentProperty="body"
+            nodes={node.body}
+            Component={StatementView}
+          />
         </>
       )}
     </div>
@@ -455,11 +479,13 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
 
 const NodeList = ({
   nodeId,
+  parentProperty,
   nodes,
   Component,
   className,
 }: {
   nodeId: string
+  parentProperty: string
   nodes: CodeNode[]
   Component: React.FC<{ nodeId: string }>
   className?: string
@@ -475,14 +501,10 @@ const NodeList = ({
     setIsOpen(!isOpen)
   }
 
-  const handleSpacerClick = (nodeId: string) => {
+  const handleSpacerClick = (index: number) => {
     const newNode = codeDB?.newEmptyNode(uiNodeTypes.includes(node.type) ? "ui" : "statement")!
 
-    if (nodeId === "<end>") {
-      codeDB?.insertNodeAfter(nodes[nodes.length - 1]!.id, newNode)
-    } else {
-      codeDB?.insertNodeBefore(nodeId, newNode)
-    }
+    codeDB?.insertNodeInList(nodeId, parentProperty, index, newNode)
   }
 
   return (
@@ -506,40 +528,65 @@ const NodeList = ({
         )}
       </button>
       <div id={containerID} className={cn("flex-col items-start", isOpen ? "flex" : "hidden")}>
-        {nodes.map((node) => (
+        {nodes.map((node, index) => (
           <React.Fragment key={node.id}>
-            <NodeListSpacer nodeId={node.id} onClick={handleSpacerClick} />
+            <NodeListSpacer
+              parentNodeId={nodeId}
+              index={index}
+              nodeType={node.type}
+              parentProperty={parentProperty}
+              onClick={handleSpacerClick}
+            />
             <Component nodeId={node.id} />
           </React.Fragment>
         ))}
-        <NodeListSpacer nodeId="<end>" onClick={handleSpacerClick} />
+        <NodeListSpacer
+          parentNodeId={nodeId}
+          index={nodes.length}
+          nodeType={nodes[nodes.length - 1]!.type}
+          parentProperty={parentProperty}
+          onClick={handleSpacerClick}
+        />
       </div>
     </div>
   )
 }
 
 const NodeListSpacer = ({
-  nodeId,
+  parentNodeId,
   onClick,
+  index,
+  nodeType,
+  parentProperty,
 }: {
-  nodeId: string
-  onClick: (nodeId: string) => void
+  parentNodeId: string
+  index: number
+  nodeType: CodeNode["type"]
+  parentProperty: string
+  onClick: (index: number) => void
 }) => {
   const codeDB = useCodeDB()
-  const node = useNode<CodeNode>(nodeId)
 
-  // const {setNodeRef} = useDroppable({
-  //   id: nodeId,
-  //   data: { type: node.type, kind } satisfies DropData,
-  // })
+  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
+
+  const droppableId = `${parentNodeId}-${parentProperty}-${index}`
+
+  const isDroppedOnNode = droppedOnNodeId === droppableId
+
+  const { setNodeRef } = useDroppable({
+    id: droppableId,
+    data: { type: nodeType } satisfies DropData,
+  })
 
   return (
     <button
-      // ref={setNodeRef}
-      className="w-full pb-1 transition-colors hover:bg-gray-100"
+      ref={setNodeRef}
+      className={cn("w-full pb-1 transition-colors hover:bg-gray-100", {
+        "bg-lime-600 hover:bg-lime-600": isDroppedOnNode,
+      })}
       onClick={(event) => {
         event.preventDefault()
-        onClick(nodeId)
+        onClick(index)
       }}
       onMouseOver={(event) => {
         event.preventDefault()
@@ -562,20 +609,13 @@ const DraggableNodeContainer = ({
   const node = useNode(nodeId)
 
   const [draggedNodeId] = useAtom(draggedNodeIdAtom)
-  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
 
-  const isDroppedOnNode = !isOverlay && nodeId === droppedOnNodeId
   const isDraggedNode = !isOverlay && nodeId === draggedNodeId
 
   const isSelected = node.meta?.ui?.isSelected
   const isHovered = node.meta?.ui?.isHovered
 
   const { attributes, listeners, setNodeRef } = useDraggable({
-    id: nodeId,
-    data: { type: node.type } satisfies DropData,
-  })
-
-  const droppable = useDroppable({
     id: nodeId,
     data: { type: node.type } satisfies DropData,
   })
@@ -591,10 +631,7 @@ const DraggableNodeContainer = ({
           "w-full": !isOverlay && isNodeKind(node, "statement"),
         },
       )}
-      ref={(ref) => {
-        setNodeRef(ref)
-        droppable.setNodeRef(ref)
-      }}
+      ref={setNodeRef}
       {...listeners}
       {...attributes}
       onMouseOver={(event) => {
@@ -624,10 +661,9 @@ const DraggableNodeContainer = ({
         }
       }}
     >
-      {(isDroppedOnNode || isSelected || isHovered) && !isOverlay && (
+      {(isSelected || isHovered) && !isOverlay && (
         <div
           className={cn("absolute left-[-5px] top-0 h-full w-1 rounded opacity-50", {
-            "bg-lime-600": !isDraggedNode && isDroppedOnNode,
             "bg-gray-300": isDraggedNode || isHovered,
             "bg-blue-500": isSelected,
           })}
@@ -671,7 +707,12 @@ export const FunctionView = ({ node }: { node: FunctionNode }) => {
         </div>
       </div>
       <div className="pt-1">{/* spacer */}</div>
-      <NodeList nodeId={node.id} nodes={node.body} Component={StatementView} />
+      <NodeList
+        nodeId={node.id}
+        parentProperty="body"
+        nodes={node.body}
+        Component={StatementView}
+      />
     </>
   )
 }
@@ -686,7 +727,12 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
         <ExpressionView nodeId={node.test.id} />
       </div>
       <div className="pt-1">{/* spacer */}</div>
-      <NodeList nodeId={node.id} nodes={node.then} Component={StatementView} />
+      <NodeList
+        nodeId={node.id}
+        parentProperty="then"
+        nodes={node.then}
+        Component={StatementView}
+      />
       {/* Missing else if TODO */}
       {node.else && (
         <>
@@ -695,7 +741,12 @@ export const IfStatementView = ({ nodeId }: { nodeId: string }) => {
             <span className="text-code-keyword">else</span>
           </div>
           <div className="pt-1">{/* spacer */}</div>
-          <NodeList nodeId={node.id} nodes={node.else} Component={StatementView} />
+          <NodeList
+            nodeId={node.id}
+            parentProperty="else"
+            nodes={node.else}
+            Component={StatementView}
+          />
         </>
       )}
     </div>
@@ -743,6 +794,7 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
 
 export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<EmptyNode>(nodeId)
+  const codeDB = useCodeDB()
   const isSelected = node.meta?.ui?.isSelected
 
   const kind = node.kind
@@ -778,6 +830,10 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
                 key={match.title}
                 value={match.title}
                 className="rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
+                onClick={() => {
+                  codeDB?.replaceNodeInList(nodeId, codeDB?.newEmptyNode(kind)!)
+                  // codeDB?.deleteNode(nodeId)
+                }}
               />
             ))
           ) : (
@@ -825,25 +881,27 @@ const closestTopRightCorner =
     for (const droppableContainer of droppableContainers) {
       const { id } = droppableContainer
 
+      const sanitizedId = (id as string).split("-")[0]
+
       const droppableContainerData: DropData = droppableContainer.data.current as any
 
-      const droppableNode = codeDB?.getNodeByID(id as string)
+      const droppableNode = codeDB?.getNodeByID(sanitizedId as string)
 
-      if (isActiveNodeUI) {
-        // if moving a UI node, only allow dropping on UI nodes that have a parent UI node
-        const droppableNodeParent = codeDB.getNodeByID(droppableNode?.meta?.parentId!)
-        if (!uiNodeTypes.includes(droppableNodeParent?.type as any)) {
-          continue
-        }
-      }
+      // if (isActiveNodeUI) {
+      //   // if moving a UI node, only allow dropping on UI nodes that have a parent UI node
+      //   const droppableNodeParent = codeDB.getNodeByID(droppableNode?.meta?.parentId!)
+      //   if (!uiNodeTypes.includes(droppableNodeParent?.type as any)) {
+      //     continue
+      //   }
+      // }
 
-      if (codeDB.isDescendantOf(droppableNode!, activeNode!) && id !== active.id) {
-        continue
-      }
+      // if (codeDB.isDescendantOf(droppableNode!, activeNode!) && id !== active.id) {
+      //   continue
+      // }
 
-      if (!areNodeTypesCompatible(activeData.type, droppableContainerData.type)) {
-        continue
-      }
+      // if (!areNodeTypesCompatible(activeData.type, droppableContainerData.type)) {
+      //   continue
+      // }
 
       const rect = droppableRects.get(id)
 

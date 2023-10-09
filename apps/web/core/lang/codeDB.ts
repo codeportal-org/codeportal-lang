@@ -130,43 +130,41 @@ export class CodeDB {
    * @param node Node to be moved.
    * @param target Node to be moved to, the node will be moved before this node.
    */
-  moveChildListNode(node: StatementNode, target: StatementNode) {
-    if (
-      !(statementTypes.includes(node.type as any) || uiNodeTypes.includes(node.type as any)) ||
-      !(statementTypes.includes(target.type as any) || uiNodeTypes.includes(target.type as any))
-    ) {
+  moveNodeFromListToList(
+    node: StatementNode,
+    targetParent: StatementNode,
+    parentProperty: string,
+    index: number,
+  ) {
+    const nodeParent = this.getNodeByID(node.meta?.parentId!) as FunctionNode
+
+    if (!(statementTypes.includes(node.type as any) || uiNodeTypes.includes(node.type as any))) {
       throw new Error(
-        `This method can only move statement or UI nodes, attempted to move ${node.type} to ${target.type}`,
+        `This method can only move statement or UI nodes, attempted to move ${node.type}`,
       )
     }
-
-    if (!target.meta?.parentId) {
-      throw new Error("Target node must have a parent")
-    }
-
-    const nodeParent = this.getNodeByID(node.meta?.parentId!) as FunctionNode
-    const targetParent = this.getNodeByID(target.meta?.parentId!) as FunctionNode
 
     if (!nodeParent || !targetParent) {
       throw new Error("Node and target must have parents")
     }
 
     const nodeParentProperty = node.meta?.parentProperty!
-    const targetParentProperty = target.meta?.parentProperty!
 
     const nodeIndex = (nodeParent as any)[nodeParentProperty].indexOf(node)
-    const targetIndex = (targetParent as any)[targetParentProperty].indexOf(target)
 
-    if (nodeIndex === -1 || targetIndex === -1) {
-      throw new Error("Node and target must be in their parents")
+    if (nodeIndex === -1) {
+      throw new Error("Node must be in its parent")
     }
 
     // remove node from parent
     const nodeParentList = (nodeParent as any)[nodeParentProperty] as any[]
     nodeParentList.splice(nodeIndex, 1)
 
+    const insertionIndex =
+      nodeParent.id === targetParent.id && index > nodeIndex ? index - 1 : index
+
     // add node to parent at target index
-    ;(targetParent as any)[targetParentProperty].splice(targetIndex, 0, node)
+    ;(targetParent as any)[parentProperty].splice(insertionIndex, 0, node)
 
     // Always leave an empty statement for UX reasons
     if (nodeParentList.length === 0) {
@@ -180,7 +178,7 @@ export class CodeDB {
 
     // update parent
     node.meta!.parentId = targetParent.id
-    node.meta!.parentProperty = targetParentProperty
+    node.meta!.parentProperty = parentProperty
 
     // notify changes
     this.notifyNodeChange(node.id)
@@ -551,6 +549,26 @@ export class CodeDB {
     ;(parent as any)[parentProperty].splice(index, 1, newNode)
 
     this.nodeMap.delete(nodeId)
+
+    if (newNode.meta) {
+      newNode.meta.parentId = parent.id
+      newNode.meta.parentProperty = parentProperty
+    } else {
+      throw new Error("New node must have meta")
+    }
+
+    this.notifyNodeChange(newNode.id)
+    this.notifyNodeChange(parent.id)
+  }
+
+  insertNodeInList(parentNodeId: string, parentProperty: string, index: number, newNode: CodeNode) {
+    const parent = this.getNodeByID(parentNodeId)
+
+    if (!parent) {
+      throw new Error("Node must have a parent")
+    }
+
+    ;(parent as any)[parentProperty].splice(index, 0, newNode)
 
     if (newNode.meta) {
       newNode.meta.parentId = parent.id
