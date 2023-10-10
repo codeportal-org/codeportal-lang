@@ -253,6 +253,8 @@ export class Interpreter {
       return this.interpretRef(node)
     } else if (node.type === "nary") {
       return this.interpretNaryExpression(node)
+    } else if (node.type === "empty") {
+      return null
     } else if (node.type === "object") {
       return this.interpretObjectNode(node)
     } else if (node.type === "function") {
