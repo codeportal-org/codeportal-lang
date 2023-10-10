@@ -24,10 +24,6 @@ export default function TreeSitterTest() {
   const parserRef = React.useRef<Parser>()
 
   React.useEffect(() => {
-    if (typeof window === undefined) {
-      console.log("SSR")
-      return
-    }
     ;(async () => {
       await Parser.init({
         locateFile(scriptName: string, scriptDirectory: string) {
