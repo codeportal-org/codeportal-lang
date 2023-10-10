@@ -5,6 +5,7 @@ import {
   ComponentNode,
   ExpressionNode,
   FunctionNode,
+  IfStatementNode,
   NAryExpression,
   ObjectNode,
   ProgramNode,
@@ -136,6 +137,8 @@ export class Interpreter {
       this.interpretVariableDeclaration(node)
     } else if (node.type === "state") {
       this.interpretStateDeclaration(node)
+    } else if (node.type === "if") {
+      this.interpretIfStatement(node)
     } else if (node.type === "state change") {
       this.interpretStateChange(node)
     } else if (node.type === "return") {
@@ -379,6 +382,16 @@ export class Interpreter {
     }
 
     return obj
+  }
+
+  private interpretIfStatement(node: IfStatementNode) {
+    let condition = this.interpretExpression(node.test)
+
+    if (condition) {
+      this.interpretStatementList(node.then)
+    }
+
+    // TODO: missing else-if chain
   }
 }
 
