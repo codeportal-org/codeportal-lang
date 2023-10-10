@@ -111,8 +111,8 @@ importers:
         specifier: ^2.2.11
         version: 2.2.11(react@18.2.0)(solid-js@1.7.11)(svelte@4.2.0)(vue@3.3.4)
       carloslfu-cmdk-internal:
-        specifier: ^0.3.0
-        version: 0.3.0(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.3.1
+        version: 0.3.1(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -7304,8 +7304,8 @@ packages:
   /caniuse-lite@1.0.30001524:
     resolution: {integrity: sha512-Jj917pJtYg9HSJBF95HVX3Cdr89JUyLT4IZ8SvM5aDRni95swKgYi3TgYLH5hnGfPE/U1dg6IfZ50UsIlLkwSA==}
 
-  /carloslfu-cmdk-internal@0.3.0(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-g7UkPfNL7O8WOxrhHDbAHBPgzvZKMUgYUHPwRMZXjDJ+29a4xPkYfOrRulBTh9OpU2MayMVxnLoR4uNvXyzBTg==}
+  /carloslfu-cmdk-internal@0.3.1(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-F1rTU92alsuTm0tu4pQadLFBsvAkoSYTUks1M+bJs4prh+mud0tLwhk+zNXqsfxRxj2Vogh7dVJ9/wlY24pOjA==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
