@@ -303,6 +303,8 @@ export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
     return <ReferenceView nodeId={node.id} />
   } else if (node.type === "nary") {
     return <NaryExpressionView node={node} />
+  } else if (node.type === "empty") {
+    return <EmptyNodeView nodeId={node.id} />
   } else if (node.type === "state change") {
     return <StateChangeView node={node} />
   } else if (uiNodeTypes.includes(node.type)) {
@@ -820,7 +822,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
           autoSelect
         />
         <ComboboxPopover
-          gutter={8}
+          gutter={4}
           sameWidth
           className="z-50 rounded-sm border border-gray-300 bg-white px-1 py-1"
         >
@@ -831,8 +833,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
                 value={match.title}
                 className="rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
                 onClick={() => {
-                  codeDB?.replaceNodeInList(nodeId, codeDB?.newEmptyNode(kind)!)
-                  // codeDB?.deleteNode(nodeId)
+                  codeDB?.replaceNodeInList(nodeId, codeDB?.newNodeFromType(match.type)!)
                 }}
               />
             ))

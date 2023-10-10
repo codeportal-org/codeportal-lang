@@ -290,12 +290,12 @@ export class CodeDB {
 
     // This is necessary because CodeDB instances rely on object references
     for (const property of properties) {
-      if (nodeTypeMeta[node.type].childLists.includes(property)) {
+      if (nodeTypeMeta[node.type]?.childLists?.find((childList) => childList.name === property)) {
         // get current CodeDB node's children, in case the node was serialized like in the dev sites case
         ;((node as any)[property] as CodeNode[]) = ((newNode as any)[property] as CodeNode[]).map(
           (child) => this.getNodeByID(child.id),
         )
-      } else if (nodeTypeMeta[node.type].expressions.includes(property)) {
+      } else if (nodeTypeMeta[node.type]?.expressions?.includes(property)) {
         // get current CodeDB node's children, in case the node was serialized like in the dev sites case
         ;(node as any)[property] = this.getNodeByID((newNode as any)[property].id)
       } else {
@@ -345,7 +345,11 @@ export class CodeDB {
       const parentProperty = node.meta.parentProperty
 
       if (parent && parentProperty) {
-        if (nodeTypeMeta[parent.type].childLists.includes(parentProperty)) {
+        if (
+          nodeTypeMeta[parent.type]?.childLists?.find(
+            (childList) => childList.name === parentProperty,
+          )
+        ) {
           const nodeList = (parent as any)[parentProperty] as any[]
 
           const index = nodeList.indexOf(node)
@@ -363,7 +367,7 @@ export class CodeDB {
               emptyStatement.meta!.parentProperty = parentProperty
             }
           }
-        } else if (nodeTypeMeta[parent.type].expressions.includes(parentProperty)) {
+        } else if (nodeTypeMeta[parent.type]?.expressions?.includes(parentProperty)) {
           ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
         }
 
@@ -579,5 +583,48 @@ export class CodeDB {
 
     this.notifyNodeChange(newNode.id)
     this.notifyNodeChange(parent.id)
+  }
+
+  newNodeFromType(type: CodeNode["type"]) {
+    const id = this.idCounter.toString()
+    this.idCounter++
+    const newNode = {
+      id,
+      type,
+      meta: {
+        ui: {
+          isHovered: false,
+          isSelected: false,
+        },
+      },
+    } as CodeNode
+
+    const typeMeta = nodeTypeMeta[type]
+
+    if (typeMeta.childLists && typeMeta.childLists.length > 0) {
+      for (const childList of typeMeta.childLists) {
+        if (childList.alwaysPresent) {
+          const emptyNode = this.newEmptyNode(childList.kind)
+          ;(newNode as any)[childList.name] = [emptyNode]
+          emptyNode.meta!.parentId = newNode.id
+          emptyNode.meta!.parentProperty = childList.name
+        }
+      }
+    }
+
+    if (typeMeta.expressions && typeMeta.expressions.length > 0) {
+      for (const expression of typeMeta.expressions) {
+        const emptyNode = this.newEmptyNode("expression")
+        ;(newNode as any)[expression] = emptyNode
+        emptyNode.meta!.parentId = newNode.id
+        emptyNode.meta!.parentProperty = expression
+      }
+    }
+
+    this.nodeMap.set(newNode.id, newNode)
+
+    this.notifyNodeChange(newNode.id)
+
+    return newNode
   }
 }
