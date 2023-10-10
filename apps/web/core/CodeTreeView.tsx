@@ -881,27 +881,29 @@ const closestTopRightCorner =
     for (const droppableContainer of droppableContainers) {
       const { id } = droppableContainer
 
-      const sanitizedId = (id as string).split("-")[0]
+      // node list droppable validation
+      if ((id as string).includes("-")) {
+        const [parentNodeId] = (id as string).split("-")
+
+        const parentNode = codeDB?.getNodeByID(parentNodeId!)
+
+        if (isActiveNodeUI) {
+          // if moving a UI node, only allow dropping on UI nodes that have a parent UI node
+          if (!uiNodeTypes.includes(parentNode?.type as any)) {
+            continue
+          }
+        }
+
+        if (codeDB.isDescendantOf(parentNode, activeNode!)) {
+          continue
+        }
+      }
 
       const droppableContainerData: DropData = droppableContainer.data.current as any
 
-      const droppableNode = codeDB?.getNodeByID(sanitizedId as string)
-
-      // if (isActiveNodeUI) {
-      //   // if moving a UI node, only allow dropping on UI nodes that have a parent UI node
-      //   const droppableNodeParent = codeDB.getNodeByID(droppableNode?.meta?.parentId!)
-      //   if (!uiNodeTypes.includes(droppableNodeParent?.type as any)) {
-      //     continue
-      //   }
-      // }
-
-      // if (codeDB.isDescendantOf(droppableNode!, activeNode!) && id !== active.id) {
-      //   continue
-      // }
-
-      // if (!areNodeTypesCompatible(activeData.type, droppableContainerData.type)) {
-      //   continue
-      // }
+      if (!areNodeTypesCompatible(activeData.type, droppableContainerData.type)) {
+        continue
+      }
 
       const rect = droppableRects.get(id)
 
