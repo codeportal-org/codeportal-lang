@@ -200,6 +200,12 @@ importers:
       tinykeys:
         specifier: ^2.1.0
         version: 2.1.0
+      tree-sitter-javascript:
+        specifier: ^0.20.1
+        version: 0.20.1
+      web-tree-sitter:
+        specifier: ^0.20.8
+        version: 0.20.8
       zustand:
         specifier: ^4.3.9
         version: 4.3.9(react@18.2.0)
@@ -11708,6 +11714,10 @@ packages:
       lru-cache: 7.18.3
     dev: false
 
+  /nan@2.18.0:
+    resolution: {integrity: sha512-W7tfG7vMOGtD30sHoZSSc/JVYiyDPEyQVso/Zz+/uQd0B0L46gtC+pHha5FFMRpil6fm/AoEcRWyOVi4+E/f8w==}
+    dev: false
+
   /nanoevents@8.0.0:
     resolution: {integrity: sha512-bYYwNCdNc5ea6/Lwh1uioU1/7aaKa3EPmNQ2weTm8PWSpbWrsaWHePe0Zq4SF+D3F3JX3cn+QdktOPCf1meOqw==}
     engines: {node: ^16.0.0 || ^18.0.0 || >=20.0.0}
@@ -14364,6 +14374,13 @@ packages:
     hasBin: true
     dev: true
 
+  /tree-sitter-javascript@0.20.1:
+    resolution: {integrity: sha512-2LNRAw6vd6NDGf5DvAZTaIJDv0j7519bbDsQQ9jnT7uC91efvbn2BxOagNs7u41LSbmsuScjkM8VeN0mnya1iw==}
+    requiresBuild: true
+    dependencies:
+      nan: 2.18.0
+    dev: false
+
   /trim-newlines@3.0.1:
     resolution: {integrity: sha512-c1PTsA3tYrIsLGkJkzHF+w9F2EyxfXGo4UyJc4pFL++FMjnq0HJS69T3M7d//gKrFKwy429bouPescbjecU+Zw==}
     engines: {node: '>=8'}
@@ -15060,6 +15077,10 @@ packages:
   /web-streams-polyfill@4.0.0-beta.3:
     resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
     engines: {node: '>= 14'}
+    dev: false
+
+  /web-tree-sitter@0.20.8:
+    resolution: {integrity: sha512-weOVgZ3aAARgdnb220GqYuh7+rZU0Ka9k9yfKtGAzEYMa6GgiCzW9JjQRJyCJakvibQW+dfjJdihjInKuuCAUQ==}
     dev: false
 
   /webcrypto-core@1.7.7:

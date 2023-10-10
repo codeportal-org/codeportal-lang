@@ -68,6 +68,8 @@
     "swr": "^2.2.0",
     "tailwind-merge": "^1.14.0",
     "tinykeys": "^2.1.0",
+    "tree-sitter-javascript": "^0.20.1",
+    "web-tree-sitter": "^0.20.8",
     "zustand": "^4.3.9"
   },
   "devDependencies": {
