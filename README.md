@@ -13,7 +13,7 @@
 
 <br />
 
-<img src="./apps/web/public/ui-screenshot-1.png" title="CodePortal screenshot">
+<img src="./apps/web/public/editor-ui-screenshot.png" title="CodePortal screenshot">
 
 <br />
 
