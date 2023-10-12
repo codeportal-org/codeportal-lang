@@ -11,6 +11,12 @@
 <a href="https://codeportal.io/discord">Discord</a>
 </div>
 
+<br />
+
+<img src="./apps/web/public/ui-screenshot-1.png" title="CodePortal screenshot">
+
+<br />
+
 ## Introduction
 
 CodePortal is a full-stack AI-first programming platform for makers and product teams who are frustrated with the limitations of traditional programming and tooling. It makes it easier for all team members to make changes to their products, reducing friction, eliminating handoffs and increasing velocity. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
