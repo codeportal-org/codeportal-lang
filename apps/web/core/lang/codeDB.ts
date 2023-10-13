@@ -554,6 +554,13 @@ export class CodeDB {
 
     this.nodeMap.delete(nodeId)
 
+    if (this.selectedNodeIds.includes(nodeId)) {
+      this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
+    }
+    if (this.hoveredNodeId === nodeId) {
+      this.hoveredNodeId = undefined
+    }
+
     if (newNode.meta) {
       newNode.meta.parentId = parent.id
       newNode.meta.parentProperty = parentProperty
