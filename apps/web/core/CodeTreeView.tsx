@@ -801,9 +801,14 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
   const kind = node.kind
 
+  const filteredBaseNodeMetaList = React.useMemo(
+    () => baseNodeMetaList.filter((n) => n.kinds.includes(kind)),
+    [kind],
+  )
+
   const [searchValue, setSearchValue] = React.useState("")
   const matches = React.useMemo(
-    () => matchSorter(baseNodeMetaList, searchValue, { keys: ["title"] }),
+    () => matchSorter(filteredBaseNodeMetaList, searchValue, { keys: ["title"] }),
     [searchValue],
   )
 

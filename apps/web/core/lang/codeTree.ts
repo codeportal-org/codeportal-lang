@@ -514,7 +514,7 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
   empty: {
     title: "Empty block",
     description: "This node is used to represent an empty block or an empty expression",
-    kinds: ["statement", "expression"],
+    kinds: ["statement", "expression", "ui", "props", "style"],
   },
   param: { kinds: [] },
   ref: { kinds: ["expression"] },
