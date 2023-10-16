@@ -454,9 +454,10 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     ],
   },
   "ui element": {
+    title: "UI Element",
     kinds: ["expression", "ui"],
     childLists: [
-      { name: "children", kind: "ui" },
+      { name: "children", kind: "ui", alwaysPresent: true },
       { name: "props", kind: "props" },
       { name: "style", kind: "style" },
     ],
@@ -522,11 +523,25 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
   number: { kinds: ["expression"] },
   boolean: { kinds: ["expression"] },
 }
-export const baseNodeTypeList: CodeNode["type"][] = ["if", "empty"]
 
-export const baseNodeMetaList = baseNodeTypeList.map((type) => ({
-  type,
-  ...nodeTypeMeta[type],
+export const baseNodeTypeList: {
+  type: CodeNode["type"]
+  title?: string
+  name?: string
+}[] = [
+  { type: "if", title: nodeTypeMeta.if.title },
+  {
+    type: "ui element",
+    name: "div",
+    title: "Box element (HTML div)",
+  },
+]
+
+export const baseNodeMetaList = baseNodeTypeList.map((node) => ({
+  type: node.type,
+  title: node.title,
+  name: node.name,
+  kinds: nodeTypeMeta[node.type].kinds,
 }))
 
 export const isNodeKind = (node: CodeNode, kind: NodeKind) => {

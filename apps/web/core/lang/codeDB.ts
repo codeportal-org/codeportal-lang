@@ -592,7 +592,7 @@ export class CodeDB {
     this.notifyNodeChange(parent.id)
   }
 
-  newNodeFromType(type: CodeNode["type"]) {
+  newNodeFromType(type: CodeNode["type"], extras?: Partial<CodeNode>) {
     const id = this.idCounter.toString()
     this.idCounter++
     const newNode = {
@@ -604,6 +604,7 @@ export class CodeDB {
           isSelected: false,
         },
       },
+      ...extras,
     } as CodeNode
 
     const typeMeta = nodeTypeMeta[type]

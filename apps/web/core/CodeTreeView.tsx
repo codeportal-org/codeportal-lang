@@ -838,7 +838,17 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
                 value={match.title}
                 className="rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
                 onClick={() => {
-                  codeDB?.replaceNodeInList(nodeId, codeDB?.newNodeFromType(match.type)!)
+                  codeDB?.replaceNodeInList(
+                    nodeId,
+                    codeDB?.newNodeFromType(
+                      match.type,
+                      match.name
+                        ? {
+                            name: match.name,
+                          }
+                        : {},
+                    )!,
+                  )
                 }}
               />
             ))
