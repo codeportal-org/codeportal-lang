@@ -535,6 +535,15 @@ export const baseNodeTypeList: {
     name: "div",
     title: "Box element (HTML div)",
   },
+  {
+    type: "ui element",
+    name: "h1",
+    title: "Heading element (HTML h1)",
+  },
+  {
+    type: "ui text",
+    title: "Text",
+  },
 ]
 
 export const baseNodeMetaList = baseNodeTypeList.map((node) => ({
