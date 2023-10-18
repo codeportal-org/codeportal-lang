@@ -693,6 +693,7 @@ export const UITextView = ({ nodeId }: { nodeId: string }) => {
         className="text-code-ui-text w-full max-w-lg resize-none rounded border-none border-slate-300 bg-gray-100 px-2 py-0 focus-visible:bg-gray-200 focus-visible:outline-none focus-visible:ring-0"
         value={node.text}
         onChange={handleChange}
+        autoFocus
       />
     </div>
   )
