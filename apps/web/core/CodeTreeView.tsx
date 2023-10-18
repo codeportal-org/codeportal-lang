@@ -822,7 +822,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
       >
         <Combobox
           placeholder="..."
-          className="border-0 p-0 pl-1 focus-visible:ring-0"
+          className="w-full max-w-sm border-0 p-0 pl-1 focus-visible:ring-0"
           autoFocus
           autoSelect
         />
