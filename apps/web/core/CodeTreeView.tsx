@@ -800,6 +800,8 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   const codeDB = useCodeDB()
   const isSelected = node.meta?.ui?.isSelected
 
+  const [isComboboxOpen, setIsComboboxOpen] = React.useState(true)
+
   const kind = node.kind
 
   const filteredBaseNodeMetaList = React.useMemo(
@@ -820,6 +822,10 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
           React.startTransition(() => setSearchValue(value))
         }}
         focusLoop={true}
+        setOpen={(isOpen) => {
+          setIsComboboxOpen(isOpen)
+        }}
+        open={isComboboxOpen}
       >
         <Combobox
           placeholder="..."
