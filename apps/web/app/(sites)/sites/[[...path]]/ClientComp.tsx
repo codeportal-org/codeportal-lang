@@ -94,8 +94,6 @@ export function ClientComp({
     forceUpdate()
   }
 
-  ;(window as any).handleCodeChange = handleCodeChange
-
   const componentCallNode = {
     id: "test",
     type: "component call",
