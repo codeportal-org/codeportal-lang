@@ -338,6 +338,20 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
             node.name
           )}
         </div>
+        {node.style && (
+          <div className={indentationClass}>
+            <div className="flex flex-col gap-1.5 text-gray-500">
+              {Object.entries(node.style).map(([key, value]) => (
+                <div key={key} className="flex flex-wrap gap-2">
+                  <div className="col-span-1">{key}:</div>
+                  <div className="col-span-4">
+                    <ExpressionView nodeId={value.id} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         {node.props && (
           <div className={indentationClass}>
             <div className={cn("flex flex-col gap-1.5 text-gray-500", indentationClass)}>
