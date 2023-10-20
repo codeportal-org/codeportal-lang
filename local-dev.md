@@ -18,3 +18,7 @@ Run web tests:
 Push db changes:
 
 - pnpm db:push
+
+## .test domain for local development
+
+To use a `.test` domain, you need Puma dev installed: https://github.com/puma/puma-dev. This allows you to have SSL locally.
