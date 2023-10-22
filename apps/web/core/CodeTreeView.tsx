@@ -657,6 +657,13 @@ const DraggableNodeContainer = ({
         event.preventDefault()
         console.log("hovering", nodeId)
         codeDB?.hoverNode(nodeId)
+
+        const node = codeDB?.getNodeByID(nodeId)
+
+        if (node?.type === "ui text") {
+          const parentId = node.meta?.parentId
+          codeDB?.hoverNode(parentId!)
+        }
       }}
       onMouseLeave={() => {
         codeDB?.hoverNodeOff(nodeId)
