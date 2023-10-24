@@ -165,8 +165,17 @@ export type UISpreadPropNode = {
 export type UIStyleNode = {
   type: "ui style"
   id: string
+  kind: "style" | "tailwind"
+  /** The name of the style. For Tailwind, this is for instance "bg" or "text". */
   name: string
+  /**
+   * For Tailwind, this is for instance "red-500". In most cases this is static.
+   */
   value: ExpressionNode
+  /**
+   * The test is used to determine whether the style should be applied or not.
+   */
+  test: ExpressionNode
   meta?: CodeMeta
 }
 
@@ -468,7 +477,7 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
   "ui prop declaration": { kinds: [], expressions: ["value"] },
   "ui prop": { kinds: [], expressions: ["value"] },
   "ui spread prop": { kinds: [], expressions: ["arg"] },
-  "ui style": { kinds: [], expressions: ["value"] },
+  "ui style": { kinds: ["style"], expressions: ["value", "test"] },
   return: { kinds: ["statement"], expressions: ["arg"] },
   assignment: { kinds: ["statement"], expressions: ["left", "right"] },
   state: { kinds: ["statement"], expressions: ["value"] },
