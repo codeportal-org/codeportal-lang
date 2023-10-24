@@ -88,7 +88,7 @@ export function ClientComp({
       return
     }
 
-    codeDB.updateNode(nodeId, node)
+    codeDB.syncNode(nodeId, node)
     ;(window as any).codeDB = codeDB
 
     forceUpdate()

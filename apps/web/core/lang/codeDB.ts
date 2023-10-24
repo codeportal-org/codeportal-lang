@@ -270,10 +270,26 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
+  updateNode(nodeId: string, data: Partial<UIElementNode>) {
+    const node = this.getNodeByID(nodeId)
+    if (!node) {
+      return
+    }
+
+    const properties = Object.keys(data)
+
+    // This is necessary because CodeDB instances rely on object references
+    for (const property of properties) {
+      ;(node as any)[property] = (data as any)[property]
+    }
+
+    this.notifyNodeChange(nodeId)
+  }
+
   /**
    * Syncs the node state and CodeDB's state.
    */
-  updateNode(nodeId: string, newNode: CodeNode | null) {
+  syncNode(nodeId: string, newNode: CodeNode | null) {
     const node = this.getNodeByID(nodeId)
 
     if (!newNode) {
@@ -592,7 +608,7 @@ export class CodeDB {
     this.notifyNodeChange(parent.id)
   }
 
-  newNodeFromType(type: CodeNode["type"], extras?: Partial<CodeNode>) {
+  newNodeFromType<T>(type: CodeNode["type"], extras?: Partial<CodeNode>): T {
     const id = this.idCounter.toString()
     this.idCounter++
     const newNode = {
@@ -633,6 +649,6 @@ export class CodeDB {
 
     this.notifyNodeChange(newNode.id)
 
-    return newNode
+    return newNode as T
   }
 }
