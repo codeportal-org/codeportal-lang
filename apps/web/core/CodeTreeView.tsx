@@ -20,7 +20,7 @@ import {
   useSensors,
 } from "@dnd-kit/core"
 import { atom, useAtom } from "jotai"
-import { ChevronDown, ChevronRight, Square, Type } from "lucide-react"
+import { ChevronDown, ChevronRight, PencilRuler, Square, Type } from "lucide-react"
 import { matchSorter } from "match-sorter"
 import React, { PointerEvent } from "react"
 import ContentEditable from "react-contenteditable"
@@ -47,6 +47,7 @@ import {
   StatementNode,
   StringLiteral,
   UINode,
+  UIStyleNode,
   UITextNode,
   VarStatement,
   areNodeTypesCompatible,
@@ -316,6 +317,10 @@ export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
 
 export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
   const node = useNode<UINode>(nodeId)
+  const codeDB = useCodeDB()
+
+  const isHovered = node.meta?.ui?.isHovered
+  const isSelected = node.meta?.ui?.isSelected
 
   let uiNodeView: React.ReactNode
 
@@ -324,34 +329,42 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
   } else if (node.type === "ui element") {
     uiNodeView = (
       <div className="flex flex-col">
-        <div className="text-code-ui-element-name flex items-center gap-1.5">
+        <div className="text-code-ui-element-name relative flex items-center gap-1.5">
           {node.name === "div" ? (
             <>
               <Square size={16} className="text-code-name" />
               Box
             </>
           ) : node.name === "p" ? (
-            <div className="text-code-ui-element-name">Paragraph</div>
+            "Paragraph"
           ) : node.name.startsWith("h") && !isNaN(Number(node.name[1])) ? (
-            <div className="text-code-ui-element-name">Heading {node.name[1]}</div>
+            `Heading ${node.name[1]}`
           ) : (
             node.name
           )}
+
+          {(isHovered || isSelected) && node.style === undefined && (
+            <>
+              <div className="pl-0.5">{/* spacer */}</div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  className="text-code-ui-element-name transition-color rounded-md bg-gray-100 px-1 hover:bg-gray-200"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    const newStyleNode = codeDB?.newNodeFromType<UIStyleNode>("ui style")!
+
+                    codeDB?.updateNode(nodeId, {
+                      style: [newStyleNode],
+                    })
+                  }}
+                >
+                  add style
+                </button>
+              </div>
+            </>
+          )}
         </div>
-        {node.style && (
-          <div className={indentationClass}>
-            <div className="flex flex-col gap-1.5 text-gray-500">
-              {Object.entries(node.style).map(([key, value]) => (
-                <div key={key} className="flex flex-wrap gap-2">
-                  <div className="col-span-1">{key}:</div>
-                  <div className="col-span-4">
-                    <ExpressionView nodeId={value.id} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {node.style !== undefined && <StylesView nodeId={node.id} style={node.style} />}
         {node.props && (
           <div className={indentationClass}>
             <div className={cn("flex flex-col gap-1.5 text-gray-500", indentationClass)}>
@@ -410,6 +423,121 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
     <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
       {uiNodeView}
     </DraggableNodeContainer>
+  )
+}
+
+const tailwindStyles = [
+  { title: "background color", value: "bg-color" },
+  { title: "text color", value: "text-color" },
+  { title: "font size", value: "font-size" },
+  { title: "font weight", value: "font-weight" },
+  { title: "font family", value: "font-family" },
+  { title: "padding", value: "padding" },
+  { title: "margin", value: "margin" },
+  { title: "border", value: "border" },
+  { title: "border radius", value: "border-radius" },
+  { title: "border width", value: "border-width" },
+  { title: "border color", value: "border-color" },
+  { title: "border style", value: "border-style" },
+  { title: "box shadow", value: "box-shadow" },
+  { title: "text shadow", value: "text-shadow" },
+  { title: "text align", value: "text-align" },
+  { title: "text decoration", value: "text-decoration" },
+  { title: "text overflow", value: "text-overflow" },
+  { title: "text transform", value: "text-transform" },
+  { title: "text wrap", value: "text-wrap" },
+  { title: "text indent", value: "text-indent" },
+]
+
+export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNode[] }) => {
+  const node = useNode<CodeNode>(nodeId)
+  const codeDB = useCodeDB()
+  const [isOpen, setIsOpen] = React.useState(true)
+  const containerID = React.useId()
+
+  const [isComboboxOpen, setIsComboboxOpen] = React.useState(false)
+  const [searchValue, setSearchValue] = React.useState("")
+  const matches = React.useMemo(
+    () => matchSorter(tailwindStyles, searchValue, { keys: ["title", "value"] }),
+    [searchValue],
+  )
+
+  return (
+    <div className={indentationClass}>
+      <div className={indentationClass}>
+        <button
+          aria-expanded={isOpen}
+          aria-controls={containerID}
+          className="flex cursor-pointer items-center gap-1.5 via-slate-100"
+          onClick={(event) => {
+            event.preventDefault()
+            setIsOpen(!isOpen)
+          }}
+        >
+          {isOpen ? (
+            <ChevronDown className="text-gray-400 transition-colors hover:text-gray-500" />
+          ) : (
+            <ChevronRight className="text-gray-400 transition-colors hover:text-gray-500" />
+          )}
+          <PencilRuler size={16} className="text-code-constant" />
+        </button>
+        <div
+          id={containerID}
+          className={cn("flex-col items-start", indentationClass, isOpen ? "flex" : "hidden")}
+        >
+          <div>
+            <ComboboxProvider
+              setValue={(value) => {
+                React.startTransition(() => setSearchValue(value))
+              }}
+              focusLoop={true}
+              setOpen={(isOpen) => {
+                setIsComboboxOpen(isOpen)
+              }}
+              open={isComboboxOpen}
+            >
+              <Combobox
+                placeholder="..."
+                className="w-full max-w-sm border-0 p-0 pl-1 focus-visible:ring-0"
+                autoFocus
+                autoSelect
+              />
+              <ComboboxPopover
+                gutter={4}
+                sameWidth
+                className="z-50 rounded-sm border border-gray-300 bg-white px-1 py-1"
+              >
+                {matches.length !== 0 ? (
+                  matches.map((match) => (
+                    <ComboboxItem
+                      key={match.title}
+                      value={match.title}
+                      className="rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
+                      onClick={() => {
+                        console.log("clicked", match)
+                      }}
+                    />
+                  ))
+                ) : (
+                  <div className="no-results">No results found</div>
+                )}
+              </ComboboxPopover>
+            </ComboboxProvider>
+          </div>
+          <div className="pt-1">{/* spacer */}</div>
+          <div className="flex flex-wrap gap-1.5 text-gray-500">
+            {style.map((node, index) => (
+              <div key={node.id} className="flex flex-wrap gap-2">
+                <div className="col-span-1">{node.name}</div>
+                <div className="col-span-4">
+                  <ExpressionView nodeId={node.value.id} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -513,10 +641,6 @@ const NodeList = ({
 
   const isHovered = node.meta?.ui?.isHovered
 
-  const toggleOpen = () => {
-    setIsOpen(!isOpen)
-  }
-
   const handleSpacerClick = (index: number) => {
     const newNode = codeDB?.newEmptyNode(uiNodeTypes.includes(node.type) ? "ui" : "statement")!
 
@@ -535,7 +659,10 @@ const NodeList = ({
         className={`absolute left-0 top-0 cursor-pointer ${
           isOpen ? (isHovered ? "block" : "hidden") : ""
         }`}
-        onClick={toggleOpen}
+        onClick={(event) => {
+          event.preventDefault()
+          setIsOpen(!isOpen)
+        }}
       >
         {isOpen ? (
           <ChevronDown className="text-gray-400 transition-colors hover:text-gray-500" />
@@ -859,7 +986,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
           sameWidth
           className="z-50 rounded-sm border border-gray-300 bg-white px-1 py-1"
         >
-          {matches.length ? (
+          {matches.length !== 0 ? (
             matches.map((match) => (
               <ComboboxItem
                 key={match.title}
