@@ -34,7 +34,7 @@ describe("generateTailwindClassesData", () => {
     expect(areAllClassNamesPresent).toBe(true)
   })
 
-  it("should generate padding classes", () => {
+  it("should generate padding classes and there should be one of each", () => {
     const expectedClassNames = [
       "px-0",
       "py-1",
@@ -50,7 +50,16 @@ describe("generateTailwindClassesData", () => {
       classNames.includes(className),
     )
 
+    const px0Count = classNames.filter((className) => className === "px-0").length
+    const pl5Count = classNames.filter((className) => className === "pl-5").length
+    const plArbitraryCount = classNames.filter(
+      (className) => className === "pl-[arbitrary_dimension]",
+    ).length
+
     expect(areAllClassNamesPresent).toBe(true)
+    expect(px0Count).toBe(1)
+    expect(pl5Count).toBe(1)
+    expect(plArbitraryCount).toBe(1)
   })
 
   it("should generate margin classes", () => {
