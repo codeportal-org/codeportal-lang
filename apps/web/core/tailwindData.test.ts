@@ -19,17 +19,13 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate columns classes", () => {
-    const expectedClassNames = ["columns-1", "columns-5", "columns-auto", "columns-7xl"]
-
-    const areAllClassNamesPresent = expectedClassNames.every((className) =>
-      classNames.includes(className),
-    )
-
-    expect(areAllClassNamesPresent).toBe(true)
-  })
-
-  it("should generate columns classes", () => {
-    const expectedClassNames = ["columns-1", "columns-5", "columns-auto", "columns-7xl"]
+    const expectedClassNames = [
+      "columns-1",
+      "columns-5",
+      "columns-auto",
+      "columns-7xl",
+      "columns-[arbitrary_dimension]",
+    ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -39,7 +35,16 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate padding classes", () => {
-    const expectedClassNames = ["px-0", "py-1", "pt-2", "pr-3", "pb-4", "pl-5"]
+    const expectedClassNames = [
+      "px-0",
+      "py-1",
+      "pt-2",
+      "pr-3",
+      "pb-4",
+      "pl-5",
+      "px-[arbitrary_dimension]",
+      "pl-[arbitrary_dimension]",
+    ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -49,7 +54,15 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate margin classes", () => {
-    const expectedClassNames = ["mx-0", "my-1", "mt-2", "mr-3", "mb-4", "ml-5"]
+    const expectedClassNames = [
+      "mx-0",
+      "my-1",
+      "mt-2",
+      "mr-3",
+      "mb-4",
+      "ml-5",
+      "mx-[arbitrary_dimension]",
+    ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -71,6 +84,7 @@ describe("generateTailwindClassesData", () => {
       "w-auto",
       "w-full",
       "w-screen",
+      "w-[arbitrary_dimension]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -81,7 +95,7 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate min-width classes", () => {
-    const expectedClassNames = ["min-w-0", "min-w-full", "min-w-max"]
+    const expectedClassNames = ["min-w-0", "min-w-full", "min-w-max", "min-w-[arbitrary_dimension]"]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -97,6 +111,7 @@ describe("generateTailwindClassesData", () => {
       "max-w-max",
       "max-w-7xl",
       "max-w-screen-sm",
+      "max-w-[arbitrary_dimension]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -107,7 +122,16 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate height classes", () => {
-    const expectedClassNames = ["h-0", "h-screen", "h-full", "h-1/2", "h-3/6", "h-1/12", "h-auto"]
+    const expectedClassNames = [
+      "h-0",
+      "h-screen",
+      "h-full",
+      "h-1/2",
+      "h-3/6",
+      "h-1/12",
+      "h-auto",
+      "h-[arbitrary_dimension]",
+    ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -117,7 +141,7 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate min-height classes", () => {
-    const expectedClassNames = ["min-h-0"]
+    const expectedClassNames = ["min-h-0", "min-h-[arbitrary_dimension]"]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -127,7 +151,7 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate max-height classes", () => {
-    const expectedClassNames = ["max-h-0", "max-h-screen"]
+    const expectedClassNames = ["max-h-0", "max-h-screen", "max-h-[arbitrary_dimension]"]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -137,7 +161,13 @@ describe("generateTailwindClassesData", () => {
   })
 
   it("should generate space between classes", () => {
-    const expectedClassNames = ["space-x-0", "space-y-1", "space-x-2", "space-y-reverse"]
+    const expectedClassNames = [
+      "space-x-0",
+      "space-y-1",
+      "space-x-2",
+      "space-y-reverse",
+      "space-x-[arbitrary_dimension]",
+    ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),
@@ -159,6 +189,7 @@ describe("generateTailwindClassesData", () => {
       "text-red-500",
       "text-emerald-500",
       "text-green-950",
+      "text-[arbitrary_color]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -193,6 +224,7 @@ describe("generateTailwindClassesData", () => {
       "bg-slate-100",
       "bg-red-500",
       "bg-green-950",
+      "bg-[arbitrary_color]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -230,6 +262,7 @@ describe("generateTailwindClassesData", () => {
       // border-l
       "border-l-inherit",
       "border-l-red-500",
+      "border-l-[arbitrary_color]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -248,6 +281,7 @@ describe("generateTailwindClassesData", () => {
       "accent-slate-100",
       "accent-red-500",
       "accent-green-950",
+      "accent-[arbitrary_color]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -265,6 +299,7 @@ describe("generateTailwindClassesData", () => {
       "caret-slate-100",
       "caret-red-500",
       "caret-green-950",
+      "caret-[arbitrary_color]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -283,6 +318,7 @@ describe("generateTailwindClassesData", () => {
       "fill-slate-100",
       "fill-red-500",
       "fill-green-950",
+      "fill-[arbitrary_color]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -299,6 +335,7 @@ describe("generateTailwindClassesData", () => {
       "stroke-black",
       "stroke-slate-100",
       "stroke-red-500",
+      "stroke-[arbitrary_color]",
     ]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
@@ -320,6 +357,16 @@ describe("generateTailwindClassesData", () => {
 
   it("should generate font style classes by taking into account the prefixes", () => {
     const expectedClassNames = ["italic", "not-italic"]
+
+    const areAllClassNamesPresent = expectedClassNames.every((className) =>
+      classNames.includes(className),
+    )
+
+    expect(areAllClassNamesPresent).toBe(true)
+  })
+
+  it("should generate content classes and generate the arbitrary values class", () => {
+    const expectedClassNames = ["content-none", "content-[arbitrary_string]"]
 
     const areAllClassNamesPresent = expectedClassNames.every((className) =>
       classNames.includes(className),

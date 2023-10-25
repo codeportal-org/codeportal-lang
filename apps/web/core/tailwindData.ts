@@ -1,3 +1,41 @@
+export type TailwindClassData = {
+  name: string
+  title: string
+  description: string
+  type:
+    | "sizing"
+    | "spacing"
+    | "layout"
+    | "typography"
+    | "borders"
+    | "interactivity"
+    | "svg"
+    | "backgrounds"
+  docsUrl: string
+  /**
+   * A function that returns the generated CSS for the given value and modifier.
+   * Used for showing the generated CSS in the UI.
+   */
+  genFn?: (value: any, modifier?: any) => string
+
+  useScale?: boolean
+  useFractions?: boolean
+  useColors?: boolean
+  values?: string[]
+  prefixes?: string[]
+  isStandalone?: boolean
+  /**
+   * Whether the value can be arbitrary or not.
+   */
+  allowArbitraryValues: boolean
+  arbitraryValueType?: "dimension" | "color" | "string"
+}
+
+export type TailwindClassDataItem = {
+  className: string
+  data: TailwindClassData
+}
+
 export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
   const classesData: TailwindClassDataItem[] = []
 
@@ -46,7 +84,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
       }
     }
 
-    if (tailwindStyle.type === "color") {
+    if (tailwindStyle.useColors) {
       for (const color of tailwindRawColors) {
         const item: TailwindClassDataItem = {
           className: `${tailwindStyle.name}-${color}`,
@@ -66,6 +104,15 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
           tailwindStyleClasses.push(item)
         }
       }
+    }
+
+    if (tailwindStyle.allowArbitraryValues) {
+      const arbitraryColorItem: TailwindClassDataItem = {
+        className: `${tailwindStyle.name}-[arbitrary_${tailwindStyle.arbitraryValueType}]`,
+        data: tailwindStyle,
+      }
+
+      tailwindStyleClasses.push(arbitraryColorItem)
     }
 
     const additionalStyleClasses: TailwindClassDataItem[] = []
@@ -88,11 +135,6 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
   }
 
   return classesData
-}
-
-export type TailwindClassDataItem = {
-  className: string
-  data: TailwindClassData
 }
 
 export const tailwindScale = [
@@ -203,24 +245,6 @@ export const tailwindPaletteShades = [
   "950",
 ]
 
-export type TailwindClassData = {
-  name: string
-  title: string
-  description: string
-  type: "color" | "sizing" | "spacing" | "layout" | "typography"
-  useScale?: boolean
-  useFractions?: boolean
-  docsUrl: string
-  values?: string[]
-  prefixes?: string[]
-  isStandalone?: boolean
-  /**
-   * A function that returns the generated CSS for the given value and modifier.
-   * Used for showing the generated CSS in the UI.
-   */
-  genFn?: (value: any, modifier?: any) => string
-}
-
 // TODO: complete genFn for all styles
 
 export const tailwindData: TailwindClassData[] = [
@@ -234,6 +258,7 @@ export const tailwindData: TailwindClassData[] = [
     description: "Utilities for controlling the aspect ratio of an element.",
     docsUrl: "https://tailwindcss.com/docs/aspect-ratio",
     values: ["auto", "square", "video"],
+    allowArbitraryValues: false,
     genFn: (value: "auto" | "square" | "video" | string) => {
       const ratioValue =
         value === "auto"
@@ -256,6 +281,7 @@ export const tailwindData: TailwindClassData[] = [
     description: "A component for fixing an element's width to the current breakpoint.",
     docsUrl: "https://tailwindcss.com/docs/container",
     isStandalone: true,
+    allowArbitraryValues: false,
   },
 
   /* Columns */
@@ -328,6 +354,8 @@ export const tailwindData: TailwindClassData[] = [
       "6xl",
       "7xl",
     ],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
 
   /* Break After */
@@ -1273,6 +1301,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding on all sides.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "px",
@@ -1281,6 +1311,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding left and right.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "py",
@@ -1289,6 +1321,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding top and bottom.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "ps",
@@ -1297,6 +1331,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding left in LTR, right in RTL.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "pe",
@@ -1305,6 +1341,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding right in LTR, left in RTL.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "pt",
@@ -1313,6 +1351,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding top.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "pr",
@@ -1321,6 +1361,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding right.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "pb",
@@ -1329,6 +1371,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding bottom.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "pl",
@@ -1337,6 +1381,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Padding left.",
     docsUrl: "https://tailwindcss.com/docs/padding",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
 
   /* Margin */
@@ -1348,6 +1394,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin on all sides.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "mx",
@@ -1357,6 +1405,8 @@ export const tailwindData: TailwindClassData[] = [
     description: "Margin left and right.",
     docsUrl: "https://tailwindcss.com/docs/margin",
     values: ["auto"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "my",
@@ -1365,6 +1415,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin top and bottom.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "ms",
@@ -1373,6 +1425,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin left in LTR, right in RTL.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "me",
@@ -1381,6 +1435,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin right in LTR, left in RTL.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "mt",
@@ -1389,6 +1445,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin top.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "mr",
@@ -1397,6 +1455,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin right.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "mb",
@@ -1405,6 +1465,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin bottom.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "ml",
@@ -1413,6 +1475,8 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin left.",
     docsUrl: "https://tailwindcss.com/docs/margin",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
 
   /* Space Between */
@@ -1425,6 +1489,8 @@ export const tailwindData: TailwindClassData[] = [
     description: "Horizontal space between children.",
     docsUrl: "https://tailwindcss.com/docs/space",
     values: ["reverse"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
   {
     name: "space-y",
@@ -1434,11 +1500,12 @@ export const tailwindData: TailwindClassData[] = [
     description: "Vertical space between children.",
     docsUrl: "https://tailwindcss.com/docs/space",
     values: ["reverse"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
 
   // // MARK: Sizing
 
-  /* Width */
   {
     name: "w",
     title: "Width",
@@ -1448,9 +1515,9 @@ export const tailwindData: TailwindClassData[] = [
     description: "Utilities for setting the width of an element.",
     docsUrl: "https://tailwindcss.com/docs/width",
     values: ["auto", "full", "screen", "min", "max", "fit"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
-
-  /* Min-Width */
   {
     name: "min-w",
     title: "Min-Width",
@@ -1458,9 +1525,9 @@ export const tailwindData: TailwindClassData[] = [
     description: "Utilities for setting the minimum width of an element.",
     docsUrl: "https://tailwindcss.com/docs/min-width",
     values: ["0", "full", "min", "max", "fit"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
-
-  /* Max-Width */
   {
     name: "max-w",
     title: "Max-Width",
@@ -1492,9 +1559,9 @@ export const tailwindData: TailwindClassData[] = [
       "screen-xl",
       "screen-2xl",
     ],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
-
-  /* Height */
   {
     name: "h",
     title: "Height",
@@ -1504,9 +1571,9 @@ export const tailwindData: TailwindClassData[] = [
     description: "Utilities for setting the height of an element.",
     docsUrl: "https://tailwindcss.com/docs/height",
     values: ["auto", "full", "screen", "min", "max", "fit"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
-
-  /* Min-Height */
   {
     name: "min-h",
     title: "Min-Height",
@@ -1514,9 +1581,9 @@ export const tailwindData: TailwindClassData[] = [
     description: "Utilities for setting the minimum height of an element.",
     docsUrl: "https://tailwindcss.com/docs/min-height",
     values: ["0", "full", "screen", "min", "max", "fit"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
-
-  /* Max-Height */
   {
     name: "max-h",
     title: "Max-Height",
@@ -1525,11 +1592,11 @@ export const tailwindData: TailwindClassData[] = [
     docsUrl: "https://tailwindcss.com/docs/max-height",
     useScale: true,
     values: ["none", "full", "screen", "min", "max", "fit"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
 
   // // MARK: Typography
-
-  /* Font Family */
   {
     name: "font",
     title: "Font Family",
@@ -1537,8 +1604,9 @@ export const tailwindData: TailwindClassData[] = [
     description: "Utilities for setting the font family of an element.",
     docsUrl: "https://tailwindcss.com/docs/font-family",
     values: ["sans", "serif", "mono"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "string",
   },
-  /* Font Size */
   {
     name: "text",
     title: "Font Size",
@@ -1560,9 +1628,9 @@ export const tailwindData: TailwindClassData[] = [
       "8xl",
       "9xl",
     ],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
-
-  /* Font Smoothing */
   {
     name: "antialiased",
     title: "Font Smoothing",
@@ -1571,9 +1639,8 @@ export const tailwindData: TailwindClassData[] = [
     docsUrl: "https://tailwindcss.com/docs/font-smoothing",
     isStandalone: true,
     prefixes: ["subpixel"],
+    allowArbitraryValues: false,
   },
-
-  /* Font Style */
   {
     name: "italic",
     title: "Font Style",
@@ -1582,6 +1649,7 @@ export const tailwindData: TailwindClassData[] = [
     docsUrl: "https://tailwindcss.com/docs/font-style",
     isStandalone: true,
     prefixes: ["not"],
+    allowArbitraryValues: false,
   },
 
   /* Font Weight */
@@ -1664,9 +1732,12 @@ export const tailwindData: TailwindClassData[] = [
   {
     name: "text",
     title: "Text Color",
-    type: "color",
+    type: "typography",
+    useColors: true,
     description: "Text color.",
     docsUrl: "https://tailwindcss.com/docs/text-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Text Decoration */
@@ -1680,9 +1751,12 @@ export const tailwindData: TailwindClassData[] = [
   {
     name: "decoration",
     title: "Text Decoration Color",
-    type: "color",
+    type: "typography",
+    useColors: true,
     description: "Text decoration color.",
     docsUrl: "https://tailwindcss.com/docs/text-decoration-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Text Decoration Style */
@@ -1721,73 +1795,66 @@ export const tailwindData: TailwindClassData[] = [
   // "text-clip",
 
   /* Text Indent */
-  // "indent-0",
-  // "indent-px",
-  // "indent-0.5",
-  // "indent-1",
-  // "indent-1.5",
-  // "indent-2",
-  // "indent-2.5",
-  // "indent-3",
-  // "indent-3.5",
-  // "indent-4",
-  // "indent-5",
-  // "indent-6",
-  // "indent-7",
-  // "indent-8",
-  // "indent-9",
-  // "indent-10",
-  // "indent-11",
-  // "indent-12",
-  // "indent-14",
-  // "indent-16",
-  // "indent-20",
-  // "indent-24",
-  // "indent-28",
-  // "indent-32",
-  // "indent-36",
-  // "indent-40",
-  // "indent-44",
-  // "indent-48",
-  // "indent-52",
-  // "indent-56",
-  // "indent-60",
-  // "indent-64",
-  // "indent-72",
-  // "indent-80",
-  // "indent-96",
-
-  /* Vertical Align */
-  // "align-baseline",
-  // "align-top",
-  // "align-middle",
-  // "align-bottom",
-  // "align-text-top",
-  // "align-text-bottom",
-  // "align-sub",
-  // "align-super",
-
-  /* Whitespace */
-  // "whitespace-normal",
-  // "whitespace-nowrap",
-  // "whitespace-pre",
-  // "whitespace-pre-line",
-  // "whitespace-pre-wrap",
-  // "whitespace-break-spaces",
-
-  /* Word Break */
-  // "break-normal",
-  // "break-words",
-  // "break-all",
-  // "break-keep",
-
-  /* Hyphens */
-  // "hyphens-none",
-  // "hyphens-manual",
-  // "hyphens-auto",
+  {
+    name: "indent",
+    title: "Text Indent",
+    type: "typography",
+    useScale: true,
+    description:
+      "Utilities for controlling the amount of empty space shown before text in a block.",
+    docsUrl: "https://tailwindcss.com/docs/text-indent",
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
+  },
+  {
+    name: "align",
+    title: "Vertical Align",
+    type: "typography",
+    description: "Utilities for controlling the vertical alignment of an inline or table-cell box.",
+    docsUrl: "https://tailwindcss.com/docs/vertical-align",
+    values: ["baseline", "top", "middle", "bottom", "text-top", "text-bottom", "sub", "super"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
+  },
+  {
+    name: "whitespace",
+    title: "Whitespace",
+    type: "typography",
+    description: "Utilities for controlling an element's white-space property.",
+    docsUrl: "https://tailwindcss.com/docs/whitespace",
+    values: ["normal", "nowrap", "pre", "pre-line", "pre-wrap", "break-spaces"],
+    allowArbitraryValues: false,
+  },
+  {
+    name: "break",
+    title: "Word Break",
+    type: "typography",
+    description: "Utilities for controlling word breaks in an element.",
+    docsUrl: "https://tailwindcss.com/docs/word-break",
+    values: ["normal", "words", "all", "keep"],
+    allowArbitraryValues: false,
+  },
+  {
+    name: "hyphens",
+    title: "Hyphens",
+    type: "typography",
+    description: "Utilities for controlling how words should be hyphenated.",
+    docsUrl: "https://tailwindcss.com/docs/hyphens",
+    values: ["none", "manual", "auto"],
+    allowArbitraryValues: false,
+  },
 
   /* Content */
-  // "content-none",
+  {
+    name: "content",
+    title: "Content",
+    type: "typography",
+    description: "Utilities for controlling the content of the before and after pseudo-elements.",
+    docsUrl: "https://tailwindcss.com/docs/content",
+    values: ["none"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "string",
+  },
 
   // // MARK: Backgrounds
 
@@ -1806,9 +1873,12 @@ export const tailwindData: TailwindClassData[] = [
   {
     name: "bg",
     title: "Background Color",
-    type: "color",
+    type: "backgrounds",
+    useColors: true,
     description: "Background color.",
     docsUrl: "https://tailwindcss.com/docs/background-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Background Origin */
@@ -2050,74 +2120,104 @@ export const tailwindData: TailwindClassData[] = [
   {
     name: "border",
     title: "Border Color",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for all sides.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-x",
     title: "Border Color X",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for left and right sides.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-y",
     title: "Border Color Y",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for top and bottom sides.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-s",
     title: "Border Color Start",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for start side in LTR, left side in RTL.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-e",
     title: "Border Color End",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for end side in LTR, right side in RTL.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-t",
     title: "Border Color Top",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for top side.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-r",
     title: "Border Color Right",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for right side.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-b",
     title: "Border Color Bottom",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for bottom side.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
   {
     name: "border-l",
     title: "Border Color Left",
-    type: "color",
+    type: "borders",
+    useColors: true,
     description: "Border color for left side.",
     docsUrl: "https://tailwindcss.com/docs/border-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Border Style */
-  // "border-solid",
-  // "border-dashed",
-  // "border-dotted",
-  // "border-double",
-  // "border-hidden",
-  // "border-none",
+  {
+    name: "border",
+    title: "Border Style",
+    type: "borders",
+    description: "Border style.",
+    docsUrl: "https://tailwindcss.com/docs/border-style",
+    values: ["solid", "dashed", "dotted", "double", "hidden", "none"],
+    allowArbitraryValues: false,
+  },
 
   /* Divide Width */
   // "divide-x-0",
@@ -3967,10 +4067,13 @@ export const tailwindData: TailwindClassData[] = [
   {
     name: "accent",
     title: "Accent Color",
-    type: "color",
+    type: "interactivity",
+    useColors: true,
     description: "Utilities for controlling the accented color of a form control.",
     docsUrl: "https://tailwindcss.com/docs/accent-color",
     values: ["auto"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Appearance */
@@ -4018,9 +4121,12 @@ export const tailwindData: TailwindClassData[] = [
   {
     name: "caret",
     title: "Caret Color",
-    type: "color",
+    type: "interactivity",
+    useColors: true,
     description: "Utilities for controlling the color of the text input cursor.",
     docsUrl: "https://tailwindcss.com/docs/caret-color",
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Pointer Events */
@@ -4735,34 +4841,39 @@ export const tailwindData: TailwindClassData[] = [
   {
     name: "fill",
     title: "Fill (SVG)",
-    type: "color",
+    type: "svg",
+    useColors: true,
     description: "Utilities for styling the fill of SVG elements.",
     docsUrl: "https://tailwindcss.com/docs/fill",
     values: ["none"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Stroke */
   {
     name: "stroke",
     title: "Stroke (SVG)",
-    type: "color",
+    type: "svg",
+    useColors: true,
     description: "Utilities for styling the stroke of SVG elements.",
     docsUrl: "https://tailwindcss.com/docs/stroke",
     values: ["none"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "color",
   },
 
   /* Stroke Width */
   {
     name: "stroke",
     title: "Stroke Width (SVG)",
-    type: "sizing",
+    type: "svg",
     description: "Utilities for controlling the width of SVG strokes.",
     docsUrl: "https://tailwindcss.com/docs/stroke-width",
     values: ["0", "1", "2"],
+    allowArbitraryValues: true,
+    arbitraryValueType: "dimension",
   },
-  // "stroke-0",
-  // "stroke-1",
-  // "stroke-2",
 
   // // MARK: Accessibility
 
