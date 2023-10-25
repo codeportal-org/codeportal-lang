@@ -33,6 +33,8 @@ export type TailwindClassData = {
 
 export type TailwindClassDataItem = {
   className: string
+  args?: string[]
+  prefix?: string
   data: TailwindClassData
 }
 
@@ -46,6 +48,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
       for (const value of tailwindStyle.values) {
         const item: TailwindClassDataItem = {
           className: `${tailwindStyle.name}-${value}`,
+          args: [value],
           data: tailwindStyle,
         }
 
@@ -66,6 +69,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
       for (const value of tailwindScale) {
         const item: TailwindClassDataItem = {
           className: `${tailwindStyle.name}-${value}`,
+          args: [value],
           data: tailwindStyle,
         }
 
@@ -77,6 +81,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
       for (const value of tailwindFractions) {
         const item: TailwindClassDataItem = {
           className: `${tailwindStyle.name}-${value}`,
+          args: [value],
           data: tailwindStyle,
         }
 
@@ -88,6 +93,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
       for (const color of tailwindRawColors) {
         const item: TailwindClassDataItem = {
           className: `${tailwindStyle.name}-${color}`,
+          args: [color],
           data: tailwindStyle,
         }
 
@@ -98,6 +104,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
         for (const shade of tailwindPaletteShades) {
           const item: TailwindClassDataItem = {
             className: `${tailwindStyle.name}-${color}-${shade}`,
+            args: [color, shade],
             data: tailwindStyle,
           }
 
@@ -122,6 +129,8 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
         for (const className of tailwindStyleClasses) {
           const item: TailwindClassDataItem = {
             className: `${prefix}-${className.className}`,
+            args: className.args,
+            prefix,
             data: tailwindStyle,
           }
 
