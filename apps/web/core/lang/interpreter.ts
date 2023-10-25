@@ -210,7 +210,7 @@ export class Interpreter {
 
       const props: Record<string, any> = {
         key: node.id,
-        style: node.style,
+        // style: node.style,
       }
 
       if (this.isDevSite) {
