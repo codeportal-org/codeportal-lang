@@ -1,4 +1,11 @@
-import { Combobox, ComboboxItem, ComboboxPopover, ComboboxProvider } from "@ariakit/react"
+import {
+  Combobox,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopover,
+  ComboboxProvider,
+  useComboboxStore,
+} from "@ariakit/react"
 import {
   ClientRect,
   CollisionDescriptor,
@@ -19,6 +26,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import { atom, useAtom } from "jotai"
 import { ChevronDown, ChevronRight, PencilRuler, Square, Type } from "lucide-react"
 import { matchSorter } from "match-sorter"
@@ -56,6 +64,7 @@ import {
   statementTypes,
   uiNodeTypes,
 } from "./lang/codeTree"
+import { generateTailwindClassesData } from "./tailwindData"
 
 type DropData = { type: CodeNode["type"] }
 
@@ -351,10 +360,9 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
                   className="text-code-ui-element-name transition-color rounded-md bg-gray-100 px-1 hover:bg-gray-200"
                   onClick={(event) => {
                     event.preventDefault()
-                    const newStyleNode = codeDB?.newNodeFromType<UIStyleNode>("ui style")!
 
                     codeDB?.updateNode(nodeId, {
-                      style: [newStyleNode],
+                      style: [],
                     })
                   }}
                 >
@@ -426,29 +434,6 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
   )
 }
 
-const tailwindStyles = [
-  { title: "background color", value: "bg-color" },
-  { title: "text color", value: "text-color" },
-  { title: "font size", value: "font-size" },
-  { title: "font weight", value: "font-weight" },
-  { title: "font family", value: "font-family" },
-  { title: "padding", value: "padding" },
-  { title: "margin", value: "margin" },
-  { title: "border", value: "border" },
-  { title: "border radius", value: "border-radius" },
-  { title: "border width", value: "border-width" },
-  { title: "border color", value: "border-color" },
-  { title: "border style", value: "border-style" },
-  { title: "box shadow", value: "box-shadow" },
-  { title: "text shadow", value: "text-shadow" },
-  { title: "text align", value: "text-align" },
-  { title: "text decoration", value: "text-decoration" },
-  { title: "text overflow", value: "text-overflow" },
-  { title: "text transform", value: "text-transform" },
-  { title: "text wrap", value: "text-wrap" },
-  { title: "text indent", value: "text-indent" },
-]
-
 export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNode[] }) => {
   const node = useNode<CodeNode>(nodeId)
   const codeDB = useCodeDB()
@@ -457,10 +442,52 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
 
   const [isComboboxOpen, setIsComboboxOpen] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState("")
+
+  const comboboxStore = useComboboxStore({
+    resetValueOnHide: true,
+    setValue: (value) => {
+      React.startTransition(() => setSearchValue(value))
+    },
+    focusLoop: true,
+    setOpen: (isOpen) => {
+      setIsComboboxOpen(isOpen)
+    },
+    open: isComboboxOpen,
+  })
+
+  const tailwindStyles = React.useMemo(
+    () =>
+      generateTailwindClassesData().map((style) => ({
+        title:
+          style.data.title +
+          (style.className.includes("arbitrary")
+            ? ` (arbitrary ${style.data.arbitraryValueType})`
+            : ""),
+        value: style.className,
+        name: style.data.name,
+        data: style.data,
+      })),
+    [],
+  )
+
   const matches = React.useMemo(
-    () => matchSorter(tailwindStyles, searchValue, { keys: ["title", "value"] }),
+    () =>
+      searchValue.length === 0
+        ? []
+        : matchSorter(tailwindStyles, searchValue, {
+            keys: ["value", "title"],
+            baseSort: (a, b) => (a.index > b.index ? 1 : -1),
+          }),
     [searchValue],
   )
+
+  const virtualizedListContainerRef = React.useRef<HTMLDivElement>(null)
+
+  const rowVirtualizer = useVirtualizer({
+    count: matches.length,
+    getScrollElement: () => virtualizedListContainerRef.current,
+    estimateSize: () => 28,
+  })
 
   return (
     <div className={indentationClass}>
@@ -486,43 +513,65 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
           className={cn("flex-col items-start", indentationClass, isOpen ? "flex" : "hidden")}
         >
           <div>
-            <ComboboxProvider
-              setValue={(value) => {
-                React.startTransition(() => setSearchValue(value))
-              }}
-              focusLoop={true}
-              setOpen={(isOpen) => {
-                setIsComboboxOpen(isOpen)
-              }}
-              open={isComboboxOpen}
+            <Combobox
+              store={comboboxStore}
+              placeholder="..."
+              className="w-full max-w-sm border-0 p-0 pl-1 focus-visible:ring-0"
+              autoFocus
+            />
+            <ComboboxPopover
+              store={comboboxStore}
+              gutter={4}
+              className="z-50 h-72 w-56 overflow-auto rounded-sm border border-gray-300 bg-white px-1 py-1"
             >
-              <Combobox
-                placeholder="..."
-                className="w-full max-w-sm border-0 p-0 pl-1 focus-visible:ring-0"
-                autoFocus
-                autoSelect
-              />
-              <ComboboxPopover
-                gutter={4}
-                sameWidth
-                className="z-50 rounded-sm border border-gray-300 bg-white px-1 py-1"
+              <ComboboxList
+                store={comboboxStore}
+                ref={virtualizedListContainerRef}
+                className="h-full w-full overflow-auto"
               >
                 {matches.length !== 0 ? (
-                  matches.map((match) => (
-                    <ComboboxItem
-                      key={match.title}
-                      value={match.title}
-                      className="rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
-                      onClick={() => {
-                        console.log("clicked", match)
-                      }}
-                    />
-                  ))
+                  <div
+                    style={{
+                      height: `${rowVirtualizer.getTotalSize()}px`,
+                      width: "100%",
+                      position: "relative",
+                    }}
+                  >
+                    {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+                      const match = matches[virtualItem.index]!
+
+                      return (
+                        <ComboboxItem
+                          store={comboboxStore}
+                          key={match.value}
+                          value={match.value}
+                          className="flex items-center gap-1.5 rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: `${virtualItem.size}px`,
+                            transform: `translateY(${virtualItem.start}px)`,
+                          }}
+                          onClick={() => {
+                            console.log("clicked", match)
+                          }}
+                        >
+                          {match.data.useColors && (
+                            <div className="ml-1 h-4 w-4 rounded-sm border border-gray-300 bg-emerald-200" />
+                          )}
+
+                          {match.value}
+                        </ComboboxItem>
+                      )
+                    })}
+                  </div>
                 ) : (
                   <div className="no-results">No results found</div>
                 )}
-              </ComboboxPopover>
-            </ComboboxProvider>
+              </ComboboxList>
+            </ComboboxPopover>
           </div>
           <div className="pt-1">{/* spacer */}</div>
           <div className="flex flex-wrap gap-1.5 text-gray-500">
