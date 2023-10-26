@@ -478,7 +478,7 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
   "ui prop declaration": { kinds: [], expressions: ["value"] },
   "ui prop": { kinds: [], expressions: ["value"] },
   "ui spread prop": { kinds: [], expressions: ["arg"] },
-  "ui style": { kinds: ["style"], expressions: ["value", "test"] },
+  "ui style": { kinds: ["style"], expressions: ["test"] },
   return: { kinds: ["statement"], expressions: ["arg"] },
   assignment: { kinds: ["statement"], expressions: ["left", "right"] },
   state: { kinds: ["statement"], expressions: ["value"] },
