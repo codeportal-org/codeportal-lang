@@ -1,3 +1,4 @@
+import { createNanoEvents } from "nanoevents"
 import React from "react"
 
 import { tailwindDataMap } from "../tailwindData"
@@ -43,6 +44,23 @@ export class Interpreter {
   }
 
   private currentScope: Scope = this.globalScope
+
+  private tailwindClassesSet = new Set<string>()
+
+  private events = createNanoEvents()
+
+  getTailwindClasses() {
+    return Array.from(this.tailwindClassesSet)
+  }
+
+  onNewTailwindClass(callback: (className: string) => void) {
+    return this.events.on("newTailwindClass", callback)
+  }
+
+  private newTailwindClass(className: string) {
+    this.tailwindClassesSet.add(className)
+    this.events.emit("newTailwindClass", className)
+  }
 
   interpret(node: ProgramNode) {
     this.currentScope = this.globalScope
@@ -246,7 +264,13 @@ export class Interpreter {
 
           const styleData = tailwindDataMap.get(style.name)!
 
-          tailwindClasses += style.args ? `${styleData.tag}-${style.args.join("-")}` : styleData.tag
+          const tailwindClass = style.args
+            ? `${styleData.tag}-${style.args.join("-")}`
+            : styleData.tag
+
+          tailwindClasses += tailwindClass
+
+          this.newTailwindClass(tailwindClass)
         }
 
         props.className = (props.className === "" ? "" : " ") + tailwindClasses
