@@ -64,7 +64,7 @@ import {
   statementTypes,
   uiNodeTypes,
 } from "./lang/codeTree"
-import { generateTailwindClassesData } from "./tailwindData"
+import { TailwindShade, generateTailwindClassesData, tailwindColorPalette } from "./tailwindData"
 
 type DropData = { type: CodeNode["type"] }
 
@@ -446,9 +446,14 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
   const comboboxStore = useComboboxStore({
     resetValueOnHide: true,
     setValue: (value) => {
-      React.startTransition(() => setSearchValue(value))
+      React.startTransition(() => {
+        setSearchValue(value)
+        setTimeout(() => {
+          comboboxStore.move(comboboxStore.down())
+        }, 100)
+      })
     },
-    focusLoop: true,
+    focusLoop: false,
     setOpen: (isOpen) => {
       setIsComboboxOpen(isOpen)
     },
@@ -465,6 +470,8 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
             : ""),
         value: style.className,
         name: style.data.name,
+        args: style.args,
+        prefix: style.prefix,
         data: style.data,
       })),
     [],
@@ -472,12 +479,10 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
 
   const matches = React.useMemo(
     () =>
-      searchValue.length === 0
-        ? []
-        : matchSorter(tailwindStyles, searchValue, {
-            keys: ["value", "title"],
-            baseSort: (a, b) => (a.index > b.index ? 1 : -1),
-          }),
+      matchSorter(tailwindStyles, searchValue, {
+        keys: ["value", "title"],
+        baseSort: (a, b) => (a.index > b.index ? 1 : -1),
+      }),
     [searchValue],
   )
 
@@ -489,30 +494,32 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
     estimateSize: () => 28,
   })
 
+  React.useEffect(() => {
+    setIsComboboxOpen(true)
+  }, [])
+
   return (
     <div className={indentationClass}>
       <div className={indentationClass}>
-        <button
-          aria-expanded={isOpen}
-          aria-controls={containerID}
-          className="flex cursor-pointer items-center gap-1.5 via-slate-100"
-          onClick={(event) => {
-            event.preventDefault()
-            setIsOpen(!isOpen)
-          }}
-        >
-          {isOpen ? (
-            <ChevronDown className="text-gray-400 transition-colors hover:text-gray-500" />
-          ) : (
-            <ChevronRight className="text-gray-400 transition-colors hover:text-gray-500" />
-          )}
-          <PencilRuler size={16} className="text-code-constant" />
-        </button>
-        <div
-          id={containerID}
-          className={cn("flex-col items-start", indentationClass, isOpen ? "flex" : "hidden")}
-        >
-          <div>
+        <div className="flex gap-1">
+          <button
+            aria-expanded={isOpen}
+            aria-controls={containerID}
+            className="flex cursor-pointer items-center gap-1.5 via-slate-100"
+            onClick={(event) => {
+              event.preventDefault()
+              setIsOpen(!isOpen)
+            }}
+          >
+            {isOpen ? (
+              <ChevronDown className="text-gray-400 transition-colors hover:text-gray-500" />
+            ) : (
+              <ChevronRight className="text-gray-400 transition-colors hover:text-gray-500" />
+            )}
+            <PencilRuler size={16} className="text-code-constant" />
+          </button>
+          {/* Style Autocomplete */}
+          <div className={isOpen ? "block" : "hidden"}>
             <Combobox
               store={comboboxStore}
               placeholder="..."
@@ -559,7 +566,18 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                           }}
                         >
                           {match.data.useColors && (
-                            <div className="ml-1 h-4 w-4 rounded-sm border border-gray-300 bg-emerald-200" />
+                            <div
+                              className="ml-1 h-4 w-4 rounded-sm border shadow-sm"
+                              style={
+                                match.args !== undefined
+                                  ? {
+                                      backgroundColor: tailwindColorPalette.find(
+                                        (color) => match.args && color.name === match.args[0],
+                                      )?.shades[match.args[1] as TailwindShade],
+                                    }
+                                  : {}
+                              }
+                            />
                           )}
 
                           {match.value}
@@ -573,6 +591,11 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
               </ComboboxList>
             </ComboboxPopover>
           </div>
+        </div>
+        <div
+          id={containerID}
+          className={cn("flex-col items-start", indentationClass, isOpen ? "flex" : "hidden")}
+        >
           <div className="pt-1">{/* spacer */}</div>
           <div className="flex flex-wrap gap-1.5 text-gray-500">
             {style.map((node, index) => (
