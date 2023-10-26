@@ -14,7 +14,7 @@ describe("generateTailwindClassesData", () => {
     expect(areAllClassNamesPresent).toBe(true)
   })
 
-  it("should generate the container class and the attached className", () => {
+  it("should generate the container class", () => {
     expect(classNames.includes("container")).toBe(true)
     expect(classNames.includes("mx-auto")).toBe(true)
   })
