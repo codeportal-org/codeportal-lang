@@ -27,7 +27,7 @@ import {
 } from "@dnd-kit/core"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { atom, useAtom } from "jotai"
-import { ChevronDown, ChevronRight, PencilRuler, Square, Type } from "lucide-react"
+import { ChevronDown, ChevronRight, HelpCircle, PencilRuler, Square, Type, X } from "lucide-react"
 import { matchSorter } from "match-sorter"
 import React, { PointerEvent } from "react"
 import ContentEditable from "react-contenteditable"
@@ -603,46 +603,90 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
         >
           <div className="pt-1">{/* spacer */}</div>
           <div className="flex flex-wrap gap-1.5 text-gray-500">
-            {style.map((styleNode, index) => {
-              const styleData = tailwindDataMap.get(styleNode.name)!
-
-              return (
-                <button
-                  key={styleNode.id}
-                  className="flex flex-wrap items-center gap-1 rounded-sm border border-gray-300 px-1"
-                  onClick={(event) => {
-                    event.preventDefault()
-
-                    codeDB?.deleteNode(styleNode.id)
-                  }}
-                >
-                  {styleData.useColors && (
-                    <div
-                      className="ml-1 h-4 w-4 rounded-sm border shadow-sm"
-                      style={
-                        styleNode.args !== undefined
-                          ? {
-                              backgroundColor: tailwindColorPalette.find(
-                                (color) => styleNode.args && color.name === styleNode.args[0],
-                              )?.shades[styleNode.args[1] as TailwindShade],
-                            }
-                          : {}
-                      }
-                    />
-                  )}
-                  <div>
-                    {styleNode.args
-                      ? `${styleData.tag}-${styleNode.args?.join("-")}`
-                      : styleData.tag}
-                  </div>
-                </button>
-              )
-            })}
+            {style.map((styleNode) => (
+              <StyleNodeView nodeId={styleNode.id} key={styleNode.id} />
+            ))}
           </div>
           <div className="pt-1">{/* spacer */}</div>
         </div>
       </div>
     </div>
+  )
+}
+
+export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<UIStyleNode>(nodeId)
+  const codeDB = useCodeDB()
+
+  const styleData = tailwindDataMap.get(node.name)!
+
+  const isHovered = node.meta?.ui?.isHovered
+
+  return (
+    <button
+      className="relative flex flex-wrap items-center gap-1 rounded-sm border border-gray-300 px-1"
+      onClick={(event) => {
+        event.preventDefault()
+
+        codeDB?.selectNode(nodeId)
+      }}
+      onFocus={(event) => {
+        event.preventDefault()
+
+        codeDB?.selectNode(nodeId)
+      }}
+      onMouseOver={(event) => {
+        event.preventDefault()
+
+        codeDB?.hoverNode(nodeId)
+      }}
+      onMouseLeave={() => {
+        codeDB?.hoverNodeOff(nodeId)
+      }}
+    >
+      {styleData.useColors && (
+        <div
+          className="ml-1 h-4 w-4 rounded-sm border shadow-sm"
+          style={
+            node.args !== undefined
+              ? {
+                  backgroundColor: tailwindColorPalette.find(
+                    (color) => node.args && color.name === node.args[0],
+                  )?.shades[node.args[1] as TailwindShade],
+                }
+              : {}
+          }
+        />
+      )}
+      <div>{node.args ? `${styleData.tag}-${node.args?.join("-")}` : styleData.tag}</div>
+
+      {/* Controls overlay */}
+      {(isHovered || node.meta?.ui?.isSelected) && (
+        <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center gap-2 rounded-sm bg-gray-100 bg-opacity-20">
+          <button
+            className="rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
+            onClick={(event) => {
+              event.preventDefault()
+
+              codeDB?.deleteNode(nodeId)
+            }}
+          >
+            <X size={16} />
+          </button>
+
+          <button
+            className="rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
+            onClick={(event) => {
+              event.preventDefault()
+
+              window.open(styleData.docsUrl)
+            }}
+          >
+            <HelpCircle size={16} />
+          </button>
+        </div>
+      )}
+    </button>
   )
 }
 
@@ -905,6 +949,14 @@ const DraggableNodeContainer = ({
           return
         }
         event.preventDefault()
+        codeDB?.selectNode(nodeId)
+      }}
+      onFocus={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
         codeDB?.selectNode(nodeId)
       }}
       onBlur={() => {
