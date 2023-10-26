@@ -1,5 +1,6 @@
 export type TailwindClassData = {
   name: string
+  tag: string
   title: string
   description: string
   type:
@@ -47,7 +48,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
     if (tailwindStyle.values) {
       for (const value of tailwindStyle.values) {
         const item: TailwindClassDataItem = {
-          className: `${tailwindStyle.name}-${value}`,
+          className: `${tailwindStyle.tag}-${value}`,
           args: [value],
           data: tailwindStyle,
         }
@@ -58,7 +59,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
 
     if (tailwindStyle.isStandalone) {
       const item: TailwindClassDataItem = {
-        className: tailwindStyle.name,
+        className: tailwindStyle.tag,
         data: tailwindStyle,
       }
 
@@ -68,7 +69,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
     if (tailwindStyle.useScale) {
       for (const value of tailwindScale) {
         const item: TailwindClassDataItem = {
-          className: `${tailwindStyle.name}-${value}`,
+          className: `${tailwindStyle.tag}-${value}`,
           args: [value],
           data: tailwindStyle,
         }
@@ -80,7 +81,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
     if (tailwindStyle.useFractions) {
       for (const value of tailwindFractions) {
         const item: TailwindClassDataItem = {
-          className: `${tailwindStyle.name}-${value}`,
+          className: `${tailwindStyle.tag}-${value}`,
           args: [value],
           data: tailwindStyle,
         }
@@ -92,7 +93,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
     if (tailwindStyle.useColors) {
       for (const color of tailwindRawColors) {
         const item: TailwindClassDataItem = {
-          className: `${tailwindStyle.name}-${color}`,
+          className: `${tailwindStyle.tag}-${color}`,
           args: [color],
           data: tailwindStyle,
         }
@@ -103,7 +104,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
       for (const color of tailwindPaletteColors) {
         for (const shade of tailwindPaletteShades) {
           const item: TailwindClassDataItem = {
-            className: `${tailwindStyle.name}-${color}-${shade}`,
+            className: `${tailwindStyle.tag}-${color}-${shade}`,
             args: [color, shade],
             data: tailwindStyle,
           }
@@ -115,7 +116,7 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
 
     if (tailwindStyle.allowArbitraryValues) {
       const arbitraryColorItem: TailwindClassDataItem = {
-        className: `${tailwindStyle.name}-[arbitrary_${tailwindStyle.arbitraryValueType}]`,
+        className: `${tailwindStyle.tag}-[arbitrary_${tailwindStyle.arbitraryValueType}]`,
         data: tailwindStyle,
       }
 
@@ -609,7 +610,10 @@ export const tailwindPaletteShades = [
   "950",
 ] as const
 
-export type TailwindShade = typeof tailwindPaletteShades[number]
+export type TailwindShade = (typeof tailwindPaletteShades)[number]
+
+// TODO: complete all the Tailwind classes
+// TODO: make all names dashed
 
 // TODO: complete genFn for all styles
 
@@ -618,7 +622,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Aspect Ratio */
   {
-    name: "aspect",
+    name: "aspect ratio",
+    tag: "aspect",
     title: "Aspect Ratio",
     type: "layout",
     description: "Utilities for controlling the aspect ratio of an element.",
@@ -642,6 +647,7 @@ export const tailwindData: TailwindClassData[] = [
   /* Container */
   {
     name: "container",
+    tag: "container",
     title: "Container",
     type: "layout",
     description: "A component for fixing an element's width to the current breakpoint.",
@@ -653,6 +659,7 @@ export const tailwindData: TailwindClassData[] = [
   /* Columns */
   {
     name: "columns",
+    tag: "columns",
     title: "Columns",
     type: "layout",
     description: "Utilities for controlling the number of columns within an element.",
@@ -1661,7 +1668,8 @@ export const tailwindData: TailwindClassData[] = [
   /* Padding */
 
   {
-    name: "p",
+    name: "padding",
+    tag: "p",
     title: "Padding",
     type: "spacing",
     useScale: true,
@@ -1671,7 +1679,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "px",
+    name: "padding x",
+    tag: "px",
     title: "Padding X",
     type: "spacing",
     useScale: true,
@@ -1681,7 +1690,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "py",
+    name: "padding y",
+    tag: "py",
     title: "Padding Y",
     type: "spacing",
     useScale: true,
@@ -1691,7 +1701,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "ps",
+    name: "padding start",
+    tag: "ps",
     title: "Padding Start",
     type: "spacing",
     useScale: true,
@@ -1701,7 +1712,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "pe",
+    name: "padding end",
+    tag: "pe",
     title: "Padding End",
     type: "spacing",
     useScale: true,
@@ -1711,7 +1723,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "pt",
+    name: "padding top",
+    tag: "pt",
     title: "Padding Top",
     type: "spacing",
     useScale: true,
@@ -1721,7 +1734,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "pr",
+    name: "padding right",
+    tag: "pr",
     title: "Padding Right",
     type: "spacing",
     useScale: true,
@@ -1731,7 +1745,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "pb",
+    name: "padding bottom",
+    tag: "pb",
     title: "Padding Bottom",
     type: "spacing",
     useScale: true,
@@ -1741,7 +1756,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "pl",
+    name: "padding left",
+    tag: "pl",
     title: "Padding Left",
     type: "spacing",
     useScale: true,
@@ -1754,7 +1770,8 @@ export const tailwindData: TailwindClassData[] = [
   /* Margin */
 
   {
-    name: "m",
+    name: "margin",
+    tag: "m",
     title: "Margin",
     type: "spacing",
     useScale: true,
@@ -1764,7 +1781,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "mx",
+    name: "margin x",
+    tag: "mx",
     title: "Margin X",
     type: "spacing",
     useScale: true,
@@ -1775,7 +1793,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "my",
+    name: "margin y",
+    tag: "my",
     title: "Margin Y",
     type: "spacing",
     useScale: true,
@@ -1785,7 +1804,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "ms",
+    name: "margin start",
+    tag: "ms",
     title: "Margin Start",
     type: "spacing",
     useScale: true,
@@ -1795,7 +1815,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "me",
+    name: "margin end",
+    tag: "me",
     title: "Margin End",
     type: "spacing",
     useScale: true,
@@ -1805,7 +1826,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "mt",
+    name: "margin top",
+    tag: "mt",
     title: "Margin Top",
     type: "spacing",
     useScale: true,
@@ -1815,7 +1837,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "mr",
+    name: "margin right",
+    tag: "mr",
     title: "Margin Right",
     type: "spacing",
     useScale: true,
@@ -1825,7 +1848,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "mb",
+    name: "margin bottom",
+    tag: "mb",
     title: "Margin Bottom",
     type: "spacing",
     useScale: true,
@@ -1835,7 +1859,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "ml",
+    name: "margin left",
+    tag: "ml",
     title: "Margin Left",
     type: "spacing",
     useScale: true,
@@ -1848,7 +1873,8 @@ export const tailwindData: TailwindClassData[] = [
   /* Space Between */
 
   {
-    name: "space-x",
+    name: "space between x",
+    tag: "space-x",
     title: "Space Between X",
     type: "spacing",
     useScale: true,
@@ -1859,7 +1885,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "space-y",
+    name: "space between y",
+    tag: "space-y",
     title: "Space Between Y",
     type: "spacing",
     useScale: true,
@@ -1873,7 +1900,8 @@ export const tailwindData: TailwindClassData[] = [
   // // MARK: Sizing
 
   {
-    name: "w",
+    name: "width",
+    tag: "w",
     title: "Width",
     type: "sizing",
     useScale: true,
@@ -1885,7 +1913,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "min-w",
+    name: "min-width",
+    tag: "min-w",
     title: "Min-Width",
     type: "sizing",
     description: "Utilities for setting the minimum width of an element.",
@@ -1895,7 +1924,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "max-w",
+    name: "max-width",
+    tag: "max-w",
     title: "Max-Width",
     type: "sizing",
     description: "Utilities for setting the maximum width of an element.",
@@ -1929,7 +1959,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "h",
+    name: "height",
+    tag: "h",
     title: "Height",
     type: "sizing",
     useScale: true,
@@ -1941,7 +1972,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "min-h",
+    name: "min-height",
+    tag: "min-h",
     title: "Min-Height",
     type: "sizing",
     description: "Utilities for setting the minimum height of an element.",
@@ -1951,7 +1983,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "max-h",
+    name: "max-height",
+    tag: "max-h",
     title: "Max-Height",
     type: "sizing",
     description: "Utilities for setting the maximum height of an element.",
@@ -1964,7 +1997,8 @@ export const tailwindData: TailwindClassData[] = [
 
   // // MARK: Typography
   {
-    name: "font",
+    name: "font family",
+    tag: "font",
     title: "Font Family",
     type: "typography",
     description: "Utilities for setting the font family of an element.",
@@ -1974,7 +2008,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "string",
   },
   {
-    name: "text",
+    name: "font size",
+    tag: "text",
     title: "Font Size",
     type: "typography",
     description: "Utilities for setting the font size of an element.",
@@ -1998,7 +2033,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "antialiased",
+    name: "font smoothing",
+    tag: "antialiased",
     title: "Font Smoothing",
     type: "typography",
     description: "Utilities for controlling the font smoothing of an element.",
@@ -2008,7 +2044,8 @@ export const tailwindData: TailwindClassData[] = [
     allowArbitraryValues: false,
   },
   {
-    name: "italic",
+    name: "font style",
+    tag: "italic",
     title: "Font Style",
     type: "typography",
     description: "Utilities for controlling the style of text.",
@@ -2096,7 +2133,8 @@ export const tailwindData: TailwindClassData[] = [
   /* Text Color */
 
   {
-    name: "text",
+    name: "text color",
+    tag: "text",
     title: "Text Color",
     type: "typography",
     useColors: true,
@@ -2115,7 +2153,8 @@ export const tailwindData: TailwindClassData[] = [
   /* Text Decoration Color */
 
   {
-    name: "decoration",
+    name: "text decoration color",
+    tag: "decoration",
     title: "Text Decoration Color",
     type: "typography",
     useColors: true,
@@ -2162,7 +2201,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Text Indent */
   {
-    name: "indent",
+    name: "text indent",
+    tag: "indent",
     title: "Text Indent",
     type: "typography",
     useScale: true,
@@ -2173,7 +2213,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "dimension",
   },
   {
-    name: "align",
+    name: "vertical align",
+    tag: "align",
     title: "Vertical Align",
     type: "typography",
     description: "Utilities for controlling the vertical alignment of an inline or table-cell box.",
@@ -2184,6 +2225,7 @@ export const tailwindData: TailwindClassData[] = [
   },
   {
     name: "whitespace",
+    tag: "whitespace",
     title: "Whitespace",
     type: "typography",
     description: "Utilities for controlling an element's white-space property.",
@@ -2192,7 +2234,8 @@ export const tailwindData: TailwindClassData[] = [
     allowArbitraryValues: false,
   },
   {
-    name: "break",
+    name: "word break",
+    tag: "break",
     title: "Word Break",
     type: "typography",
     description: "Utilities for controlling word breaks in an element.",
@@ -2202,6 +2245,7 @@ export const tailwindData: TailwindClassData[] = [
   },
   {
     name: "hyphens",
+    tag: "hyphens",
     title: "Hyphens",
     type: "typography",
     description: "Utilities for controlling how words should be hyphenated.",
@@ -2213,6 +2257,7 @@ export const tailwindData: TailwindClassData[] = [
   /* Content */
   {
     name: "content",
+    tag: "content",
     title: "Content",
     type: "typography",
     description: "Utilities for controlling the content of the before and after pseudo-elements.",
@@ -2237,7 +2282,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Background Color */
   {
-    name: "bg",
+    name: "background color",
+    tag: "bg",
     title: "Background Color",
     type: "backgrounds",
     useColors: true,
@@ -2484,7 +2530,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Border Color */
   {
-    name: "border",
+    name: "border color",
+    tag: "border",
     title: "Border Color",
     type: "borders",
     useColors: true,
@@ -2494,7 +2541,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-x",
+    name: "border color x",
+    tag: "border-x",
     title: "Border Color X",
     type: "borders",
     useColors: true,
@@ -2504,7 +2552,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-y",
+    name: "border color y",
+    tag: "border-y",
     title: "Border Color Y",
     type: "borders",
     useColors: true,
@@ -2514,7 +2563,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-s",
+    name: "border color start",
+    tag: "border-s",
     title: "Border Color Start",
     type: "borders",
     useColors: true,
@@ -2524,7 +2574,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-e",
+    name: "border color end",
+    tag: "border-e",
     title: "Border Color End",
     type: "borders",
     useColors: true,
@@ -2534,7 +2585,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-t",
+    name: "border-color-top",
+    tag: "border-t",
     title: "Border Color Top",
     type: "borders",
     useColors: true,
@@ -2544,7 +2596,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-r",
+    name: "border-color-right",
+    tag: "border-r",
     title: "Border Color Right",
     type: "borders",
     useColors: true,
@@ -2554,7 +2607,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-b",
+    name: "border-color-bottom",
+    tag: "border-b",
     title: "Border Color Bottom",
     type: "borders",
     useColors: true,
@@ -2564,7 +2618,8 @@ export const tailwindData: TailwindClassData[] = [
     arbitraryValueType: "color",
   },
   {
-    name: "border-l",
+    name: "border-color-left",
+    tag: "border-l",
     title: "Border Color Left",
     type: "borders",
     useColors: true,
@@ -2576,7 +2631,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Border Style */
   {
-    name: "border",
+    name: "border-style",
+    tag: "border",
     title: "Border Style",
     type: "borders",
     description: "Border style.",
@@ -4431,7 +4487,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Accent Color */
   {
-    name: "accent",
+    name: "accent-color",
+    tag: "accent",
     title: "Accent Color",
     type: "interactivity",
     useColors: true,
@@ -4485,7 +4542,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Caret Color */
   {
-    name: "caret",
+    name: "caret-color",
+    tag: "caret",
     title: "Caret Color",
     type: "interactivity",
     useColors: true,
@@ -5206,6 +5264,7 @@ export const tailwindData: TailwindClassData[] = [
   /* Fill */
   {
     name: "fill",
+    tag: "fill",
     title: "Fill (SVG)",
     type: "svg",
     useColors: true,
@@ -5218,7 +5277,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Stroke */
   {
-    name: "stroke",
+    name: "stroke-color",
+    tag: "stroke",
     title: "Stroke (SVG)",
     type: "svg",
     useColors: true,
@@ -5231,7 +5291,8 @@ export const tailwindData: TailwindClassData[] = [
 
   /* Stroke Width */
   {
-    name: "stroke",
+    name: "stroke-width",
+    tag: "stroke",
     title: "Stroke Width (SVG)",
     type: "svg",
     description: "Utilities for controlling the width of SVG strokes.",
