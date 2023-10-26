@@ -348,7 +348,7 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
-  deleteNode(nodeId: string) {
+  deleteNode(nodeId: string, refillAndClean = true) {
     // temporal limit
     if (nodeId === "0" || nodeId === "1") {
       return
@@ -375,7 +375,7 @@ export class CodeDB {
           if (index !== -1) {
             nodeList.splice(index, 1)
 
-            if (nodeList.length === 0) {
+            if (refillAndClean && nodeList.length === 0) {
               if (childList.kind === "statement" || childList.kind === "ui") {
                 // Always leave an empty statement for UX reasons
                 const emptyStatement = this.newEmptyNode(childList.kind)
@@ -388,7 +388,9 @@ export class CodeDB {
             }
           }
         } else if (nodeTypeMeta[parent.type]?.expressions?.includes(parentProperty)) {
-          ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
+          if (refillAndClean) {
+            ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
+          }
         }
 
         this.notifyNodeChange(parent.id)
@@ -624,8 +626,7 @@ export class CodeDB {
     const existingNode = styleList.find((style) => style.name === newNode.name)
 
     if (existingNode) {
-      this.deleteNode(newNode.id)
-      return
+      this.deleteNode(existingNode.id, false)
     }
 
     styleList.push(newNode)
