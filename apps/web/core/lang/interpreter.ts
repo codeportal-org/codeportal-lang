@@ -447,11 +447,25 @@ export class Interpreter {
     // TODO: missing else-if chain
   }
 
+  private memoizedCSS = new Map<string, string>()
+
+  private memoizedCompileTailwindCSS = async (styles: string) => {
+    if (this.memoizedCSS.has(styles)) {
+      return Promise.resolve(this.memoizedCSS.get(styles)!)
+    }
+
+    const css = await compileTailwindCSS(baseCSS, styles)
+
+    this.memoizedCSS.set(styles, css)
+
+    return css
+  }
+
   /**
    * Gets compiled CSS from Tailwind CSS
    */
   getCSS(): Promise<string> {
-    return compileTailwindCSS(baseCSS, this.getTailwindClasses().join(" "))
+    return this.memoizedCompileTailwindCSS(this.getTailwindClasses().join(" "))
   }
 }
 

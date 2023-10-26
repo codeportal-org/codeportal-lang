@@ -117,11 +117,12 @@ function TailwindStylesInjector({ interpreter }: { interpreter: Interpreter }) {
   const [css, setCss] = React.useState("")
 
   React.useEffect(() => {
-    interpreter.getCSS().then((css) => {
-      setCss(css)
-    })
+    // interpreter.getCSS().then((css) => {
+    //   setCss(css)
+    // })
 
     const unbind = interpreter.onNewTailwindClass(() => {
+      console.log("-----new tailwind class----")
       setTimeout(() => {
         interpreter.getCSS().then((css) => {
           setCss(css)
@@ -132,7 +133,7 @@ function TailwindStylesInjector({ interpreter }: { interpreter: Interpreter }) {
     return () => {
       unbind()
     }
-  }, [interpreter])
+  }, [])
 
   return (
     <>
