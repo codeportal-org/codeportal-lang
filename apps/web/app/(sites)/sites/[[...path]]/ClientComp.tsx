@@ -114,12 +114,18 @@ export function ClientComp({
 }
 
 function TailwindStylesInjector({ interpreter }: { interpreter: Interpreter }) {
-  const [_, forceUpdate] = React.useReducer((x) => x + 1, 0)
+  const [css, setCss] = React.useState("")
 
   React.useEffect(() => {
+    interpreter.getCSS().then((css) => {
+      setCss(css)
+    })
+
     const unbind = interpreter.onNewTailwindClass(() => {
       setTimeout(() => {
-        forceUpdate()
+        interpreter.getCSS().then((css) => {
+          setCss(css)
+        })
       }, 0)
     })
 
@@ -130,12 +136,10 @@ function TailwindStylesInjector({ interpreter }: { interpreter: Interpreter }) {
 
   return (
     <>
-      <div>{interpreter.getTailwindClasses().join(" ")}</div>
+      {/* <div>{interpreter.getTailwindClasses().join(" ")}</div> */}
 
       <style global jsx>{`
-        .container {
-          background-color: #224fef;
-        }
+        ${css}
       `}</style>
     </>
   )

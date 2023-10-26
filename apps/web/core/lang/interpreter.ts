@@ -1,6 +1,7 @@
 import { createNanoEvents } from "nanoevents"
 import React from "react"
 
+import { compileTailwindCSS } from "../tailwind-compiler"
 import { tailwindDataMap } from "../tailwindData"
 import {
   ComponentCallNode,
@@ -445,7 +446,22 @@ export class Interpreter {
 
     // TODO: missing else-if chain
   }
+
+  /**
+   * Gets compiled CSS from Tailwind CSS
+   */
+  getCSS(): Promise<string> {
+    return compileTailwindCSS(baseCSS, this.getTailwindClasses().join(" "))
+  }
 }
+
+export const baseCSS = `
+/* Compiled CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {}
+`
 
 export class ReturnValue extends Error {
   constructor(public value: any) {
