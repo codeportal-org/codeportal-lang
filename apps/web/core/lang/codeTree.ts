@@ -166,12 +166,13 @@ export type UIStyleNode = {
   type: "ui style"
   id: string
   kind: "style" | "tailwind"
-  /** The name of the style. For Tailwind, this is for instance "bg" or "text". */
+  /** The name of the style. For Tailwind, this is for instance "bg" or "text-color". */
   name: string
   /**
-   * For Tailwind, this is for instance "red-500". In most cases this is static.
+   * For Tailwind, this is for instance ["red", "500"].
    */
-  value: ExpressionNode
+  args?: string[]
+  prefix?: string
   /**
    * The test is used to determine whether the style should be applied or not.
    */

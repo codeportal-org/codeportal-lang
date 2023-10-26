@@ -8,6 +8,7 @@ import {
   StatementNode,
   UIElementNode,
   UINode,
+  UIStyleNode,
   VarStatement,
   nodeTypeMeta,
   statementTypes,
@@ -359,13 +360,12 @@ export class CodeDB {
     if (node.meta?.parentId) {
       const parent = this.getNodeByID(node.meta.parentId)
       const parentProperty = node.meta.parentProperty
+      const childList = nodeTypeMeta[parent.type]?.childLists?.find(
+        (childList) => childList.name === parentProperty,
+      )
 
       if (parent && parentProperty) {
-        if (
-          nodeTypeMeta[parent.type]?.childLists?.find(
-            (childList) => childList.name === parentProperty,
-          )
-        ) {
+        if (childList) {
           const nodeList = (parent as any)[parentProperty] as any[]
 
           const index = nodeList.indexOf(node)
@@ -375,12 +375,12 @@ export class CodeDB {
 
             // Always leave an empty statement for UX reasons
             if (nodeList.length === 0) {
-              const emptyStatement = this.newEmptyNode(
-                nodeTypeMeta[parent.type].kinds.includes("statement") ? "statement" : "ui",
-              )
-              nodeList.push(emptyStatement)
-              emptyStatement.meta!.parentId = parent.id
-              emptyStatement.meta!.parentProperty = parentProperty
+              if (childList.kind === "statement" || childList.kind === "ui") {
+                const emptyStatement = this.newEmptyNode(childList.kind)
+                nodeList.push(emptyStatement)
+                emptyStatement.meta!.parentId = parent.id
+                emptyStatement.meta!.parentProperty = parentProperty
+              }
             }
           }
         } else if (nodeTypeMeta[parent.type]?.expressions?.includes(parentProperty)) {
@@ -596,6 +596,31 @@ export class CodeDB {
     }
 
     ;(parent as any)[parentProperty].splice(index, 0, newNode)
+
+    if (newNode.meta) {
+      newNode.meta.parentId = parent.id
+      newNode.meta.parentProperty = parentProperty
+    } else {
+      throw new Error("New node must have meta")
+    }
+
+    this.notifyNodeChange(newNode.id)
+    this.notifyNodeChange(parent.id)
+  }
+
+  addStyleToList(parentNodeId: string, parentProperty: string, newNode: UIStyleNode) {
+    const parent = this.getNodeByID(parentNodeId)
+
+    if (!parent) {
+      throw new Error("Node must have a parent")
+    }
+
+    ;(parent as any)[parentProperty].push(newNode)
+
+    // Sort styles by name
+    ;(parent as any)[parentProperty].sort((a: UIStyleNode, b: UIStyleNode) =>
+      a.name.localeCompare(b.name),
+    )
 
     if (newNode.meta) {
       newNode.meta.parentId = parent.id

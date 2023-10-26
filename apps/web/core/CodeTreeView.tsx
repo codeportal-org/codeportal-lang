@@ -7,7 +7,6 @@ import {
   useComboboxStore,
 } from "@ariakit/react"
 import {
-  ClientRect,
   CollisionDescriptor,
   CollisionDetection,
   DragEndEvent,
@@ -64,7 +63,12 @@ import {
   statementTypes,
   uiNodeTypes,
 } from "./lang/codeTree"
-import { TailwindShade, generateTailwindClassesData, tailwindColorPalette } from "./tailwindData"
+import {
+  TailwindShade,
+  generateTailwindClassesData,
+  tailwindColorPalette,
+  tailwindDataMap,
+} from "./tailwindData"
 
 type DropData = { type: CodeNode["type"] }
 
@@ -449,6 +453,8 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
       React.startTransition(() => {
         setSearchValue(value)
         setTimeout(() => {
+          // Hack to select the first item, there should be another way to do this with the combobox API
+          // Maybe we can dedupe it to improve the dev experience and make it not flash
           comboboxStore.move(comboboxStore.down())
         }, 100)
       })
@@ -463,11 +469,6 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
   const tailwindStyles = React.useMemo(
     () =>
       generateTailwindClassesData().map((style) => ({
-        title:
-          style.data.title +
-          (style.className.includes("arbitrary")
-            ? ` (arbitrary ${style.data.arbitraryValueType})`
-            : ""),
         value: style.className,
         name: style.data.name,
         args: style.args,
@@ -493,10 +494,6 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
     getScrollElement: () => virtualizedListContainerRef.current,
     estimateSize: () => 28,
   })
-
-  React.useEffect(() => {
-    setIsComboboxOpen(true)
-  }, [])
 
   return (
     <div className={indentationClass}>
@@ -563,6 +560,14 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                           }}
                           onClick={() => {
                             console.log("clicked", match)
+
+                            const newNode = codeDB?.newNodeFromType<UIStyleNode>("ui style", {
+                              name: match.name,
+                              args: match.args,
+                              prefix: match.prefix,
+                            })!
+
+                            codeDB?.addStyleToList(nodeId, "style", newNode)
                           }}
                         >
                           {match.data.useColors && (
@@ -598,15 +603,43 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
         >
           <div className="pt-1">{/* spacer */}</div>
           <div className="flex flex-wrap gap-1.5 text-gray-500">
-            {style.map((node, index) => (
-              <div key={node.id} className="flex flex-wrap gap-2">
-                <div className="col-span-1">{node.name}</div>
-                <div className="col-span-4">
-                  <ExpressionView nodeId={node.value.id} />
-                </div>
-              </div>
-            ))}
+            {style.map((styleNode, index) => {
+              const styleData = tailwindDataMap.get(styleNode.name)!
+
+              return (
+                <button
+                  key={styleNode.id}
+                  className="flex flex-wrap items-center gap-1 rounded-sm border border-gray-300 px-1"
+                  onClick={(event) => {
+                    event.preventDefault()
+
+                    codeDB?.deleteNode(styleNode.id)
+                  }}
+                >
+                  {styleData.useColors && (
+                    <div
+                      className="ml-1 h-4 w-4 rounded-sm border shadow-sm"
+                      style={
+                        styleNode.args !== undefined
+                          ? {
+                              backgroundColor: tailwindColorPalette.find(
+                                (color) => styleNode.args && color.name === styleNode.args[0],
+                              )?.shades[styleNode.args[1] as TailwindShade],
+                            }
+                          : {}
+                      }
+                    />
+                  )}
+                  <div>
+                    {styleNode.args
+                      ? `${styleData.tag}-${styleNode.args?.join("-")}`
+                      : styleData.tag}
+                  </div>
+                </button>
+              )
+            })}
           </div>
+          <div className="pt-1">{/* spacer */}</div>
         </div>
       </div>
     </div>

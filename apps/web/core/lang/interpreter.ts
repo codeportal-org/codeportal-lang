@@ -1,5 +1,6 @@
 import React from "react"
 
+import { tailwindDataMap } from "../tailwindData"
 import {
   ComponentCallNode,
   ComponentNode,
@@ -210,7 +211,7 @@ export class Interpreter {
 
       const props: Record<string, any> = {
         key: node.id,
-        // style: node.style,
+        className: "",
       }
 
       if (this.isDevSite) {
@@ -220,7 +221,12 @@ export class Interpreter {
       if (node.props) {
         for (const prop of node.props) {
           if (prop.type === "ui prop") {
-            props[prop.name] = this.interpretExpression(prop.value)
+            if (prop.name === "className") {
+              props.className =
+                (props.className === "" ? "" : " ") + this.interpretExpression(prop.value)
+            } else {
+              props[prop.name] = this.interpretExpression(prop.value)
+            }
           } else if (prop.type === "ui spread prop") {
             const spreadObj = this.interpretExpression(prop.arg)
             if (spreadObj && typeof spreadObj === "object") {
@@ -228,6 +234,26 @@ export class Interpreter {
             }
           }
         }
+      }
+
+      if (node.style) {
+        let tailwindClasses = ""
+
+        for (const style of node.style) {
+          if (tailwindClasses !== "") {
+            tailwindClasses += " "
+          }
+
+          const styleData = tailwindDataMap.get(style.name)!
+
+          tailwindClasses += style.args ? `${styleData.tag}-${style.args.join("-")}` : styleData.tag
+        }
+
+        props.className = (props.className === "" ? "" : " ") + tailwindClasses
+      }
+
+      if (props.className === "") {
+        delete props.className
       }
 
       if (!node.children || node.children.length === 0) {
