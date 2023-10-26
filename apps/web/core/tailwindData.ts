@@ -23,6 +23,10 @@ export type TailwindClassData = {
   useFractions?: boolean
   useColors?: boolean
   values?: string[]
+  /**
+   * For instance mx-auto is attached to the container class even though it's a margin.
+   */
+  attachedClassNames?: string[]
   prefixes?: string[]
   isStandalone?: boolean
   /**
@@ -137,6 +141,17 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
 
           additionalStyleClasses.push(item)
         }
+      }
+    }
+
+    if (tailwindStyle.attachedClassNames) {
+      for (const attachedClassName of tailwindStyle.attachedClassNames) {
+        const item: TailwindClassDataItem = {
+          className: attachedClassName,
+          data: tailwindStyle,
+        }
+
+        additionalStyleClasses.push(item)
       }
     }
 
@@ -652,6 +667,7 @@ export const tailwindData: TailwindClassData[] = [
     type: "layout",
     description: "A component for fixing an element's width to the current breakpoint.",
     docsUrl: "https://tailwindcss.com/docs/container",
+    attachedClassNames: ["mx-auto"],
     isStandalone: true,
     allowArbitraryValues: false,
   },
@@ -1788,7 +1804,6 @@ export const tailwindData: TailwindClassData[] = [
     useScale: true,
     description: "Margin left and right.",
     docsUrl: "https://tailwindcss.com/docs/margin",
-    values: ["auto"],
     allowArbitraryValues: true,
     arbitraryValueType: "dimension",
   },
@@ -5309,5 +5324,4 @@ export const tailwindData: TailwindClassData[] = [
   // "not-sr-only",
 ]
 
-
-export const tailwindDataMap = new Map(tailwindData.map(item => [item.name, item]))
+export const tailwindDataMap = new Map(tailwindData.map((item) => [item.name, item]))
