@@ -5308,3 +5308,6 @@ export const tailwindData: TailwindClassData[] = [
   // "sr-only",
   // "not-sr-only",
 ]
+
+
+export const tailwindDataMap = new Map(tailwindData.map(item => [item.name, item]))
