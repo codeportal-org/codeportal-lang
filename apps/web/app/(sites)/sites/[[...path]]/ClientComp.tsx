@@ -108,19 +108,37 @@ export function ClientComp({
     <>
       {interpreter.interpretComponentCall(componentCallNode)}
       <AugmentedEditorUI codeDB={codeDB} />
+      <TailwindStylesInjector interpreter={interpreter} />
     </>
   )
+}
 
-  // return (
-  //   <>
-  //     {interpreter.interpretComponent(testCodeTree)}
-  //     <style global jsx>{`
-  //       .p-2 {
-  //         padding: 0.5rem;
-  //       }
-  //     `}</style>
-  //   </>
-  // )
+function TailwindStylesInjector({ interpreter }: { interpreter: Interpreter }) {
+  const [_, forceUpdate] = React.useReducer((x) => x + 1, 0)
+
+  React.useEffect(() => {
+    const unbind = interpreter.onNewTailwindClass(() => {
+      setTimeout(() => {
+        forceUpdate()
+      }, 0)
+    })
+
+    return () => {
+      unbind()
+    }
+  }, [interpreter])
+
+  return (
+    <>
+      <div>{interpreter.getTailwindClasses().join(" ")}</div>
+
+      <style global jsx>{`
+        .container {
+          background-color: #224fef;
+        }
+      `}</style>
+    </>
+  )
 }
 
 function AugmentedEditorUI({ codeDB }: { codeDB: CodeDB }) {

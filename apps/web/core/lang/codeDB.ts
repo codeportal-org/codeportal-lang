@@ -308,10 +308,12 @@ export class CodeDB {
     // This is necessary because CodeDB instances rely on object references
     for (const property of properties) {
       if (nodeTypeMeta[node.type]?.childLists?.find((childList) => childList.name === property)) {
-        // get current CodeDB node's children, in case the node was serialized like in the dev sites case
-        ;((node as any)[property] as CodeNode[]) = ((newNode as any)[property] as CodeNode[]).map(
-          (child) => this.getNodeByID(child.id),
-        )
+        if ((newNode as any)[property]) {
+          // get current CodeDB node's children, in case the node was serialized like in the dev sites case
+          ;((node as any)[property] as CodeNode[]) = ((newNode as any)[property] as CodeNode[]).map(
+            (child) => this.getNodeByID(child.id),
+          )
+        }
       } else if (nodeTypeMeta[node.type]?.expressions?.includes(property)) {
         // get current CodeDB node's children, in case the node was serialized like in the dev sites case
         ;(node as any)[property] = this.getNodeByID((newNode as any)[property].id)
@@ -373,13 +375,15 @@ export class CodeDB {
           if (index !== -1) {
             nodeList.splice(index, 1)
 
-            // Always leave an empty statement for UX reasons
             if (nodeList.length === 0) {
               if (childList.kind === "statement" || childList.kind === "ui") {
+                // Always leave an empty statement for UX reasons
                 const emptyStatement = this.newEmptyNode(childList.kind)
                 nodeList.push(emptyStatement)
                 emptyStatement.meta!.parentId = parent.id
                 emptyStatement.meta!.parentProperty = parentProperty
+              } else if (childList.kind === "style") {
+                delete (parent as any)[parentProperty]
               }
             }
           }
@@ -615,12 +619,19 @@ export class CodeDB {
       throw new Error("Node must have a parent")
     }
 
-    ;(parent as any)[parentProperty].push(newNode)
+    const styleList = (parent as any)[parentProperty] as UIStyleNode[]
+
+    const existingNode = styleList.find((style) => style.name === newNode.name)
+
+    if (existingNode) {
+      this.deleteNode(newNode.id)
+      return
+    }
+
+    styleList.push(newNode)
 
     // Sort styles by name
-    ;(parent as any)[parentProperty].sort((a: UIStyleNode, b: UIStyleNode) =>
-      a.name.localeCompare(b.name),
-    )
+    styleList.sort((a: UIStyleNode, b: UIStyleNode) => a.name.localeCompare(b.name))
 
     if (newNode.meta) {
       newNode.meta.parentId = parent.id

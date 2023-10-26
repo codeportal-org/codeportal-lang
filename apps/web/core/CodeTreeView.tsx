@@ -505,7 +505,15 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
             className="flex cursor-pointer items-center gap-1.5 via-slate-100"
             onClick={(event) => {
               event.preventDefault()
-              setIsOpen(!isOpen)
+
+              if (style.length === 0) {
+                // remove node list if empty
+                codeDB?.updateNode(nodeId, {
+                  style: undefined,
+                })
+              } else {
+                setIsOpen(!isOpen)
+              }
             }}
           >
             {isOpen ? (
@@ -623,7 +631,9 @@ export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
   const isHovered = node.meta?.ui?.isHovered
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       className="relative flex flex-wrap items-center gap-1 rounded-sm border border-gray-300 px-1"
       onClick={(event) => {
         event.preventDefault()
@@ -662,7 +672,7 @@ export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
 
       {/* Controls overlay */}
       {(isHovered || node.meta?.ui?.isSelected) && (
-        <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center gap-2 rounded-sm bg-gray-100 bg-opacity-20">
+        <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center rounded-sm bg-gray-100 bg-opacity-20 px-0.5">
           <button
             className="rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
             onClick={(event) => {
@@ -675,7 +685,7 @@ export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
           </button>
 
           <button
-            className="rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
+            className="ml-1 rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
             onClick={(event) => {
               event.preventDefault()
 
@@ -686,7 +696,7 @@ export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
           </button>
         </div>
       )}
-    </button>
+    </div>
   )
 }
 
