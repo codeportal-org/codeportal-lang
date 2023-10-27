@@ -53,3 +53,28 @@ function indentRecursive(node: any, indent = 0) {
       indentRecursive(child, indent + 1)
     })
 }
+
+const memoizedCSS = new Map<string, string>()
+
+export const memoizedCompileTailwindCSS = async (styles: string) => {
+  if (memoizedCSS.has(styles)) {
+    return Promise.resolve(memoizedCSS.get(styles)!)
+  }
+
+  const start = Date.now()
+  const css = await compileTailwindCSS(baseCSS, styles)
+  const end = Date.now()
+  console.log(`Time taken to compile TailwindCSS: ${end - start}ms`)
+
+  memoizedCSS.set(styles, css)
+
+  return css
+}
+
+const baseCSS = `
+/* Compiled CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {}
+`

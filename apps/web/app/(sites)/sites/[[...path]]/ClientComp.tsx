@@ -9,6 +9,7 @@ import { CodeDB } from "@/core/lang/codeDB"
 import { CodeProcessor } from "@/core/lang/codeProcessor"
 import { CodeNode, ComponentCallNode, UINode } from "@/core/lang/codeTree"
 import { Interpreter } from "@/core/lang/interpreter"
+import { memoizedCompileTailwindCSS } from "@/core/tailwind-compiler"
 import { MainModule, ThemeConfig } from "@/db/schema"
 
 const astTransformer = new ASTtoCTTransformer()
@@ -117,14 +118,10 @@ function TailwindStylesInjector({ interpreter }: { interpreter: Interpreter }) {
   const [css, setCss] = React.useState("")
 
   React.useEffect(() => {
-    // interpreter.getCSS().then((css) => {
-    //   setCss(css)
-    // })
-
     const unbind = interpreter.onNewTailwindClass(() => {
       console.log("-----new tailwind class----")
       setTimeout(() => {
-        interpreter.getCSS().then((css) => {
+        memoizedCompileTailwindCSS(interpreter.getTailwindClasses().join(" ")).then((css) => {
           setCss(css)
         })
       }, 0)
