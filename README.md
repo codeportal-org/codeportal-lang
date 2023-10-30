@@ -3,7 +3,7 @@
 </div>
 
 <div align="center"><strong>CodePortal (Alpha) 🚀</strong></div>
-<div align="center">The full-stack programming platform for makers and product teams.<br />A place for all your creations. Simple, powerful, and flexible!</div>
+<div align="center">The full-stack programming platform for modern makers!<br />A place for all your creations. Simple, powerful, and flexible!</div>
 <br />
 <div align="center">
 <a href="https://codeportal.io">Website</a>
@@ -19,9 +19,9 @@
 
 ## Introduction
 
-CodePortal is a full-stack AI-first programming platform for makers and product teams who are frustrated with the limitations of traditional programming and tooling. It makes it easier for all team members to make changes to their products, reducing friction, eliminating handoffs and increasing velocity. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
+CodePortal is a full-stack visual programming platform for makers who are frustrated with the limitations of traditional programming and tooling. It makes it easier for all team members to make changes to their products, reducing friction, eliminating handoffs and increasing velocity. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
 
-Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and editor are heavily focused on developer experience, and supporting multiple views of a program. Additionally, they are thought from the ground up to work hand in hand with generative AI.
+Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and visual editor are heavily focused on developer experience, and supporting multiple views of a program. Additionally, they are thought from the ground up to work hand in hand with generative AI.
 
 CodePortal is currently in alpha, so, many of the features are being actively developed, and some are coming soon.
 
