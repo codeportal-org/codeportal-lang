@@ -25,6 +25,8 @@ Our goal is to remove as much clutter and unnecessary complexity as possible out
 
 CodePortal is currently in alpha, so, many of the features are being actively developed, and some are coming soon.
 
+## How does it work?
+
 This project has two main parts, the Portal Language (PortalLang), a general purpose programming language, and the CodePortal Platform. Our goals are ambitious and bold! We want to make programming drastically better. This project is based on three core design choices:
 
 - ✨ We should be able to read, modify and navigate code in multiple ways. Like in a block-based UI, a graph view, in a canvas view, in a notebook, and in visual UI builder. Also, these there should be ways to extend these views even further. This makes the system accessible to more people, and makes it easier to understand and to work with. Additionally, it enables new ways of working with code that are not possible with text-based programming. Imagine there is a different representation of the code depending on the task at hand or the person that is interacting with the system.
@@ -32,6 +34,8 @@ This project has two main parts, the Portal Language (PortalLang), a general pur
 - 🔍 There are no files and folders. Everything is interconnected by unique IDs and classified with metadata (tags, types, etc.). We think modern coding is better when it heavily relies on forward and back references, full-text/metadata/semantic search, and system views to explore and understand the code and to find the right code.
 
 The work for the Portal language is happening [here](apps/web/core/PortalLang.md).
+
+## Our vision
 
 Here is what we envision for PortalLang and CodePortal:
 
