@@ -19,7 +19,7 @@
 
 ## Introduction
 
-CodePortal is a full-stack visual programming platform for makers who are frustrated with the limitations of traditional programming and tooling. It makes it easier for all team members to make changes to their products, reducing friction, eliminating handoffs and increasing velocity. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
+CodePortal is a full-stack visual programming platform for makers looking to overcome the limitations of traditional programming and tools. It empowers you to build digital products faster without losing the power and flexibility of code. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
 
 Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and visual editor are heavily focused on developer experience, and supporting multiple views of a program. Additionally, they are thought from the ground up to work hand in hand with generative AI.
 

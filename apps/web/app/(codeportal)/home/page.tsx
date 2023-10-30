@@ -26,9 +26,9 @@ export default function Home() {
           </h1>
 
           <p className="mx-2 mb-8 max-w-3xl text-center text-lg sm:text-xl">
-            CodePortal is visual programming platform for modern makers who are frustrated with the
-            limitations of traditional programming and tooling. It empowers you to build digital
-            product faster without losing the power of code.
+            CodePortal is a full-stack visual programming platform for makers looking to overcome
+            the limitations of traditional programming and tools. It empowers you to build digital
+            products faster without losing the power and flexibility of code.
           </p>
           <div className="mb-16 flex justify-center">
             <EarlyAccessButton>Join our closed alpha!</EarlyAccessButton>
