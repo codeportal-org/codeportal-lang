@@ -26,10 +26,9 @@ export default function Home() {
           </h1>
 
           <p className="mx-2 mb-8 max-w-3xl text-center text-lg sm:text-xl">
-            CodePortal is a full-stack AI-first programming platform for makers and product teams
-            who are frustrated with the limitations of traditional programming and tooling. It makes
-            it easier for all team members to make changes to their products, reducing friction,
-            eliminating handoffs and increasing velocity.
+            CodePortal is visual programming platform for modern makers who are frustrated with the
+            limitations of traditional programming and tooling. It empowers you to build digital
+            product faster without losing the power of code.
           </p>
           <div className="mb-16 flex justify-center">
             <EarlyAccessButton>Join our closed alpha!</EarlyAccessButton>
@@ -39,7 +38,7 @@ export default function Home() {
 
           <div className="max-w-2xl px-2">
             <h2 className="mb-6 mt-16 text-center text-2xl font-bold sm:text-4xl">
-              Streamline product development
+              Build faster, iterate faster
             </h2>
 
             <ul className="mb-8 list-none pl-4 sm:pl-5">
@@ -64,15 +63,6 @@ export default function Home() {
                   with LLMs.
                 </span>
               </li>
-              <li className="mb-4 flex text-lg leading-7">
-                <CheckCircleIcon className="text-primary-500 mr-2 h-7 w-7 flex-shrink-0" />
-                <span>
-                  Include the whole team! CodePortal gives you the full-power of code with the
-                  simplicity of no-code/low-code tools. You can include your whole team in the
-                  development process. Designers, product managers, marketers and other people can
-                  contribute to the development process too.
-                </span>
-              </li>
             </ul>
 
             <div className="mb-14 flex justify-center">
@@ -85,18 +75,6 @@ export default function Home() {
       <footer className="bg-primary-100 mt-8 flex flex-col items-center justify-center text-center">
         <div className="p-2 text-center">
           Copyright © 2023 LikableApps, Inc. All rights reserved.
-        </div>
-
-        <div className="p-2 text-center">
-          Made by{" "}
-          <a
-            href="https://twitter.com/carloslfu"
-            target="_blank"
-            rel="noreferrer"
-            className="underline"
-          >
-            Carlos Galarza
-          </a>
         </div>
       </footer>
     </div>
