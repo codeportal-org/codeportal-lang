@@ -801,7 +801,12 @@ const NodeList = ({
   const isHovered = node.meta?.ui?.isHovered
 
   const handleSpacerClick = (index: number) => {
-    const newNode = codeDB?.newEmptyNode(uiNodeTypes.includes(node.type) ? "ui" : "statement")!
+    const newNode = codeDB?.newEmptyNode(uiNodeTypes.includes(node.type) ? "ui" : "statement", {
+      ui: {
+        isSelected: true,
+        isHovered: false,
+      },
+    })!
 
     codeDB?.insertNodeInList(nodeId, parentProperty, index, newNode)
   }
@@ -1115,7 +1120,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   const codeDB = useCodeDB()
   const isSelected = node.meta?.ui?.isSelected
 
-  const [isComboboxOpen, setIsComboboxOpen] = React.useState(true)
+  const [isComboboxOpen, setIsComboboxOpen] = React.useState(isSelected)
 
   const kind = node.kind
 
@@ -1145,7 +1150,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
         <Combobox
           placeholder="..."
           className="w-full max-w-sm border-0 p-0 pl-1 focus-visible:ring-0"
-          autoFocus
+          autoFocus={isSelected}
           autoSelect
         />
         <ComboboxPopover
