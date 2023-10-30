@@ -25,9 +25,9 @@ Our goal is to remove as much clutter and unnecessary complexity as possible out
 
 CodePortal is currently in alpha, so, many of the features are being actively developed, and some are coming soon.
 
-## How does it work?
+## Design choices
 
-This project has two main parts, the Portal Language (PortalLang), a general purpose programming language, and the CodePortal Platform. Our goals are ambitious and bold! We want to make programming drastically better. This project is based on three core design choices:
+Our goals are ambitious and bold! We want to make programming drastically better. This project is based on three core design choices:
 
 - ✨ We should be able to read, modify and navigate code in multiple ways. Like in a block-based UI, a graph view, in a canvas view, in a notebook, and in visual UI builder. Also, these there should be ways to extend these views even further. This makes the system accessible to more people, and makes it easier to understand and to work with. Additionally, it enables new ways of working with code that are not possible with text-based programming. Imagine there is a different representation of the code depending on the task at hand or the person that is interacting with the system.
 - 🕸️ Code is stored, modified and managed as a graph of nodes and connections, not as plain text in files and folders. We see this as a more natural medium for code that's easier to work with. It enables a lot of things that are more difficult or impossible with text files, like multiple views, better linked code, tooling and version control (AST-based). Bye, bye, imports! Also, every node is addressable by a unique ID.
@@ -72,6 +72,8 @@ Go to [codeportal.io](https://codeportal.io), create an account and start using 
 ## How does it work?
 
 DISCLAIMER: This is a work in progress, so, things are changing fast and some things are not implemented yet. This is a high level overview of the system. For more details, check out the code.
+
+This project has two main parts, the Portal Language (PortalLang), a general purpose programming language, and the CodePortal Platform.
 
 ### The Portal Language
 
