@@ -434,7 +434,7 @@ export class CodeDB {
     return newCodeTree
   }
 
-  newEmptyNode(kind: EmptyNode["kind"]) {
+  newEmptyNode(kind: EmptyNode["kind"], meta?: Partial<EmptyNode["meta"]>) {
     const id = this.idCounter.toString()
     this.idCounter++
     const newNode = {
@@ -446,6 +446,7 @@ export class CodeDB {
           isHovered: false,
           isSelected: false,
         },
+        ...meta,
       },
     } as EmptyNode
 
