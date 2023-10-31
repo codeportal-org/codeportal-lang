@@ -26,8 +26,8 @@ export default function Home() {
           </h1>
 
           <p className="mx-2 mb-8 max-w-3xl text-center text-lg sm:text-xl">
-            CodePortal is a full-stack visual programming platform for makers looking to overcome
-            the limitations of traditional programming and tools. It empowers you to build digital
+            CodePortal is a full-stack visual programming platform for makers looking to avoid the
+            limitations of traditional programming and tools. It empowers you to build digital
             products faster without losing the power and flexibility of code.
           </p>
           <div className="mb-16 flex justify-center">
