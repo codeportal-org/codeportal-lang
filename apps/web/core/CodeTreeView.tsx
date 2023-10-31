@@ -559,7 +559,7 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                           store={comboboxStore}
                           key={match.value}
                           value={match.value}
-                          className="flex items-center gap-1.5 rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
+                          className="flex items-center justify-between rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
                           style={{
                             position: "absolute",
                             top: 0,
@@ -581,7 +581,14 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                           }}
                         >
                           {/* Left container */}
-                          <div className="flex items-center gap-1.5">
+                          <div
+                            className={cn("flex items-center gap-1.5", {
+                              "w-1/3":
+                                match.data.useScale &&
+                                match.args &&
+                                typeof match.args[0] === "object",
+                            })}
+                          >
                             {match.data.useColors && (
                               <div
                                 className="ml-1 h-4 w-4 rounded-sm border shadow-sm"
@@ -601,15 +608,18 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                           </div>
 
                           {/* Right container */}
-                          <div className="flex items-center gap-1.5">
-                            {match.data.useScale &&
-                              match.args &&
-                              typeof match.args[0] === "object" && (
-                                <>
-                                  {match.args[0].pixels} px | {match.args[0].size}
-                                </>
-                              )}
-                          </div>
+                          {match.data.useScale &&
+                            match.args &&
+                            typeof match.args[0] === "object" && (
+                              <div className="flex w-2/3">
+                                <div className="w-1/2 border-l border-gray-400 text-center">
+                                  {match.args[0].pixels} px
+                                </div>
+                                <div className="w-1/2 border-l border-gray-400 text-center">
+                                  {match.args[0].size}
+                                </div>
+                              </div>
+                            )}
                         </ComboboxItem>
                       )
                     })}
