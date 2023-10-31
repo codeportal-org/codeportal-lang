@@ -1118,7 +1118,9 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
 export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<EmptyNode>(nodeId)
   const codeDB = useCodeDB()
+
   const isSelected = node.meta?.ui?.isSelected
+  const isHovered = node.meta?.ui?.isHovered
 
   const [isComboboxOpen, setIsComboboxOpen] = React.useState(isSelected)
 
@@ -1136,7 +1138,21 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   )
 
   return (
-    <div>
+    <div className="relative">
+      {(isSelected || isHovered) && (
+        <div className="absolute right-0 top-0 flex h-full w-[24px] items-center justify-start">
+          <button
+            className="rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
+            onClick={(event) => {
+              event.preventDefault()
+
+              codeDB?.deleteNode(nodeId)
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
       <ComboboxProvider
         setValue={(value) => {
           React.startTransition(() => setSearchValue(value))
@@ -1155,7 +1171,6 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
         />
         <ComboboxPopover
           gutter={4}
-          sameWidth
           className="z-50 rounded-sm border border-gray-300 bg-white px-1 py-1"
         >
           {matches.length !== 0 ? (
