@@ -1,4 +1,4 @@
-import React from "react"
+import { type TailwindScale } from "../tailwindData"
 
 export type CodeNode = ProgramNode | StatementNode | ExpressionNode | SpecialNodes
 
@@ -171,7 +171,7 @@ export type UIStyleNode = {
   /**
    * For Tailwind, this is for instance ["red", "500"].
    */
-  args?: string[]
+  args?: (string | TailwindScale)[]
   prefix?: string
   /**
    * The test is used to determine whether the style should be applied or not.

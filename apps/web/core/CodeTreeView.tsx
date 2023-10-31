@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Combobox,
   ComboboxItem,
@@ -534,7 +536,7 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
             <ComboboxPopover
               store={comboboxStore}
               gutter={4}
-              className="z-50 h-72 w-56 overflow-auto rounded-sm border border-gray-300 bg-white px-1 py-1"
+              className="z-50 h-72 w-72 overflow-auto rounded-sm border border-gray-300 bg-white px-1 py-1"
             >
               <ComboboxList
                 store={comboboxStore}
@@ -578,22 +580,36 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                             codeDB?.addStyleToList(nodeId, "style", newNode)
                           }}
                         >
-                          {match.data.useColors && (
-                            <div
-                              className="ml-1 h-4 w-4 rounded-sm border shadow-sm"
-                              style={
-                                match.args !== undefined
-                                  ? {
-                                      backgroundColor: tailwindColorPalette.find(
-                                        (color) => match.args && color.name === match.args[0],
-                                      )?.shades[match.args[1] as TailwindShade],
-                                    }
-                                  : {}
-                              }
-                            />
-                          )}
+                          {/* Left container */}
+                          <div className="flex items-center gap-1.5">
+                            {match.data.useColors && (
+                              <div
+                                className="ml-1 h-4 w-4 rounded-sm border shadow-sm"
+                                style={
+                                  match.args !== undefined
+                                    ? {
+                                        backgroundColor: tailwindColorPalette.find(
+                                          (color) => match.args && color.name === match.args[0],
+                                        )?.shades[match.args[1] as TailwindShade],
+                                      }
+                                    : {}
+                                }
+                              />
+                            )}
 
-                          {match.value}
+                            {match.value}
+                          </div>
+
+                          {/* Right container */}
+                          <div className="flex items-center gap-1.5">
+                            {match.data.useScale &&
+                              match.args &&
+                              typeof match.args[0] === "object" && (
+                                <>
+                                  {match.args[0].pixels} px | {match.args[0].size}
+                                </>
+                              )}
+                          </div>
                         </ComboboxItem>
                       )
                     })}
@@ -668,7 +684,13 @@ export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
           }
         />
       )}
-      <div>{node.args ? `${styleData.tag}-${node.args?.join("-")}` : styleData.tag}</div>
+      <div>
+        {node.args
+          ? `${styleData.tag}-${node.args
+              .map((arg) => (typeof arg === "string" ? arg : arg.name))
+              .join("-")}`
+          : styleData.tag}
+      </div>
 
       {/* Controls overlay */}
       {(isHovered || node.meta?.ui?.isSelected) && (
@@ -1171,7 +1193,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
         />
         <ComboboxPopover
           gutter={4}
-          className="z-50 rounded-sm border border-gray-300 bg-white px-1 py-1"
+          className="z-50 max-h-72 w-72 rounded-sm border border-gray-300 bg-white px-1 py-1"
         >
           {matches.length !== 0 ? (
             matches.map((match) => (

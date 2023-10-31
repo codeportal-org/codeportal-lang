@@ -266,7 +266,9 @@ export class Interpreter {
           const styleData = tailwindDataMap.get(style.name)!
 
           const tailwindClass = style.args
-            ? `${styleData.tag}-${style.args.join("-")}`
+            ? `${styleData.tag}-${style.args
+                .map((arg) => (typeof arg === "string" ? arg : arg.name))
+                .join("-")}`
             : styleData.tag
 
           tailwindClasses += tailwindClass
