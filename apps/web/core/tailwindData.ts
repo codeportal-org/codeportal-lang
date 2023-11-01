@@ -146,12 +146,385 @@ export const generateTailwindClassesData = (): TailwindClassDataItem[] => {
       }
     }
 
+    tailwindStyleClasses.push(...additionalStyleClasses)
     classesData.push(...tailwindStyleClasses)
-    classesData.push(...additionalStyleClasses)
   }
 
   return classesData
 }
+
+export type TailwindModifier = {
+  name: string
+  css: string
+  type: "pseudo-class" | "pseudo-element" | "media-query" | "attribute-selector" | "feature-query"
+  // TODO: add docsUrl and description
+}
+
+/**
+ * Source: https://tailwindcss.com/docs/hover-focus-and-other-states#appendix
+ */
+export const tailwindModifiers: TailwindModifier[] = [
+  {
+    name: "hover",
+    css: "&:hover",
+    type: "pseudo-class",
+  },
+  {
+    name: "focus",
+    css: "&:focus",
+    type: "pseudo-class",
+  },
+  {
+    name: "focus-within",
+    css: "&:focus-within",
+    type: "pseudo-class",
+  },
+  {
+    name: "focus-visible",
+    css: "&:focus-visible",
+    type: "pseudo-class",
+  },
+  {
+    name: "active",
+    css: "&:active",
+    type: "pseudo-class",
+  },
+  {
+    name: "visited",
+    css: "&:visited",
+    type: "pseudo-class",
+  },
+  {
+    name: "target",
+    css: "&:target",
+    type: "pseudo-class",
+  },
+  {
+    name: "first",
+    css: "&:first-child",
+    type: "pseudo-class",
+  },
+  {
+    name: "last",
+    css: "&:last-child",
+    type: "pseudo-class",
+  },
+  {
+    name: "only",
+    css: "&:only-child",
+    type: "pseudo-class",
+  },
+  {
+    name: "odd",
+    css: "&:nth-child(odd)",
+    type: "pseudo-class",
+  },
+  {
+    name: "even",
+    css: "&:nth-child(even)",
+    type: "pseudo-class",
+  },
+  {
+    name: "first-of-type",
+    css: "&:first-of-type",
+    type: "pseudo-class",
+  },
+  {
+    name: "last-of-type",
+    css: "&:last-of-type",
+    type: "pseudo-class",
+  },
+  {
+    name: "only-of-type",
+    css: "&:only-of-type",
+    type: "pseudo-class",
+  },
+  {
+    name: "empty",
+    css: "&:empty",
+    type: "pseudo-class",
+  },
+  {
+    name: "disabled",
+    css: "&:disabled",
+    type: "pseudo-class",
+  },
+  {
+    name: "enabled",
+    css: "&:enabled",
+    type: "pseudo-class",
+  },
+  {
+    name: "checked",
+    css: "&:checked",
+    type: "pseudo-class",
+  },
+  {
+    name: "indeterminate",
+    css: "&:indeterminate",
+    type: "pseudo-class",
+  },
+  {
+    name: "default",
+    css: "&:default",
+    type: "pseudo-class",
+  },
+  {
+    name: "required",
+    css: "&:required",
+    type: "pseudo-class",
+  },
+  {
+    name: "valid",
+    css: "&:valid",
+    type: "pseudo-class",
+  },
+  {
+    name: "invalid",
+    css: "&:invalid",
+    type: "pseudo-class",
+  },
+  {
+    name: "in-range",
+    css: "&:in-range",
+    type: "pseudo-class",
+  },
+  {
+    name: "out-of-range",
+    css: "&:out-of-range",
+    type: "pseudo-class",
+  },
+  {
+    name: "placeholder-shown",
+    css: "&:placeholder-shown",
+    type: "pseudo-class",
+  },
+  {
+    name: "autofill",
+    css: "&:autofill",
+    type: "pseudo-class",
+  },
+  {
+    name: "read-only",
+    css: "&:read-only",
+    type: "pseudo-class",
+  },
+  {
+    name: "before",
+    css: "&::before",
+    type: "pseudo-element",
+  },
+  {
+    name: "after",
+    css: "&::after",
+    type: "pseudo-element",
+  },
+  {
+    name: "first-letter",
+    css: "&::first-letter",
+    type: "pseudo-element",
+  },
+  {
+    name: "first-line",
+    css: "&::first-line",
+    type: "pseudo-element",
+  },
+  {
+    name: "marker",
+    css: "&::marker",
+    type: "pseudo-element",
+  },
+  {
+    name: "selection",
+    css: "&::selection",
+    type: "pseudo-element",
+  },
+  {
+    name: "file",
+    css: "&::file-selector-button",
+    type: "pseudo-element",
+  },
+  {
+    name: "backdrop",
+    css: "&::backdrop",
+    type: "pseudo-element",
+  },
+  {
+    name: "placeholder",
+    css: "&::placeholder",
+    type: "pseudo-element",
+  },
+  {
+    name: "sm",
+    css: "@media (min-width: 640px)",
+    type: "media-query",
+  },
+  {
+    name: "md",
+    css: "@media (min-width: 768px)",
+    type: "media-query",
+  },
+  {
+    name: "lg",
+    css: "@media (min-width: 1024px)",
+    type: "media-query",
+  },
+  {
+    name: "xl",
+    css: "@media (min-width: 1280px)",
+    type: "media-query",
+  },
+  {
+    name: "2xl",
+    css: "@media (min-width: 1536px)",
+    type: "media-query",
+  },
+  {
+    name: "min-[\u2026]",
+    css: "@media (min-width:\u2026)",
+    type: "media-query",
+  },
+  {
+    name: "max-sm",
+    css: "@media not all and (min-width: 640px)",
+    type: "media-query",
+  },
+  {
+    name: "max-md",
+    css: "@media not all and (min-width: 768px)",
+    type: "media-query",
+  },
+  {
+    name: "max-lg",
+    css: "@media not all and (min-width: 1024px)",
+    type: "media-query",
+  },
+  {
+    name: "max-xl",
+    css: "@media not all and (min-width: 1280px)",
+    type: "media-query",
+  },
+  {
+    name: "max-2xl",
+    css: "@media not all and (min-width: 1536px)",
+    type: "media-query",
+  },
+  {
+    name: "max-[\u2026]",
+    css: "@media (max-width:\u2026)",
+    type: "media-query",
+  },
+  {
+    name: "dark",
+    css: "@media (prefers-color-scheme: dark)",
+    type: "media-query",
+  },
+  {
+    name: "portrait",
+    css: "@media (orientation: portrait)",
+    type: "media-query",
+  },
+  {
+    name: "landscape",
+    css: "@media (orientation: landscape)",
+    type: "media-query",
+  },
+  {
+    name: "motion-safe",
+    css: "@media (prefers-reduced-motion: no-preference)",
+    type: "media-query",
+  },
+  {
+    name: "motion-reduce",
+    css: "@media (prefers-reduced-motion: reduce)",
+    type: "media-query",
+  },
+  {
+    name: "contrast-more",
+    css: "@media (prefers-contrast: more)",
+    type: "media-query",
+  },
+  {
+    name: "contrast-less",
+    css: "@media (prefers-contrast: less)",
+    type: "media-query",
+  },
+  {
+    name: "print",
+    css: "@media print",
+    type: "media-query",
+  },
+  {
+    name: "supports-[\u2026]",
+    css: "@supports (\u2026)",
+    type: "feature-query",
+  },
+  {
+    name: "aria-checked",
+    css: "&[aria-checked=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-disabled",
+    css: "&[aria-disabled=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-expanded",
+    css: "&[aria-expanded=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-hidden",
+    css: "&[aria-hidden=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-pressed",
+    css: "&[aria-pressed=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-readonly",
+    css: "&[aria-readonly=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-required",
+    css: "&[aria-required=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-selected",
+    css: "&[aria-selected=\u201ctrue\u201d]",
+    type: "attribute-selector",
+  },
+  {
+    name: "aria-[\u2026]",
+    css: "&[aria-\u2026]",
+    type: "attribute-selector",
+  },
+  {
+    name: "data-[\u2026]",
+    css: "&[data-\u2026]",
+    type: "attribute-selector",
+  },
+  {
+    name: "rtl",
+    css: "[dir=\u201crtl\u201d]&",
+    type: "attribute-selector",
+  },
+  {
+    name: "ltr",
+    css: "[dir=\u201cltr\u201d]&",
+    type: "attribute-selector",
+  },
+  {
+    name: "open",
+    css: "&[open]",
+    type: "attribute-selector",
+  },
+]
 
 export const tailwindScale: TailwindScale[] = [
   { name: "0", size: "0px", pixels: 0 },
