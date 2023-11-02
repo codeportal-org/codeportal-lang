@@ -12,6 +12,7 @@ export type TailwindClassData = {
     | "interactivity"
     | "svg"
     | "backgrounds"
+    | "accessibility"
   docsUrl: string
   /**
    * A function that returns the generated CSS for the given value and modifier.
@@ -5777,8 +5778,16 @@ export const tailwindData: TailwindClassData[] = [
   // // MARK: Accessibility
 
   /* Screen Readers */
-  // "sr-only",
-  // "not-sr-only",
+  {
+    name: "sr-only",
+    tag: "sr-only",
+    title: "Screen Readers",
+    type: "accessibility",
+    description: "Utilities for improving accessibility with screen readers.",
+    docsUrl: "https://tailwindcss.com/docs/screen-readers",
+    allowArbitraryValues: false,
+    prefixes: ["not"],
+  },
 ]
 
 export const tailwindDataMap = new Map(tailwindData.map((item) => [item.name, item]))
