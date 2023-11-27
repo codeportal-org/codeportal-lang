@@ -8,6 +8,7 @@ export type TailwindClassData = {
     | "spacing"
     | "layout"
     | "typography"
+    | "flexbox"
     | "borders"
     | "interactivity"
     | "svg"
@@ -1190,8 +1191,17 @@ export const tailwindData: TailwindClassData[] = [
   // "clear-none",
 
   /* Isolation */
-  // "isolate",
-  // "isolation-auto",
+  {
+    name: "isolate",
+    tag: "isolate",
+    title: "Isolate",
+    type: "layout",
+    description: "A utility for isolating an element's content from outside elements.",
+    docsUrl: "https://tailwindcss.com/docs/isolation",
+    values: ["auto"],
+    isStandalone: true,
+    allowArbitraryValues: false,
+  },
 
   /* Object Fit */
   // "object-contain",
@@ -1651,6 +1661,17 @@ export const tailwindData: TailwindClassData[] = [
 
   // // MARK: Flexbox & Grid
 
+  {
+    name: "flex",
+    tag: "flex",
+    title: "Flex",
+    type: "flexbox",
+    description: "A utility for creating a flex container.",
+    docsUrl: "https://tailwindcss.com/docs/flex-direction",
+    isStandalone: true,
+    allowArbitraryValues: false,
+  },
+
   /* Flex Basis */
   // "basis-0",
   // "basis-1",
@@ -1717,10 +1738,19 @@ export const tailwindData: TailwindClassData[] = [
   // "basis-full",
 
   /* Flex Direction */
-  // "flex-row",
-  // "flex-row-reverse",
-  // "flex-col",
-  // "flex-col-reverse",
+  {
+    name: "flex direction",
+    tag: "flex",
+    title: "Flex Direction",
+    type: "flexbox",
+    description: "Utilities for controlling the direction of flex items.",
+    docsUrl: "https://tailwindcss.com/docs/flex-direction",
+    values: ["row", "row-reverse", "col", "col-reverse"],
+    allowArbitraryValues: false,
+    genFn: (value: "row" | "row-reverse" | "col" | "col-reverse") => {
+      return `flex-direction: ${value};`
+    },
+  },
 
   /* Flex Wrap */
   // "flex-wrap",
