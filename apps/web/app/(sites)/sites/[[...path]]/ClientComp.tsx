@@ -130,6 +130,11 @@ function TailwindStylesInjector({
       setTimeout(() => {
         memoizedCompileTailwindCSS(interpreter.getTailwindClasses().join(" ")).then((css) => {
           setCss(css)
+
+          // notify the hovered node to update its styles
+          if (codeDB.hoveredNodeId) {
+            codeDB.notifyNodeChange(codeDB.hoveredNodeId)
+          }
         })
       }, 0)
     }
