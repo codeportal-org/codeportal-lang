@@ -1,7 +1,5 @@
-import { createNanoEvents } from "nanoevents"
 import React from "react"
 
-import { compileTailwindCSS } from "../tailwind-compiler"
 import { tailwindDataMap } from "../tailwindData"
 import {
   ComponentCallNode,
@@ -48,19 +46,12 @@ export class Interpreter {
 
   private tailwindClassesSet = new Set<string>()
 
-  private events = createNanoEvents()
-
   getTailwindClasses() {
     return Array.from(this.tailwindClassesSet)
   }
 
-  onNewTailwindClass(callback: (className: string) => void) {
-    return this.events.on("newTailwindClass", callback)
-  }
-
   private newTailwindClass(className: string) {
     this.tailwindClassesSet.add(className)
-    this.events.emit("newTailwindClass", className)
   }
 
   interpret(node: ProgramNode) {

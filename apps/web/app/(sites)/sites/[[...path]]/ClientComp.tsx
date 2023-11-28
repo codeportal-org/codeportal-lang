@@ -44,7 +44,9 @@ export function ClientComp({
   theme: ThemeConfig | null
   isDevSite: boolean
 }) {
+  // TODO: replace with useSyncExternalStore
   const [, forceUpdate] = React.useReducer((x) => x + 1, 0)
+
   const [interpreter] = React.useState(() => new Interpreter(isDevSite))
 
   const [codeDB] = React.useState<CodeDB>(() => {
@@ -109,33 +111,40 @@ export function ClientComp({
     <>
       {interpreter.interpretComponentCall(componentCallNode)}
       <AugmentedEditorUI codeDB={codeDB} />
-      <TailwindStylesInjector interpreter={interpreter} />
+      <TailwindStylesInjector interpreter={interpreter} codeDB={codeDB} />
     </>
   )
 }
 
-function TailwindStylesInjector({ interpreter }: { interpreter: Interpreter }) {
+function TailwindStylesInjector({
+  interpreter,
+  codeDB,
+}: {
+  interpreter: Interpreter
+  codeDB: CodeDB
+}) {
   const [css, setCss] = React.useState("")
 
   React.useEffect(() => {
-    const unbind = interpreter.onNewTailwindClass(() => {
-      console.log("-----new tailwind class----")
+    function compileTailwindCSS() {
       setTimeout(() => {
         memoizedCompileTailwindCSS(interpreter.getTailwindClasses().join(" ")).then((css) => {
           setCss(css)
         })
       }, 0)
-    })
+    }
+
+    compileTailwindCSS()
+
+    const unsubscribe = codeDB.onNodeChange(compileTailwindCSS)
 
     return () => {
-      unbind()
+      unsubscribe()
     }
-  }, [])
+  })
 
   return (
     <>
-      {/* <div>{interpreter.getTailwindClasses().join(" ")}</div> */}
-
       <style global jsx>{`
         ${css}
       `}</style>
