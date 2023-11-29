@@ -122,7 +122,7 @@ Carlos Galarza, Founder
 - ["Moldable development" by Tudor Girba](https://www.youtube.com/watch?v=Pot9GnHFOVU): Having multiple views of a system, and having your dev environment be moldable are big ideas! 💡
 - ["The Post JavaScript Apocalypse" by Douglas Crockford](https://www.youtube.com/watch?v=99Zacm7SsWQ): Lots of wisdom here! It sparks joy! ✨ Many hot takes! Like names with spaces! 🌶️ 🤯
 - ["Why Dark" by Paul Biggar](https://www.youtube.com/watch?v=66w4Pdp5RhI): Simplifying, and getting rid of accidental complexity! Thinking about the important parts of what we do as an industry. Instant deployments! Live values (trace-driven development)! Some great gems here! 💎
-- ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code is a great idea! 📍
+- ["Unison: a new distributed programming language" by Paul Chiusano](https://www.youtube.com/watch?v=gCWtkvDQ2ZI): Content-addressed code and [making a codebase a proper database](https://www.unison-lang.org/learn/the-big-idea/#richer-codebase-tools) are a great ideas! 📍
 - [Toward a better programming by Chris Granger](https://chris-granger.com/2014/03/27/toward-a-better-programming)
 
 ## Local development
