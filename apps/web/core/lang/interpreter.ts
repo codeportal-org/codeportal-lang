@@ -1,6 +1,5 @@
 import React from "react"
 
-import { tailwindDataMap } from "../tailwindData"
 import {
   ComponentCallNode,
   ComponentNode,
@@ -254,13 +253,11 @@ export class Interpreter {
             tailwindClasses += " "
           }
 
-          const styleData = tailwindDataMap.get(style.name)!
-
           const tailwindClass = style.args
-            ? `${styleData.tag}-${style.args
+            ? `${style.tag}-${style.args
                 .map((arg) => (typeof arg === "string" ? arg : arg.name))
                 .join("-")}`
-            : styleData.tag
+            : style.tag!
 
           tailwindClasses += tailwindClass
 

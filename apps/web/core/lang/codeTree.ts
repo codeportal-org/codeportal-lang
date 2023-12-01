@@ -166,8 +166,13 @@ export type UIStyleNode = {
   type: "ui style"
   id: string
   kind: "style" | "tailwind"
-  /** The name of the style. For Tailwind, this is for instance "bg" or "text-color". */
+  /** The name of the style. For Tailwind, this is for instance "bg" or "text-color". It is unique. */
   name: string
+  /**
+   * A tag is used to build the Tailwind class name. For instance, "bg" + "-" + "red" + "-" + "500". bg is the tag.
+   * A tag is not unique.
+   */
+  tag?: string
   /**
    * For Tailwind, this is for instance ["red", "500"].
    */
