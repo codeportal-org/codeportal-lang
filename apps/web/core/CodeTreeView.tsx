@@ -39,6 +39,7 @@ import sanitizeHtml from "sanitize-html"
 
 import { cn, isTouchEnabled } from "@/lib/utils"
 
+import { CodeDB } from "./lang/codeDB"
 import { useCodeDB, useNode } from "./lang/codeDBContext"
 import {
   CodeNode,
@@ -472,6 +473,7 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
       generateTailwindClassesData().map((style) => ({
         value: style.className,
         name: style.data.name,
+        tag: style.data.tag,
         args: style.args,
         prefix: style.prefix,
         data: style.data,
@@ -572,7 +574,7 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
 
                             const newNode = codeDB?.newNodeFromType<UIStyleNode>("ui style", {
                               name: match.name,
-                              tag: match.data.tag,
+                              tag: match.tag,
                               args: match.args,
                               prefix: match.prefix,
                             })!
