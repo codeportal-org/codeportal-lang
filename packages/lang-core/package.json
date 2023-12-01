@@ -50,6 +50,7 @@
     "@storybook/react-vite": "^7.2.1",
     "@storybook/testing-library": "^0.2.0",
     "@types/jest": "^29.5.3",
+    "@types/node": "^20.10.1",
     "@types/react": "^18.2.5",
     "eslint": "^7.32.0",
     "eslint-config-custom": "workspace:*",
@@ -67,5 +68,12 @@
     "extends": [
       "plugin:storybook/recommended"
     ]
+  },
+  "dependencies": {
+    "acorn": "^8.10.0",
+    "acorn-jsx": "^5.3.2",
+    "acorn-walk": "^8.2.0",
+    "estree-jsx": "^0.0.1",
+    "nanoevents": "^8.0.0"
   }
 }
