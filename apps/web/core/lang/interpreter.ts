@@ -7,6 +7,7 @@ import {
   FunctionNode,
   IfStatementNode,
   NAryExpression,
+  NAryOperator,
   ObjectNode,
   ProgramNode,
   ReferenceNode,
@@ -369,6 +370,7 @@ export class Interpreter {
 
     let first = true
 
+    let i = 0
     for (let arg of node.args) {
       if (first) {
         result = this.interpretExpression(arg)
@@ -377,13 +379,15 @@ export class Interpreter {
       }
 
       arg = this.interpretExpression(arg)
-      result = this.interpretNAryOperator(node.operator, result, arg)
+
+      result = this.interpretNAryOperator(node.operators[i]!, result, arg)
+      i++
     }
 
     return result
   }
 
-  private interpretNAryOperator(operator: NAryExpression["operator"], left: any, right: any): any {
+  private interpretNAryOperator(operator: NAryOperator, left: any, right: any): any {
     if (operator === "+") {
       return left + right
     } else if (operator === "-") {

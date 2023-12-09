@@ -356,7 +356,7 @@ export type UnaryExpressionNode = {
 export type NAryExpression = {
   type: "nary"
   id: string
-  operator: NAryOperator
+  operators: NAryOperator[]
   args: ExpressionNode[]
   meta?: CodeMeta
 }

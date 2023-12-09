@@ -805,7 +805,7 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
           <React.Fragment key={arg.id}>
             <ExpressionView nodeId={arg.id} />
             {idx < node.args.length - 1 && (
-              <span className="text-code-symbol">{node.operator}</span>
+              <span className="text-code-symbol">{node.operators[idx]}</span>
             )}
           </React.Fragment>
         )

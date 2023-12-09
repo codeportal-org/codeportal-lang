@@ -35,6 +35,7 @@ import {
   IfStatementNode,
   LiteralNode,
   NAryExpression,
+  NAryOperator,
   NAryOperatorSymbols,
   ObjectNode,
   ParamDeclaration,
@@ -488,7 +489,7 @@ export class ASTtoCTTransformer {
     return {
       type: "nary",
       id: nAryId,
-      operator: operator as any,
+      operators: [operator as NAryOperator],
       args: args.reverse(),
     }
   }
