@@ -146,7 +146,7 @@ function TailwindStylesInjector({
     return () => {
       unsubscribe()
     }
-  })
+  }, [])
 
   return (
     <>
