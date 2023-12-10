@@ -254,6 +254,9 @@ export type PathAccessNode = {
   meta?: CodeMeta
 }
 
+/**
+ * A variable declaration.
+ */
 export type VarStatement = {
   type: "var"
   id: string
@@ -450,6 +453,7 @@ export type NodeTypeMeta = {
   kinds: NodeKind[]
   title?: string
   description?: string
+  hasName?: boolean
 }
 
 export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
@@ -486,7 +490,13 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
   "ui style": { kinds: ["style"], expressions: ["test"] },
   return: { kinds: ["statement"], expressions: ["arg"] },
   assignment: { kinds: ["statement"], expressions: ["left", "right"] },
-  state: { kinds: ["statement"], expressions: ["value"] },
+  state: {
+    title: "State declaration",
+    description: "This node is used to declare a state in the current scope",
+    hasName: true,
+    kinds: ["statement"],
+    expressions: ["value"],
+  },
   print: { kinds: ["statement"], expressions: ["arg"] },
   unary: { kinds: ["statement"], expressions: ["arg"] },
   nary: { kinds: ["statement"], childLists: [{ name: "args", kind: "statement" }] },
@@ -525,7 +535,13 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     ],
   },
   "path access": { kinds: ["expression"], argLists: ["path"] },
-  var: { kinds: ["statement"], expressions: ["value"] },
+  var: {
+    title: "Variable declaration",
+    description: "This node is used to declare a variable in the current scope",
+    kinds: ["statement"],
+    expressions: ["value"],
+    hasName: true,
+  },
   property: { kinds: ["statement"], expressions: ["name", "value"] },
   empty: {
     title: "Empty block",
@@ -544,6 +560,7 @@ export const baseNodeTypeList: {
   title?: string
   name?: string
 }[] = [
+  { type: "var", title: nodeTypeMeta.var.title },
   { type: "if", title: nodeTypeMeta.if.title },
   {
     type: "ui element",
