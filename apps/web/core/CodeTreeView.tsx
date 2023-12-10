@@ -270,16 +270,7 @@ export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
   return (
     <div className="flex flex-row gap-1.5">
       <span className="text-code-keyword">var</span>
-      <span
-        className={cn(
-          "text-code-name rounded-md bg-gray-100 px-1 transition-colors hover:bg-gray-200",
-          {
-            "bg-gray-200": node.meta?.ui?.isHovered,
-          },
-        )}
-      >
-        {node.name}
-      </span>
+      <EditableNodeName nodeId={nodeId} />
       <span className="text-code-symbol">=</span>
 
       <ExpressionView nodeId={node.value.id} />
@@ -293,7 +284,7 @@ export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
 
   return (
     <div className="flex flex-row gap-1.5">
-      <span className="text-code-keyword ">state</span>
+      <span className="text-code-keyword">state</span>
       <EditableNodeName nodeId={nodeId} />
       <span className="text-code-symbol">=</span>
 

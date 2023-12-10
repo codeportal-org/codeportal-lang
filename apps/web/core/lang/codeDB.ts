@@ -663,6 +663,10 @@ export class CodeDB {
 
     const typeMeta = nodeTypeMeta[type]
 
+    if (typeMeta.hasName) {
+      ;(newNode as any).name = ""
+    }
+
     if (typeMeta.childLists && typeMeta.childLists.length > 0) {
       for (const childList of typeMeta.childLists) {
         if (childList.alwaysPresent) {
