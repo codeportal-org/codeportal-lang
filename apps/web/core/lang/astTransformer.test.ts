@@ -744,7 +744,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
               arg: {
                 type: "nary",
                 id: "5",
-                operator: "+",
+                operators: ["+"],
                 args: [
                   {
                     type: "ref",
@@ -873,7 +873,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
               test: {
                 type: "nary",
                 id: "5",
-                operator: "==",
+                operators: ["=="],
                 args: [
                   {
                     type: "ref",
@@ -1000,7 +1000,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
               test: {
                 type: "nary",
                 id: "5",
-                operator: "==",
+                operators: ["=="],
                 args: [
                   {
                     type: "ref",
@@ -1033,7 +1033,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                   test: {
                     type: "nary",
                     id: "11",
-                    operator: ">",
+                    operators: [">"],
                     args: [
                       {
                         type: "ref",
@@ -1066,7 +1066,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                   test: {
                     type: "nary",
                     id: "17",
-                    operator: "<",
+                    operators: ["<"],
                     args: [
                       {
                         type: "ref",
@@ -1392,7 +1392,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                                     arg: {
                                       type: "nary",
                                       id: "13",
-                                      operator: "+",
+                                      operators: ["+"],
                                       args: [
                                         {
                                           type: "ref",
@@ -1454,7 +1454,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                                     arg: {
                                       type: "nary",
                                       id: "26",
-                                      operator: "+",
+                                      operators: ["+"],
                                       args: [
                                         {
                                           type: "ref",
@@ -1516,7 +1516,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                                     arg: {
                                       type: "nary",
                                       id: "39",
-                                      operator: "+",
+                                      operators: ["+"],
                                       args: [
                                         {
                                           type: "ref",
@@ -1578,7 +1578,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                                     arg: {
                                       type: "nary",
                                       id: "52",
-                                      operator: "+",
+                                      operators: ["+"],
                                       args: [
                                         {
                                           type: "ref",
@@ -1640,7 +1640,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
                                     arg: {
                                       type: "nary",
                                       id: "65",
-                                      operator: "+",
+                                      operators: ["+"],
                                       args: [
                                         {
                                           type: "ref",
