@@ -49,6 +49,7 @@ import {
   FunctionNode,
   IfStatementNode,
   NAryExpression,
+  NAryOperator,
   NAryOperators,
   NumberLiteral,
   ProgramNode,
@@ -820,6 +821,10 @@ const StateChangeView = ({ node }: { node: StateChangeNode }) => {
 }
 
 const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
+  const codeDB = useCodeDB()
+
+  const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(false)
+
   return (
     <div className="flex flex-row flex-wrap items-start gap-1.5 border-2 border-transparent">
       {node.args.map((arg, idx) => {
@@ -827,9 +832,23 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
           <React.Fragment key={arg.id}>
             <ExpressionView nodeId={arg.id} />
             {idx < node.args.length - 1 && (
-              <DropdownMenu.Root>
+              <DropdownMenu.Root
+                open={isOperatorDropdownOpen}
+                onOpenChange={(isOpen) => {
+                  setIsOperatorDropdownOpen(isOpen)
+                }}
+              >
                 <DropdownMenu.Trigger asChild>
-                  <button className="text-code-symbol">{node.operators[idx]}</button>
+                  <button
+                    className={cn(
+                      "text-code-symbol outline-none ring-blue-700 ring-offset-1 focus-visible:ring-2",
+                      {
+                        "ring-2": isOperatorDropdownOpen,
+                      },
+                    )}
+                  >
+                    {node.operators[idx]}
+                  </button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
                   <DropdownMenu.Content
@@ -853,7 +872,18 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
                         key={operator}
                         onClick={(event) => {
                           event.preventDefault()
-                          console.log("clicked", operator)
+
+                          codeDB?.updateNode<NAryExpression>(node.id, {
+                            operators: [
+                              ...node.operators.slice(0, idx),
+                              operator as NAryOperator,
+                              ...node.operators.slice(idx + 1),
+                            ],
+                          })
+
+                          setTimeout(() => {
+                            setIsOperatorDropdownOpen(false)
+                          }, 100)
                         }}
                         onMouseOver={(event) => {
                           event.preventDefault()

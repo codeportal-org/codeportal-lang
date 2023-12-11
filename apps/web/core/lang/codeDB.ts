@@ -271,7 +271,7 @@ export class CodeDB {
     this.notifyNodeChange(nodeId)
   }
 
-  updateNode(nodeId: string, data: Partial<UIElementNode>) {
+  updateNode<T>(nodeId: string, data: Partial<T>) {
     const node = this.getNodeByID(nodeId)
     if (!node) {
       return
