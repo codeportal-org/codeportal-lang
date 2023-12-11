@@ -248,7 +248,7 @@ describe("CodeTreeWalk", () => {
               test: {
                 type: "nary",
                 id: "5",
-                operator: "==",
+                operators: ["=="],
                 args: [
                   {
                     type: "ref",
@@ -310,7 +310,7 @@ describe("CodeTreeWalk", () => {
                   test: {
                     type: "nary",
                     id: "11",
-                    operator: "==",
+                    operators: ["=="],
                     args: [
                       {
                         type: "ref",
@@ -378,7 +378,7 @@ describe("CodeTreeWalk", () => {
                   test: {
                     type: "nary",
                     id: "17",
-                    operator: "==",
+                    operators: ["=="],
                     args: [
                       {
                         type: "ref",
@@ -446,7 +446,7 @@ describe("CodeTreeWalk", () => {
                   test: {
                     type: "nary",
                     id: "23",
-                    operator: "==",
+                    operators: ["=="],
                     args: [
                       {
                         type: "ref",
