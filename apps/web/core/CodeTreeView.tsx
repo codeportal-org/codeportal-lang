@@ -881,9 +881,7 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
                             ],
                           })
 
-                          setTimeout(() => {
-                            setIsOperatorDropdownOpen(false)
-                          }, 100)
+                          setIsOperatorDropdownOpen(false)
                         }}
                         onMouseOver={(event) => {
                           event.preventDefault()
