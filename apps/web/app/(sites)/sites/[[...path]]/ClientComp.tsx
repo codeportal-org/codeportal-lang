@@ -133,7 +133,12 @@ function TailwindStylesInjector({
 
           // notify the hovered node to update its styles, source is "editor" to avoid infinite loop
           if (codeDB.hoveredNodeId) {
-            codeDB.notifyNodeChange(codeDB.hoveredNodeId, "editor")
+            let hoveredNodeId = codeDB.hoveredNodeId
+
+            // do it after inserting the styles to avoid unsynced styles
+            setTimeout(() => {
+              codeDB.notifyNodeChange(hoveredNodeId, "editor")
+            }, 0)
           }
         })
       }, 0)
