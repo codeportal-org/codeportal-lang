@@ -131,9 +131,9 @@ function TailwindStylesInjector({
         memoizedCompileTailwindCSS(interpreter.getTailwindClasses().join(" ")).then((css) => {
           setCss(css)
 
-          // notify the hovered node to update its styles
+          // notify the hovered node to update its styles, source is "editor" to avoid infinite loop
           if (codeDB.hoveredNodeId) {
-            codeDB.notifyNodeChange(codeDB.hoveredNodeId)
+            codeDB.notifyNodeChange(codeDB.hoveredNodeId, "editor")
           }
         })
       }, 0)
@@ -141,7 +141,11 @@ function TailwindStylesInjector({
 
     compileTailwindCSS()
 
-    const unsubscribe = codeDB.onNodeChange(compileTailwindCSS)
+    const unsubscribe = codeDB.onNodeChange(({ source }) => {
+      if (source === "sync") {
+        compileTailwindCSS()
+      }
+    })
 
     return () => {
       unsubscribe()

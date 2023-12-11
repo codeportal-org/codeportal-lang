@@ -90,11 +90,13 @@ export class CodeDB {
     return this.events.on("code-loaded", callback)
   }
 
-  notifyNodeChange(nodeId: string) {
-    this.events.emit("node-change", { nodeId })
+  notifyNodeChange(nodeId: string, source: "sync" | "editor" = "editor") {
+    console.log("--- notifyNodeChange", nodeId)
+
+    this.events.emit("node-change", { nodeId, source })
   }
 
-  onNodeChange(callback: (data: { nodeId: string }) => void) {
+  onNodeChange(callback: (data: { nodeId: string; source: "sync" | "editor" }) => void) {
     return this.events.on("node-change", callback)
   }
 
@@ -320,7 +322,7 @@ export class CodeDB {
       }
     }
 
-    this.notifyNodeChange(nodeId)
+    this.notifyNodeChange(nodeId, "sync")
 
     // sync CodeDB's state
     if (node.meta?.ui?.isSelected) {
