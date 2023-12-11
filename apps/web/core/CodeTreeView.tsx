@@ -27,6 +27,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { atom, useAtom } from "jotai"
 import { ChevronDown, ChevronRight, HelpCircle, PencilRuler, Square, Type, X } from "lucide-react"
@@ -48,6 +49,7 @@ import {
   FunctionNode,
   IfStatementNode,
   NAryExpression,
+  NAryOperators,
   NumberLiteral,
   ProgramNode,
   ReferenceNode,
@@ -299,28 +301,53 @@ export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
 
   if (!node) return null
 
-  // if (node.type === "string") {
-  //   return <StringView node={node} />
-  // } else if (node.type === "number") {
-  //   return <NumberView node={node} />
-  // } else if (node.type === "boolean") {
-  //   return <BooleanView node={node} />
-  // } else if (node.type === "function") {
-  //   return <FunctionView node={node} />
-  // } else if (node.type === "ref") {
-  //   return <ReferenceView nodeId={node.id} />
-  // } else if (node.type === "nary") {
-  //   return <NaryExpressionView node={node} />
-  // } else if (node.type === "empty") {
-  //   return <EmptyNodeView nodeId={node.id} />
-  // } else if (node.type === "state change") {
-  //   return <StateChangeView node={node} />
-  // }
-
   if (uiNodeTypes.includes(node.type)) {
     return <UINodeView nodeId={node.id} />
   } else {
-    // TODO here
+    return <InlineExpressionContainer node={node} />
+  }
+}
+
+export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) => {
+  const parent = useNode<CodeNode>(node.meta?.parentId!)
+
+  return parent.type !== "nary" && node.type !== "nary" ? (
+    <div className="flex flex-row">
+      <BasicExpressionView node={node} />
+      <button
+        className="h-full w-1 rounded hover:bg-gray-200"
+        onClick={(event) => {
+          event.preventDefault()
+          console.log("clicked")
+        }}
+        onFocus={(event) => {
+          event.preventDefault()
+        }}
+      ></button>
+    </div>
+  ) : (
+    <BasicExpressionView node={node} />
+  )
+}
+
+export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
+  if (node.type === "string") {
+    return <StringView node={node} />
+  } else if (node.type === "number") {
+    return <NumberView node={node} />
+  } else if (node.type === "boolean") {
+    return <BooleanView node={node} />
+  } else if (node.type === "function") {
+    return <FunctionView node={node} />
+  } else if (node.type === "ref") {
+    return <ReferenceView nodeId={node.id} />
+  } else if (node.type === "empty") {
+    return <EmptyNodeView nodeId={node.id} />
+  } else if (node.type === "state change") {
+    return <StateChangeView node={node} />
+  } else if (node.type === "nary") {
+    return <NaryExpressionView node={node} />
+  } else {
     return <div>unknown expression type: {node.type}</div>
   }
 }
@@ -800,7 +827,53 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
           <React.Fragment key={arg.id}>
             <ExpressionView nodeId={arg.id} />
             {idx < node.args.length - 1 && (
-              <span className="text-code-symbol">{node.operators[idx]}</span>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <button className="text-code-symbol">{node.operators[idx]}</button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    className="data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade min-w-[260px] rounded-md bg-white p-[5px] shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform]"
+                    sideOffset={5}
+                    onMouseOver={(event) => {
+                      event.preventDefault()
+                    }}
+                    onMouseLeave={(event) => {
+                      event.preventDefault()
+                    }}
+                    onFocus={(event) => {
+                      event.preventDefault()
+                    }}
+                    onBlur={(event) => {
+                      event.preventDefault()
+                    }}
+                  >
+                    {Object.entries(NAryOperators).map(([operator, description]) => (
+                      <DropdownMenu.Item
+                        key={operator}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          console.log("clicked", operator)
+                        }}
+                        onMouseOver={(event) => {
+                          event.preventDefault()
+                        }}
+                        onMouseLeave={(event) => {
+                          event.preventDefault()
+                        }}
+                        className="w-full cursor-pointer rounded-md px-2 text-left hover:bg-gray-100 hover:outline-none hover:ring-0 focus-visible:border-0 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-0"
+                      >
+                        <div className="flex flex-row items-center">
+                          <div className="text-code-symbol w-1/4">{operator}</div>
+                          <div className="w-3/4">{description}</div>
+                        </div>
+                      </DropdownMenu.Item>
+                    ))}
+
+                    <DropdownMenu.Arrow className="fill-white" />
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
             )}
           </React.Fragment>
         )
@@ -1003,7 +1076,11 @@ const DraggableNodeContainer = ({
 
         codeDB?.selectNode(nodeId)
       }}
-      onBlur={() => {
+      onBlur={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+
         codeDB?.selectNodeOff(nodeId)
       }}
       onKeyDown={(event) => {
