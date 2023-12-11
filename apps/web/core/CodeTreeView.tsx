@@ -59,12 +59,13 @@ import {
   UIStyleNode,
   UITextNode,
   VarStatement,
+} from "./lang/codeTree"
+import {
   areNodeTypesCompatible,
   baseNodeMetaList,
   isNodeKind,
-  statementTypes,
   uiNodeTypes,
-} from "./lang/codeTree"
+} from "./lang/codeTreeMeta"
 import {
   TailwindShade,
   generateTailwindClassesData,
@@ -298,25 +299,28 @@ export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
 
   if (!node) return null
 
-  if (node.type === "string") {
-    return <StringView node={node} />
-  } else if (node.type === "number") {
-    return <NumberView node={node} />
-  } else if (node.type === "boolean") {
-    return <BooleanView node={node} />
-  } else if (node.type === "function") {
-    return <FunctionView node={node} />
-  } else if (node.type === "ref") {
-    return <ReferenceView nodeId={node.id} />
-  } else if (node.type === "nary") {
-    return <NaryExpressionView node={node} />
-  } else if (node.type === "empty") {
-    return <EmptyNodeView nodeId={node.id} />
-  } else if (node.type === "state change") {
-    return <StateChangeView node={node} />
-  } else if (uiNodeTypes.includes(node.type)) {
+  // if (node.type === "string") {
+  //   return <StringView node={node} />
+  // } else if (node.type === "number") {
+  //   return <NumberView node={node} />
+  // } else if (node.type === "boolean") {
+  //   return <BooleanView node={node} />
+  // } else if (node.type === "function") {
+  //   return <FunctionView node={node} />
+  // } else if (node.type === "ref") {
+  //   return <ReferenceView nodeId={node.id} />
+  // } else if (node.type === "nary") {
+  //   return <NaryExpressionView node={node} />
+  // } else if (node.type === "empty") {
+  //   return <EmptyNodeView nodeId={node.id} />
+  // } else if (node.type === "state change") {
+  //   return <StateChangeView node={node} />
+  // }
+
+  if (uiNodeTypes.includes(node.type)) {
     return <UINodeView nodeId={node.id} />
   } else {
+    // TODO here
     return <div>unknown expression type: {node.type}</div>
   }
 }

@@ -7,13 +7,11 @@ import {
   ProgramNode,
   StatementNode,
   UIElementNode,
-  UINode,
   UIStyleNode,
   VarStatement,
-  nodeTypeMeta,
   statementTypes,
-  uiNodeTypes,
 } from "./codeTree"
+import { nodeTypeMeta, uiNodeTypes } from "./codeTreeMeta"
 import { CodeTreeWalk } from "./codeTreeWalk"
 
 /**
