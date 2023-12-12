@@ -54,6 +54,7 @@ import {
   NAryOperator,
   NAryOperators,
   NumberLiteral,
+  PrintStatement,
   ProgramNode,
   ReferenceNode,
   StateChangeNode,
@@ -258,6 +259,8 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
     statementView = <EmptyNodeView nodeId={node.id} />
   } else if (node.type === "assignment") {
     statementView = <AssignmentStatementView nodeId={node.id} />
+  } else if (node.type === "print") {
+    statementView = <PrintStatementView nodeId={node.id} />
   } else {
     statementView = (
       <div>
@@ -381,6 +384,17 @@ export const AssignmentStatementView = ({ nodeId }: { nodeId: string }) => {
       </DropdownMenu.Root>
 
       <ExpressionView nodeId={node.right.id} />
+    </div>
+  )
+}
+
+export const PrintStatementView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<PrintStatement>(nodeId)
+
+  return (
+    <div className="flex flex-row gap-1.5">
+      <span className="text-code-keyword">print</span>
+      <ExpressionView nodeId={node.arg.id} />
     </div>
   )
 }
