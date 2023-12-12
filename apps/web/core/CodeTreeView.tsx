@@ -43,6 +43,7 @@ import { cn, isTouchEnabled } from "@/lib/utils"
 import { CodeDB } from "./lang/codeDB"
 import { useCodeDB, useNode } from "./lang/codeDBContext"
 import {
+  AssignmentStatement,
   CodeNode,
   EmptyNode,
   ExpressionNode,
@@ -64,9 +65,11 @@ import {
   VarStatement,
 } from "./lang/codeTree"
 import {
+  NodeAutocompleteMeta,
   areNodeTypesCompatible,
   baseNodeMetaList,
   isNodeKind,
+  nodeTypeMeta,
   uiNodeTypes,
 } from "./lang/codeTreeMeta"
 import {
@@ -252,6 +255,8 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
     statementView = <StateChangeView node={node} />
   } else if (node.type === "empty" && node.kind === "statement") {
     statementView = <EmptyNodeView nodeId={node.id} />
+  } else if (node.type === "assignment") {
+    statementView = <AssignmentStatementView nodeId={node.id} />
   } else {
     statementView = (
       <div>
@@ -293,6 +298,21 @@ export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
       <span className="text-code-symbol">=</span>
 
       <ExpressionView nodeId={node.value.id} />
+    </div>
+  )
+}
+
+export const AssignmentStatementView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<AssignmentStatement>(nodeId)
+
+  return (
+    <div className="flex flex-row flex-wrap gap-1.5">
+      <ExpressionView nodeId={node.left.id} />
+
+      {/* TODO: create the dropdown for this */}
+      <span className="text-code-symbol">{node.operator}</span>
+
+      <ExpressionView nodeId={node.right.id} />
     </div>
   )
 }
@@ -362,7 +382,9 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
 
   let uiNodeView: React.ReactNode
 
-  if (node.type === "ui text") {
+  if (node.type === "empty") {
+    uiNodeView = <EmptyNodeView nodeId={node.id} />
+  } else if (node.type === "ui text") {
     uiNodeView = <UITextView nodeId={node.id} />
   } else if (node.type === "ui element") {
     uiNodeView = (
@@ -446,8 +468,6 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
         {"}"}
       </div>
     )
-  } else if (node.type === "empty" && node.kind === "ui") {
-    uiNodeView = <EmptyNodeView nodeId={node.id} />
   } else {
     uiNodeView = (
       <div>
@@ -1293,19 +1313,75 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   const kind = node.kind
 
   const filteredBaseNodeMetaList = React.useMemo(
-    () => baseNodeMetaList.filter((n) => n.kinds.includes(kind)),
+    () => baseNodeMetaList.filter((node) => nodeTypeMeta[node.type].kinds.includes(kind)),
     [kind],
   )
 
+  const availableNodeRefs = React.useMemo(
+    () =>
+      kind === "expression" || kind === "ui" || kind === "statement"
+        ? codeDB!.availableNodeRefs(nodeId).map((node) => {
+            const refNodeType = nodeTypeMeta[node.type].referencedBy!
+
+            if (kind === "expression" || kind === "ui") {
+              return {
+                title: `${(node as any).name} (reference to ${node.type})`,
+                type: refNodeType,
+                buildNode: (codeDB: CodeDB) =>
+                  codeDB?.newNodeFromType<ReferenceNode>("ref", {
+                    refId: node.id,
+                  })!,
+              } satisfies NodeAutocompleteMeta
+            } else {
+              if (node.type === "var") {
+                return {
+                  title: `assign to ${(node as any).name} (variable)`,
+                  type: "assignment",
+                  buildNode: (codeDB: CodeDB) => {
+                    const ref = codeDB?.newNodeFromType<ReferenceNode>("ref", {
+                      refId: node.id,
+                    })!
+
+                    return codeDB?.newNodeFromType<AssignmentStatement>("assignment", {
+                      left: ref,
+                      operator: "=",
+                    })!
+                  },
+                } satisfies NodeAutocompleteMeta
+              } else if (node.type === "state change") {
+                return {
+                  title: `set ${(node as any).name} (state)`,
+                  type: "state change",
+                  buildNode: (codeDB: CodeDB) => {
+                    const ref = codeDB?.newNodeFromType<ReferenceNode>("ref", {
+                      refId: node.id,
+                    })!
+
+                    return codeDB?.newNodeFromType<StateChangeNode>("state change", {
+                      state: ref,
+                    })!
+                  },
+                } satisfies NodeAutocompleteMeta
+              }
+            }
+          })
+        : ([] as NodeAutocompleteMeta[]),
+    [nodeId],
+  )
+
   const [searchValue, setSearchValue] = React.useState("")
+
   const matches = React.useMemo(
-    () => matchSorter(filteredBaseNodeMetaList, searchValue, { keys: ["title"] }),
+    () =>
+      matchSorter([...availableNodeRefs, ...filteredBaseNodeMetaList], searchValue, {
+        keys: ["title"],
+      }),
     [searchValue],
   )
 
   return (
     <div className="relative">
-      {(isSelected || isHovered) && (
+      {kind !== "expression" && (isSelected || isHovered) && (
         <div className="absolute right-0 top-0 flex h-full w-[24px] items-center justify-start">
           <button
             className="rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
@@ -1342,21 +1418,11 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
           {matches.length !== 0 ? (
             matches.map((match) => (
               <ComboboxItem
-                key={match.title}
-                value={match.title}
+                key={match!.title}
+                value={match!.title}
                 className="rounded-sm px-1 transition-colors hover:bg-gray-100 data-[active-item]:bg-gray-200"
                 onClick={() => {
-                  codeDB?.replaceNodeInList(
-                    nodeId,
-                    codeDB?.newNodeFromType(
-                      match.type,
-                      match.name
-                        ? {
-                            name: match.name,
-                          }
-                        : {},
-                    )!,
-                  )
+                  codeDB?.replaceNode(nodeId, match!.buildNode(codeDB!))
                 }}
               />
             ))
