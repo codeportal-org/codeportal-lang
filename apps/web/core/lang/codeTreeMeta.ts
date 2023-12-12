@@ -82,7 +82,11 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     kinds: ["statement"],
     expressions: ["value"],
   },
-  print: { kinds: ["statement"], expressions: ["arg"] },
+  print: {
+    title: "Print",
+    kinds: ["statement"],
+    expressions: ["arg"],
+  },
   unary: { kinds: ["statement"], expressions: ["arg"] },
   nary: {
     title: "Expression",
@@ -140,7 +144,10 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     kinds: ["statement", "expression", "ui", "props", "style"],
   },
   param: { kinds: [] },
-  string: { kinds: ["expression"] },
+  string: {
+    title: "String (text)",
+    kinds: ["expression"],
+  },
   number: { kinds: ["expression"] },
   boolean: { kinds: ["expression"] },
 }
@@ -157,6 +164,16 @@ export type NodeAutocompleteMeta = {
 }
 
 export const baseNodeMetaList = [
+  {
+    type: "print",
+    title: nodeTypeMeta.print.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("print")!,
+  },
+  {
+    type: "string",
+    title: nodeTypeMeta.string.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("string", { value: "" })!,
+  },
   {
     type: "var",
     title: nodeTypeMeta.var.title,
@@ -179,7 +196,7 @@ export const baseNodeMetaList = [
   },
   {
     type: "ui text",
-    title: "Text",
+    title: "UI Text",
     buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui text")!,
   },
   {

@@ -890,6 +890,11 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
         className="text-code-string inline-block h-full px-1 outline-none focus-visible:bg-gray-200"
         html={node.value}
         onChange={handleChange}
+        onFocus={(event) => {
+          event.preventDefault()
+
+          codeDB?.selectNode(nodeId)
+        }}
       />
     </span>
   )
