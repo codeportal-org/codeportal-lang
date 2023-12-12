@@ -19,6 +19,7 @@
     "Pausable",
     "pino",
     "posthog",
+    "referenceable",
     "shadcn",
     "supabase",
     "superjson",
