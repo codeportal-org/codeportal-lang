@@ -333,7 +333,7 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
 
 export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
   if (node.type === "string") {
-    return <StringView node={node} />
+    return <StringView nodeId={node.id} />
   } else if (node.type === "number") {
     return <NumberView node={node} />
   } else if (node.type === "boolean") {
@@ -757,8 +757,40 @@ export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-export const StringView = ({ node }: { node: StringLiteral }) => {
-  return <div className="text-code-string"> {node.value} </div>
+export const StringView = ({ nodeId }: { nodeId: string }) => {
+  const codeDB = useCodeDB()
+  const node = useNode<StringLiteral>(nodeId)
+
+  function handleChange(event: React.ChangeEvent<any>) {
+    codeDB?.updateNode<StringLiteral>(nodeId, {
+      value: event.target.value,
+    })
+  }
+
+  return (
+    <span
+      className={cn(
+        "text-code-string overflow-hidden rounded-md bg-gray-50 transition-colors hover:bg-gray-100",
+        {
+          "bg-gray-100": node.meta?.ui?.isHovered,
+        },
+      )}
+      onMouseOver={() => {
+        codeDB?.hoverNode(nodeId)
+      }}
+      onMouseLeave={() => {
+        codeDB?.hoverNodeOff(nodeId)
+      }}
+    >
+      <ContentEditable
+        tagName="span"
+        role="textbox"
+        className="text-code-string inline-block h-full px-1 outline-none focus-visible:bg-gray-200"
+        html={node.value}
+        onChange={handleChange}
+      />
+    </span>
+  )
 }
 
 export const NumberView = ({ node }: { node: NumberLiteral }) => {
@@ -1216,9 +1248,9 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<VarStatement>(nodeId)
 
   function handleChange(event: React.ChangeEvent<any>) {
-    const valueWithoutWhitespace = event.target.value.replace(/(?:\r\n|\r|\n)/g, "")
+    const valueWithoutNewLines = event.target.value.replace(/(?:\r\n|\r|\n)/g, "")
 
-    const sanitizedValue = sanitizeHtml(valueWithoutWhitespace, {
+    const sanitizedValue = sanitizeHtml(valueWithoutNewLines, {
       allowedTags: [],
       allowedAttributes: {},
     })
