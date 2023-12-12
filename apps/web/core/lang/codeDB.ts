@@ -11,7 +11,7 @@ import {
   VarStatement,
   statementTypes,
 } from "./codeTree"
-import { nodeTypeMeta, uiNodeTypes } from "./codeTreeMeta"
+import { nodeTypeMeta, referenceableNodeTypes, uiNodeTypes } from "./codeTreeMeta"
 import { CodeTreeWalk } from "./codeTreeWalk"
 
 /**
@@ -543,7 +543,10 @@ export class CodeDB {
     this.notifyNodeChange(parent.id)
   }
 
-  replaceNodeInList(nodeId: string, newNode: CodeNode) {
+  /**
+   * Replaces a node in a property of it's parent node.
+   */
+  replaceNode(nodeId: string, newNode: CodeNode) {
     const node = this.getNodeByID(nodeId)
     if (!node) {
       return
@@ -565,15 +568,23 @@ export class CodeDB {
       throw new Error("Node must have a parent property")
     }
 
-    const nodeList = (parent as any)[parentProperty] as any[]
+    const parentValue = (parent as any)[parentProperty] as any[]
 
-    const index = nodeList.indexOf(node)
+    if (Array.isArray(parentValue)) {
+      // it is a list
+      const nodeList = parentValue
 
-    if (index === -1) {
-      throw new Error("Node must be in its parent")
+      const index = nodeList.indexOf(node)
+
+      if (index === -1) {
+        throw new Error("Node must be in its parent")
+      }
+
+      ;(parent as any)[parentProperty].splice(index, 1, newNode)
+    } else {
+      // it is a single value
+      ;(parent as any)[parentProperty] = newNode
     }
-
-    ;(parent as any)[parentProperty].splice(index, 1, newNode)
 
     this.nodeMap.delete(nodeId)
 
@@ -658,7 +669,7 @@ export class CodeDB {
           isSelected: false,
         },
       },
-      ...extras,
+      ...(extras || {}),
     } as CodeNode
 
     const typeMeta = nodeTypeMeta[type]
@@ -679,11 +690,16 @@ export class CodeDB {
     }
 
     if (typeMeta.expressions && typeMeta.expressions.length > 0) {
-      for (const expression of typeMeta.expressions) {
-        const emptyNode = this.newEmptyNode("expression")
-        ;(newNode as any)[expression] = emptyNode
-        emptyNode.meta!.parentId = newNode.id
-        emptyNode.meta!.parentProperty = expression
+      for (const expressionName of typeMeta.expressions) {
+        if ((newNode as any)[expressionName]) {
+          ;(newNode as any)[expressionName].meta!.parentId = newNode.id
+          ;(newNode as any)[expressionName].meta!.parentProperty = expressionName
+        } else {
+          const emptyNode = this.newEmptyNode("expression")
+          ;(newNode as any)[expressionName] = emptyNode
+          emptyNode.meta!.parentId = newNode.id
+          emptyNode.meta!.parentProperty = expressionName
+        }
       }
     }
 
@@ -692,5 +708,57 @@ export class CodeDB {
     this.notifyNodeChange(newNode.id)
 
     return newNode as T
+  }
+
+  availableNodeRefs(nodeId: string): CodeNode[] {
+    const node = this.getNodeByID(nodeId)
+    if (!node) {
+      return []
+    }
+
+    const availableRefs: CodeNode[] = []
+
+    // with a while visit all the ancestors to looks for available refs
+    let currentNode = node
+
+    while (currentNode.meta?.parentId) {
+      const parent = this.getNodeByID(currentNode.meta.parentId)
+
+      if (!parent) {
+        throw new Error("Node must have a parent")
+      }
+
+      const parentProperty = currentNode.meta.parentProperty
+
+      if (!parentProperty) {
+        throw new Error("Node must have a parent property")
+      }
+
+      const childList = nodeTypeMeta[parent.type]?.childLists?.find(
+        (childList) => childList.name === parentProperty,
+      )
+
+      if (childList) {
+        const nodeList = (parent as any)[parentProperty] as any[]
+
+        const index = nodeList.indexOf(currentNode)
+
+        if (index === -1) {
+          throw new Error("Node must be in its parent")
+        }
+
+        for (let i = 0; i < index; i++) {
+          const sibling = nodeList[i]
+
+          if (referenceableNodeTypes.find(({ type }) => type === sibling.type)) {
+            availableRefs.push(sibling)
+          }
+        }
+      }
+
+      currentNode = parent
+    }
+
+    return availableRefs
   }
 }
