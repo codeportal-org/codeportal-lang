@@ -1,6 +1,6 @@
 import { type TailwindScale } from "../tailwindData"
 
-export type NodeKind = "statement" | "expression" | "ui" | "props" | "style" | "else if"
+export type NodeKind = "statement" | "expression" | "ui" | "props" | "style" | "else if" | "ref"
 
 export type CodeNode = ProgramNode | StatementNode | ExpressionNode | SpecialNodes
 
@@ -215,6 +215,9 @@ export type ReturnStatementNode = {
 
 export type EmptyNode = {
   type: "empty"
+  /**
+   * Empty node kind
+   */
   kind: NodeKind
   id: string
   meta?: CodeMeta
