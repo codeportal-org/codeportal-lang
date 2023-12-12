@@ -32,7 +32,7 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import { atom, useAtom } from "jotai"
 import { ChevronDown, ChevronRight, HelpCircle, PencilRuler, Square, Type, X } from "lucide-react"
 import { matchSorter } from "match-sorter"
-import React, { PointerEvent } from "react"
+import React, { PointerEvent, useMemo } from "react"
 import ContentEditable from "react-contenteditable"
 import { createPortal } from "react-dom"
 import TextareaAutosize from "react-textarea-autosize"
@@ -880,7 +880,6 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
     <div
       className={cn("text-code-string relative rounded-md bg-gray-50 transition-colors", {
         "bg-gray-100": isHovered,
-        "ring-2 ring-blue-700 ring-offset-1": isSelected,
       })}
       onMouseOver={(event) => {
         if (event.defaultPrevented) {
@@ -922,22 +921,6 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
           codeDB?.selectNode(nodeId)
         }}
       />
-      {(isSelected || isHovered) && (
-        <button
-          className="absolute right-[-12px] top-[-12px] rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
-          onClick={(event) => {
-            if (event.defaultPrevented) {
-              return
-            }
-            event.preventDefault()
-
-            debugger
-            codeDB?.deleteNode(nodeId)
-          }}
-        >
-          <X size={16} />
-        </button>
-      )}
     </div>
   )
 }
@@ -1247,6 +1230,19 @@ const DraggableNodeContainer = ({
   const isSelected = node.meta?.ui?.isSelected
   const isHovered = node.meta?.ui?.isHovered
 
+  const isInline = useMemo(
+    () =>
+      !(
+        (isNodeKind(node, "statement") && !isNodeKind(node, "expression")) ||
+        isNodeKind(node, "ui")
+      ),
+    [node],
+  )
+
+  if (isSelected) {
+    console.log("isSelected kind", node.type, isInline, isNodeKind(node, "ui"))
+  }
+
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
     data: { type: node.type } satisfies DropData,
@@ -1260,7 +1256,8 @@ const DraggableNodeContainer = ({
         "relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
         {
           "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
-          "w-full": !isOverlay && isNodeKind(node, "statement") && !isNodeKind(node, "expression"),
+          "w-full": !isOverlay && !isInline,
+          "ring-2 ring-blue-700 ring-offset-1": isInline && isSelected,
         },
       )}
       ref={setNodeRef}
@@ -1318,13 +1315,35 @@ const DraggableNodeContainer = ({
         }
       }}
     >
-      {(isSelected || isHovered) && !isOverlay && (
+      {(isSelected || isHovered) && !isOverlay && !isInline && (
         <div
           className={cn("absolute left-[-5px] top-0 h-full w-1 rounded opacity-50", {
             "bg-gray-300": isDraggedNode || isHovered,
             "bg-blue-500": isSelected,
           })}
         />
+      )}
+      {!isOverlay && node.type !== "empty" && (isSelected || isHovered) && (
+        <div
+          className={cn("absolute z-10 rounded-full", {
+            "right-[-12px] top-[-12px]": isInline,
+            "left-[-22px] top-0 h-full w-[22px]": !isInline,
+          })}
+        >
+          <button
+            className="rounded-full bg-gray-400 text-white transition-colors hover:bg-gray-500"
+            onClick={(event) => {
+              if (event.defaultPrevented) {
+                return
+              }
+              event.preventDefault()
+
+              codeDB?.deleteNode(nodeId)
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
       )}
       {children}
     </div>
