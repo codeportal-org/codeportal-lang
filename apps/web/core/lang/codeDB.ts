@@ -390,6 +390,8 @@ export class CodeDB {
         } else if (nodeTypeMeta[parent.type]?.expressions?.includes(parentProperty)) {
           if (refillAndClean) {
             ;(parent as any)[parentProperty] = this.newEmptyNode("expression")
+            ;(parent as any)[parentProperty].meta!.parentId = parent.id
+            ;(parent as any)[parentProperty].meta!.parentProperty = parentProperty
           }
         }
 
