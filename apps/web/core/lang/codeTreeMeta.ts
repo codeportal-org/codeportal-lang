@@ -184,7 +184,7 @@ export const baseNodeMetaList = [
   },
   {
     type: "ui expression",
-    title: "Expression",
+    title: "UI expression",
     buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui expression")!,
   },
 ] satisfies NodeAutocompleteMeta[]
