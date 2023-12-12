@@ -1,4 +1,3 @@
-import { CodeDB } from "./codeDB"
 import { CodeNode, NodeKind } from "./codeTree"
 
 export type ChildList = {
@@ -155,56 +154,6 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
 export const uiNodeTypes = Object.entries(nodeTypeMeta)
   .filter(([type, meta]) => meta.kinds.includes("ui"))
   .map(([type]) => type)
-
-export type NodeAutocompleteMeta = {
-  type: CodeNode["type"]
-  title?: string
-  name?: string
-  buildNode: (codeDB: CodeDB) => CodeNode
-}
-
-export const baseNodeMetaList = [
-  {
-    type: "print",
-    title: nodeTypeMeta.print.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("print")!,
-  },
-  {
-    type: "string",
-    title: nodeTypeMeta.string.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("string", { value: "" })!,
-  },
-  {
-    type: "var",
-    title: nodeTypeMeta.var.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var")!,
-  },
-  {
-    type: "if",
-    title: nodeTypeMeta.if.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("if")!,
-  },
-  {
-    type: "ui element",
-    title: "Box element (HTML div)",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "div" })!,
-  },
-  {
-    type: "ui element",
-    title: "Heading element (HTML h1)",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "h1" })!,
-  },
-  {
-    type: "ui text",
-    title: "UI Text",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui text")!,
-  },
-  {
-    type: "ui expression",
-    title: "UI expression",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui expression")!,
-  },
-] satisfies NodeAutocompleteMeta[]
 
 export const isNodeKind = (node: CodeNode, kind: NodeKind) => {
   return nodeTypeMeta[node.type].kinds.includes(kind)

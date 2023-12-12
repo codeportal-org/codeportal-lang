@@ -66,14 +66,7 @@ import {
   UITextNode,
   VarStatement,
 } from "./lang/codeTree"
-import {
-  NodeAutocompleteMeta,
-  areNodeTypesCompatible,
-  baseNodeMetaList,
-  isNodeKind,
-  nodeTypeMeta,
-  uiNodeTypes,
-} from "./lang/codeTreeMeta"
+import { areNodeTypesCompatible, isNodeKind, nodeTypeMeta, uiNodeTypes } from "./lang/codeTreeMeta"
 import {
   TailwindShade,
   generateTailwindClassesData,
@@ -938,6 +931,7 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
             }
             event.preventDefault()
 
+            debugger
             codeDB?.deleteNode(nodeId)
           }}
         >
@@ -1465,6 +1459,56 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
     </span>
   )
 }
+
+export type NodeAutocompleteMeta = {
+  type: CodeNode["type"]
+  title?: string
+  name?: string
+  buildNode: (codeDB: CodeDB) => CodeNode
+}
+
+export const baseNodeMetaList = [
+  {
+    type: "print",
+    title: nodeTypeMeta.print.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("print")!,
+  },
+  {
+    type: "string",
+    title: nodeTypeMeta.string.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("string", { value: "" })!,
+  },
+  {
+    type: "var",
+    title: nodeTypeMeta.var.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var")!,
+  },
+  {
+    type: "if",
+    title: nodeTypeMeta.if.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("if")!,
+  },
+  {
+    type: "ui element",
+    title: "Box element (HTML div)",
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "div" })!,
+  },
+  {
+    type: "ui element",
+    title: "Heading element (HTML h1)",
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "h1" })!,
+  },
+  {
+    type: "ui text",
+    title: "UI Text",
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui text")!,
+  },
+  {
+    type: "ui expression",
+    title: "UI expression",
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui expression")!,
+  },
+] satisfies NodeAutocompleteMeta[]
 
 export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<EmptyNode>(nodeId)
