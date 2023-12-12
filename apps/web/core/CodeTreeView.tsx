@@ -277,7 +277,7 @@ export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<VarStatement>(nodeId)
 
   return (
-    <div className="flex flex-row gap-1.5">
+    <div className="flex flex-row flex-wrap items-start gap-1.5">
       <span className="text-code-keyword">var</span>
       <EditableNodeName nodeId={nodeId} />
       <span className="text-code-symbol">=</span>
