@@ -794,16 +794,27 @@ export const StyleNodeView = ({ nodeId }: { nodeId: string }) => {
         codeDB?.selectNode(nodeId)
       }}
       onFocus={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
         event.preventDefault()
 
         codeDB?.selectNode(nodeId)
       }}
       onMouseOver={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
         event.preventDefault()
 
         codeDB?.hoverNode(nodeId)
       }}
-      onMouseLeave={() => {
+      onMouseLeave={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
         codeDB?.hoverNodeOff(nodeId)
       }}
     >
@@ -863,6 +874,9 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
   const codeDB = useCodeDB()
   const node = useNode<StringLiteral>(nodeId)
 
+  const isHovered = node.meta?.ui?.isHovered
+  const isSelected = node.meta?.ui?.isSelected
+
   function handleChange(event: React.ChangeEvent<any>) {
     codeDB?.updateNode<StringLiteral>(nodeId, {
       value: event.target.value,
@@ -872,9 +886,10 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
   return (
     <span
       className={cn(
-        "text-code-string overflow-hidden rounded-md bg-gray-50 transition-colors hover:bg-gray-100",
+        "text-code-string relative rounded-md bg-gray-50 transition-colors hover:bg-gray-100",
         {
-          "bg-gray-100": node.meta?.ui?.isHovered,
+          "bg-gray-100": isHovered,
+          "ring-2 ring-blue-700 ring-offset-1": isSelected || isHovered,
         },
       )}
       onMouseOver={() => {
@@ -887,15 +902,42 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
       <ContentEditable
         tagName="span"
         role="textbox"
-        className="text-code-string inline-block h-full px-1 outline-none focus-visible:bg-gray-200"
+        className="text-code-string inline-block h-full rounded-md px-1 outline-none focus-visible:bg-gray-200"
         html={node.value}
         onChange={handleChange}
         onFocus={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
+
+          codeDB?.selectNode(nodeId)
+        }}
+        onClick={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
           event.preventDefault()
 
           codeDB?.selectNode(nodeId)
         }}
       />
+      {(isSelected || isHovered) && (
+        <button
+          className="absolute right-[-12px] top-[-12px] rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
+          onClick={(event) => {
+            debugger
+            if (event.defaultPrevented) {
+              return
+            }
+            event.preventDefault()
+
+            codeDB?.deleteNode(nodeId)
+          }}
+        >
+          <X size={16} />
+        </button>
+      )}
     </span>
   )
 }
@@ -921,10 +963,18 @@ export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
           "bg-gray-200": referencedNode.meta?.ui?.isHovered,
         },
       )}
-      onMouseOver={() => {
+      onMouseOver={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+
         codeDB?.hoverNode(node.refId)
       }}
-      onMouseLeave={() => {
+      onMouseLeave={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+
         codeDB?.hoverNodeOff(node.refId)
       }}
     >
@@ -1161,10 +1211,16 @@ const NodeListSpacer = ({
         "bg-lime-600 hover:bg-lime-600": isDroppedOnNode,
       })}
       onClick={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
         event.preventDefault()
         onClick(index)
       }}
       onMouseOver={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
         event.preventDefault()
         codeDB?.removeHover()
       }}
@@ -1225,7 +1281,12 @@ const DraggableNodeContainer = ({
           codeDB?.hoverNode(parentId!)
         }
       }}
-      onMouseLeave={() => {
+      onMouseLeave={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
         codeDB?.hoverNodeOff(nodeId)
       }}
       onClick={(event) => {
@@ -1233,6 +1294,7 @@ const DraggableNodeContainer = ({
           return
         }
         event.preventDefault()
+
         codeDB?.selectNode(nodeId)
       }}
       onFocus={(event) => {
@@ -1370,10 +1432,20 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
       className={cn("overflow-hidden rounded-md bg-gray-100 transition-colors hover:bg-gray-200", {
         "bg-gray-200": node.meta?.ui?.isHovered,
       })}
-      onMouseOver={() => {
+      onMouseOver={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
         codeDB?.hoverNode(nodeId)
       }}
-      onMouseLeave={() => {
+      onMouseLeave={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
         codeDB?.hoverNodeOff(nodeId)
       }}
     >
