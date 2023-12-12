@@ -1,6 +1,7 @@
 import React from "react"
 
 import {
+  AssignmentStatement,
   ComponentCallNode,
   ComponentNode,
   ExpressionNode,
@@ -9,6 +10,7 @@ import {
   NAryExpression,
   NAryOperator,
   ObjectNode,
+  PathAccessNode,
   ProgramNode,
   ReferenceNode,
   StateChangeNode,
@@ -154,6 +156,8 @@ export class Interpreter {
       this.interpretStateChange(node)
     } else if (node.type === "return") {
       throw new ReturnValue(this.interpretExpression(node.arg))
+    } else if (node.type === "assignment") {
+      this.interpretAssignment(node)
     } else if (node.type === "print") {
       console.log(this.interpretExpression(node.arg))
     } else if (node.type === "empty") {
@@ -189,6 +193,20 @@ export class Interpreter {
 
     const result = this.interpretStatementList(node.body)
     stateWrapper.stateArray[1](result)
+  }
+
+  private interpretAssignment(node: AssignmentStatement) {
+    const scope = this.getScopeValues()
+    const value = this.interpretExpression(node.right)
+
+    if (node.left.type === "ref") {
+      scope.set(node.left.refId, value)
+    } else if (node.left.type === "path access") {
+      const obj = this.interpretPathAccess(node.left, true)
+      const prop = this.interpretExpression(node.left.path[node.left.path.length - 1]!)
+
+      obj[prop] = value
+    }
   }
 
   interpretUINode(node: UINode): React.ReactNode {
@@ -301,6 +319,8 @@ export class Interpreter {
       return this.interpretObjectNode(node)
     } else if (node.type === "function") {
       return this.interpretFunction(node)
+    } else if (node.type === "path access") {
+      this.interpretPathAccess(node)
     } else if (
       node.type === "ui element" ||
       node.type === "ui fragment" ||
@@ -439,6 +459,22 @@ export class Interpreter {
     }
 
     // TODO: missing else-if chain
+  }
+
+  private interpretPathAccess(node: PathAccessNode, skipLast = false) {
+    const obj = this.interpretExpression(node.path[0]!)
+
+    let currentObj = obj
+
+    const offset = skipLast ? 1 : 0
+
+    for (let i = 0; i < node.path.length - 1 - offset; i++) {
+      const prop = this.interpretExpression(node.path[i]!)!
+
+      currentObj = currentObj[prop]
+    }
+
+    return currentObj
   }
 }
 
