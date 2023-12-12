@@ -1,3 +1,4 @@
+import { CodeDB } from "./codeDB"
 import { CodeNode, NodeKind } from "./codeTree"
 
 export type ChildList = {
@@ -14,16 +15,38 @@ export type NodeTypeMeta = {
   title?: string
   description?: string
   hasName?: boolean
+  /**
+   * Whether this node can be referenced by a reference node.
+   */
+  canReference?: boolean
+  /**
+   * The type of node that can reference this node. This is used for especial nodes like function calls and components.
+   * Ref nodes can reference any node with canReference === true. So a node with type "ref" is a special case.
+   * Only applicable if `canReference` is true.
+   */
+  referencedBy?: CodeNode["type"]
+  /**
+   * Whether this node is a reference node.
+   */
+  isReference?: boolean
+  /**
+   * The type of node that this node references. This is used for especial nodes like function calls and components.
+   * Only applicable if `isReference` is true.
+   */
+  references?: CodeNode["type"]
 }
 
 export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
   program: { kinds: [], childLists: [{ name: "body", kind: "statement" }] },
+  ref: { kinds: ["expression"] },
   component: {
     kinds: ["statement"],
     childLists: [
       { name: "body", kind: "statement" },
       { name: "props", kind: "props" },
     ],
+    canReference: true,
+    referencedBy: "component call",
   },
   "component call": {
     kinds: ["expression", "ui"],
@@ -31,6 +54,8 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
       { name: "children", kind: "ui" },
       { name: "props", kind: "props" },
     ],
+    isReference: true,
+    references: "component",
   },
   "ui element": {
     title: "UI Element",
@@ -105,6 +130,8 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     kinds: ["statement"],
     expressions: ["value"],
     hasName: true,
+    canReference: true,
+    referencedBy: "ref",
   },
   property: { kinds: ["statement"], expressions: ["name", "value"] },
   empty: {
@@ -113,7 +140,6 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     kinds: ["statement", "expression", "ui", "props", "style"],
   },
   param: { kinds: [] },
-  ref: { kinds: ["expression"] },
   string: { kinds: ["expression"] },
   number: { kinds: ["expression"] },
   boolean: { kinds: ["expression"] },
@@ -123,35 +149,40 @@ export const uiNodeTypes = Object.entries(nodeTypeMeta)
   .filter(([type, meta]) => meta.kinds.includes("ui"))
   .map(([type]) => type)
 
-export const baseNodeTypeList: {
+export type NodeAutocompleteMeta = {
   type: CodeNode["type"]
   title?: string
   name?: string
-}[] = [
-  { type: "var", title: nodeTypeMeta.var.title },
-  { type: "if", title: nodeTypeMeta.if.title },
+  buildNode: (codeDB: CodeDB) => CodeNode
+}
+
+export const baseNodeMetaList = [
   {
-    type: "ui element",
-    name: "div",
-    title: "Box element (HTML div)",
+    type: "var",
+    title: nodeTypeMeta.var.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var")!,
+  },
+  {
+    type: "if",
+    title: nodeTypeMeta.if.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("if")!,
   },
   {
     type: "ui element",
-    name: "h1",
+    title: "Box element (HTML div)",
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "div" })!,
+  },
+  {
+    type: "ui element",
     title: "Heading element (HTML h1)",
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "h1" })!,
   },
   {
     type: "ui text",
     title: "Text",
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui text")!,
   },
-]
-
-export const baseNodeMetaList = baseNodeTypeList.map((node) => ({
-  type: node.type,
-  title: node.title,
-  name: node.name,
-  kinds: nodeTypeMeta[node.type].kinds,
-}))
+] satisfies NodeAutocompleteMeta[]
 
 export const isNodeKind = (node: CodeNode, kind: NodeKind) => {
   return nodeTypeMeta[node.type].kinds.includes(kind)
@@ -169,3 +200,10 @@ export const areNodeTypesCompatible = (
 
   return kinds1.some((kind) => kinds2.includes(kind))
 }
+
+export const referenceableNodeTypes = Object.entries(nodeTypeMeta)
+  .filter(([type, meta]) => meta.canReference)
+  .map(([type, meta]) => ({
+    type: type as CodeNode["type"],
+    title: meta.title,
+  }))
