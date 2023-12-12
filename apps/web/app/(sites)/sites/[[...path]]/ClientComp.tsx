@@ -19,6 +19,8 @@ const testCode = `
 function App() {
   const [count, setCount] = React.useState(0)
 
+  let x = "hey there"
+
   return (
     <div>
       <h1>Counter</h1>

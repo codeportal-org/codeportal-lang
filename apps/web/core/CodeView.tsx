@@ -18,6 +18,8 @@ const testCode = `
 function App() {
   const [count, setCount] = React.useState(0)
 
+  let x = "hey there"
+
   return (
     <div>
       <h1>Counter</h1>
@@ -90,6 +92,8 @@ const CodeContainer = React.forwardRef<
   React.useEffect(() => {
     codeDB?.reset()
     codeDB?.load(testCodeTree)
+
+    console.log("testCodeTree", testCodeTree)
 
     codeDB?.onNodeChange(({ nodeId }) => {
       const node = codeDB.getNodeByID(nodeId)
