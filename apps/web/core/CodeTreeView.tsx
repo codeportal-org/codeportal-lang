@@ -43,6 +43,7 @@ import { cn, isTouchEnabled } from "@/lib/utils"
 import { CodeDB } from "./lang/codeDB"
 import { useCodeDB, useNode } from "./lang/codeDBContext"
 import {
+  AssignmentOperator,
   AssignmentStatement,
   CodeNode,
   EmptyNode,
@@ -280,7 +281,7 @@ export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
     <div className="flex flex-row flex-wrap items-start gap-1.5">
       <span className="text-code-keyword">var</span>
       <EditableNodeName nodeId={nodeId} />
-      <span className="text-code-symbol">=</span>
+      <span className="text-code-symbol">←</span>
 
       <ExpressionView nodeId={node.value.id} />
     </div>
@@ -295,7 +296,7 @@ export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
     <div className="flex flex-row gap-1.5">
       <span className="text-code-keyword">state</span>
       <EditableNodeName nodeId={nodeId} />
-      <span className="text-code-symbol">=</span>
+      <span className="text-code-symbol">←</span>
 
       <ExpressionView nodeId={node.value.id} />
     </div>
@@ -304,13 +305,80 @@ export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
 
 export const AssignmentStatementView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<AssignmentStatement>(nodeId)
+  const codeDB = useCodeDB()
+
+  const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(false)
 
   return (
     <div className="flex flex-row flex-wrap gap-1.5">
       <ExpressionView nodeId={node.left.id} />
 
-      {/* TODO: create the dropdown for this */}
-      <span className="text-code-symbol">{node.operator}</span>
+      <DropdownMenu.Root
+        open={isOperatorDropdownOpen}
+        onOpenChange={(isOpen) => {
+          setIsOperatorDropdownOpen(isOpen)
+        }}
+      >
+        <DropdownMenu.Trigger asChild>
+          <button
+            className={cn(
+              "text-code-symbol outline-none ring-blue-700 ring-offset-1 focus-visible:ring-2",
+              {
+                "ring-2": isOperatorDropdownOpen,
+              },
+            )}
+          >
+            {node.operator}
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content
+            className="data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade min-w-[260px] rounded-md bg-white p-[5px] shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform]"
+            sideOffset={5}
+            onMouseOver={(event) => {
+              event.preventDefault()
+            }}
+            onMouseLeave={(event) => {
+              event.preventDefault()
+            }}
+            onFocus={(event) => {
+              event.preventDefault()
+            }}
+            onBlur={(event) => {
+              event.preventDefault()
+            }}
+          >
+            {Object.entries(NAryOperators).map(([operator, description]) => (
+              <DropdownMenu.Item
+                key={operator}
+                onClick={(event) => {
+                  event.preventDefault()
+
+                  codeDB?.updateNode<AssignmentStatement>(node.id, {
+                    operator: operator as AssignmentOperator,
+                  })
+
+                  setIsOperatorDropdownOpen(false)
+                }}
+                onMouseOver={(event) => {
+                  event.preventDefault()
+                }}
+                onMouseLeave={(event) => {
+                  event.preventDefault()
+                }}
+                className="w-full cursor-pointer rounded-md px-2 text-left hover:bg-gray-100 hover:outline-none hover:ring-0 focus-visible:border-0 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-0"
+              >
+                <div className="flex flex-row items-center">
+                  <div className="text-code-symbol w-1/4">{operator}</div>
+                  <div className="w-3/4">{description}</div>
+                </div>
+              </DropdownMenu.Item>
+            ))}
+
+            <DropdownMenu.Arrow className="fill-white" />
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
 
       <ExpressionView nodeId={node.right.id} />
     </div>
@@ -1344,7 +1412,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
                     return codeDB?.newNodeFromType<AssignmentStatement>("assignment", {
                       left: ref,
-                      operator: "=",
+                      operator: "←",
                     })!
                   },
                 } satisfies NodeAutocompleteMeta
