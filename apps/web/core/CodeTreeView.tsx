@@ -884,25 +884,32 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
   }
 
   return (
-    <span
-      className={cn(
-        "text-code-string relative rounded-md bg-gray-50 transition-colors hover:bg-gray-100",
-        {
-          "bg-gray-100": isHovered,
-          "ring-2 ring-blue-700 ring-offset-1": isSelected || isHovered,
-        },
-      )}
-      onMouseOver={() => {
+    <div
+      className={cn("text-code-string relative rounded-md bg-gray-50 transition-colors", {
+        "bg-gray-100": isHovered,
+        "ring-2 ring-blue-700 ring-offset-1": isSelected,
+      })}
+      onMouseOver={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
         codeDB?.hoverNode(nodeId)
       }}
-      onMouseLeave={() => {
+      onMouseLeave={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
         codeDB?.hoverNodeOff(nodeId)
       }}
     >
       <ContentEditable
-        tagName="span"
+        tagName="div"
         role="textbox"
-        className="text-code-string inline-block h-full rounded-md px-1 outline-none focus-visible:bg-gray-200"
+        className="text-code-string inline-block h-full rounded-md px-1 outline-none"
         html={node.value}
         onChange={handleChange}
         onFocus={(event) => {
@@ -926,7 +933,6 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
         <button
           className="absolute right-[-12px] top-[-12px] rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
           onClick={(event) => {
-            debugger
             if (event.defaultPrevented) {
               return
             }
@@ -938,7 +944,7 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
           <X size={16} />
         </button>
       )}
-    </span>
+    </div>
   )
 }
 
@@ -1260,7 +1266,7 @@ const DraggableNodeContainer = ({
         "relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
         {
           "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
-          "w-full": !isOverlay && isNodeKind(node, "statement"),
+          "w-full": !isOverlay && isNodeKind(node, "statement") && !isNodeKind(node, "expression"),
         },
       )}
       ref={setNodeRef}
