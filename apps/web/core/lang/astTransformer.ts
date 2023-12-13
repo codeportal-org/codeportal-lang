@@ -687,7 +687,7 @@ export class ASTtoCTTransformer {
     return {
       type: "assignment",
       id: assignmentNodeId,
-      operator: node.operator.replace("=", "←") as AssignmentOperator,
+      operator: node.operator,
       left: leftNode,
       right: this.transformExpression(node.right),
     }

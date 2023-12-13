@@ -224,22 +224,22 @@ export type EmptyNode = {
 }
 
 export const AssignmentOperators = {
-  "←": "Assignment",
-  "+←": "Addition assignment",
-  "-←": "Subtraction assignment",
-  "*←": "Multiplication assignment",
-  "/←": "Division assignment",
-  "%←": "Remainder assignment",
-  "**←": "Exponentiation assignment",
-  "<<←": "Left shift assignment",
-  ">>←": "Right shift assignment",
-  ">>>←": "Unsigned right shift assignment",
-  "|←": "Bitwise OR assignment",
-  "^←": "Bitwise XOR assignment",
-  "&←": "Bitwise AND assignment",
-  "||←": "Logical OR assignment",
-  "&&←": "Logical AND assignment",
-  "??←": "Nullish coalescing assignment",
+  "=": "Assignment",
+  "+=": "Addition assignment",
+  "-=": "Subtraction assignment",
+  "*=": "Multiplication assignment",
+  "/=": "Division assignment",
+  "%=": "Remainder assignment",
+  "**=": "Exponentiation assignment",
+  "<<=": "Left shift assignment",
+  ">>=": "Right shift assignment",
+  ">>>=": "Unsigned right shift assignment",
+  "|=": "Bitwise OR assignment",
+  "^=": "Bitwise XOR assignment",
+  "&=": "Bitwise AND assignment",
+  "||=": "Logical OR assignment",
+  "&&=": "Logical AND assignment",
+  "??=": "Nullish coalescing assignment",
 }
 
 export type AssignmentOperator = keyof typeof AssignmentOperators

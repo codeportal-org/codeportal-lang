@@ -44,6 +44,7 @@ import { CodeDB } from "./lang/codeDB"
 import { useCodeDB, useNode } from "./lang/codeDBContext"
 import {
   AssignmentOperator,
+  AssignmentOperators,
   AssignmentStatement,
   CodeNode,
   EmptyNode,
@@ -324,7 +325,7 @@ export const AssignmentStatementView = ({ nodeId }: { nodeId: string }) => {
               },
             )}
           >
-            {node.operator}
+            {node.operator.replace("=", "←")}
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
@@ -344,7 +345,7 @@ export const AssignmentStatementView = ({ nodeId }: { nodeId: string }) => {
               event.preventDefault()
             }}
           >
-            {Object.entries(NAryOperators).map(([operator, description]) => (
+            {Object.entries(AssignmentOperators).map(([operator, description]) => (
               <DropdownMenu.Item
                 key={operator}
                 onClick={(event) => {
@@ -365,7 +366,7 @@ export const AssignmentStatementView = ({ nodeId }: { nodeId: string }) => {
                 className="w-full cursor-pointer rounded-md px-2 text-left hover:bg-gray-100 hover:outline-none hover:ring-0 focus-visible:border-0 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-0"
               >
                 <div className="flex flex-row items-center">
-                  <div className="text-code-symbol w-1/4">{operator}</div>
+                  <div className="text-code-symbol w-1/4">{operator.replace("=", "←")}</div>
                   <div className="w-3/4">{description}</div>
                 </div>
               </DropdownMenu.Item>
@@ -1572,7 +1573,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
                     return codeDB?.newNodeFromType<AssignmentStatement>("assignment", {
                       left: ref,
-                      operator: "←",
+                      operator: "=",
                     })!
                   },
                 } satisfies NodeAutocompleteMeta

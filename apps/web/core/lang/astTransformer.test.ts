@@ -479,7 +479,7 @@ describe("ASTtoCTTransformer - astTransformer", () => {
         {
           type: "assignment",
           id: "1",
-          operator: "←",
+          operator: "=",
           left: {
             type: "path access",
             id: "2",
