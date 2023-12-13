@@ -85,6 +85,10 @@ const droppedOnNodeIdAtom = atom<string | null>(null)
 
 export const indentationClass = "pl-6"
 
+const OverlayContext = React.createContext<{ isOverlay: boolean }>({ isOverlay: false })
+
+const useIsOverlay = () => React.useContext(OverlayContext).isOverlay
+
 export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => {
   const codeDB = useCodeDB()
 
@@ -181,24 +185,28 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
       }}
     >
       <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
-        {codeTree.type === "program" &&
-          codeTree.body.map((node) => {
-            return <StatementView nodeId={node.id} key={node.id} />
-          })}
+        <OverlayContext.Provider value={{ isOverlay: false }}>
+          {codeTree.type === "program" &&
+            codeTree.body.map((node) => {
+              return <StatementView nodeId={node.id} key={node.id} />
+            })}
+        </OverlayContext.Provider>
       </div>
       {createPortal(
         <DragOverlay>
-          {draggedNode ? (
-            uiNodeTypes.includes(draggedNode.type) ? (
-              <UINodeView nodeId={draggedNode.id} isOverlay={true} />
-            ) : draggedNode.type === "empty" ? (
-              <EmptyNodeView nodeId={draggedNode.id} />
-            ) : isNodeKind(draggedNode, "statement") ? (
-              <StatementView nodeId={draggedNode.id} isOverlay={true} />
-            ) : (
-              <ExpressionView nodeId={draggedNode.id} isOverlay={true} />
-            )
-          ) : null}
+          <OverlayContext.Provider value={{ isOverlay: true }}>
+            {draggedNode ? (
+              uiNodeTypes.includes(draggedNode.type) ? (
+                <UINodeView nodeId={draggedNode.id} />
+              ) : draggedNode.type === "empty" ? (
+                <EmptyNodeView nodeId={draggedNode.id} />
+              ) : isNodeKind(draggedNode, "statement") ? (
+                <StatementView nodeId={draggedNode.id} />
+              ) : (
+                <ExpressionView nodeId={draggedNode.id} />
+              )
+            ) : null}
+          </OverlayContext.Provider>
         </DragOverlay>,
         document.body,
       )}
@@ -206,7 +214,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   )
 }
 
-export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
+export const StatementView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<StatementNode>(nodeId)
 
   if (!node) return null
@@ -264,11 +272,7 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
     )
   }
 
-  return (
-    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
-      {statementView}
-    </DraggableNodeContainer>
-  )
+  return <DraggableNodeContainer nodeId={nodeId}>{statementView}</DraggableNodeContainer>
 }
 
 export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
@@ -393,7 +397,7 @@ export const PrintStatementView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-export const ExpressionView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
+export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<ExpressionNode>(nodeId)
 
   if (!node) return null
@@ -402,7 +406,7 @@ export const ExpressionView = ({ nodeId, isOverlay }: { nodeId: string; isOverla
     return <UINodeView nodeId={node.id} />
   } else {
     return (
-      <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
+      <DraggableNodeContainer nodeId={nodeId}>
         <InlineExpressionContainer node={node} />
       </DraggableNodeContainer>
     )
@@ -437,7 +441,7 @@ export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
   } else if (node.type === "number") {
     return <NumberView nodeId={node.id} />
   } else if (node.type === "boolean") {
-    return <BooleanView node={node} />
+    return <BooleanView nodeId={node.id} />
   } else if (node.type === "function") {
     return <FunctionView node={node} />
   } else if (node.type === "ref") {
@@ -453,7 +457,7 @@ export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
   }
 }
 
-export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
+export const UINodeView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<UINode>(nodeId)
   const codeDB = useCodeDB()
 
@@ -556,11 +560,7 @@ export const UINodeView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: 
     )
   }
 
-  return (
-    <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
-      {uiNodeView}
-    </DraggableNodeContainer>
-  )
+  return <DraggableNodeContainer nodeId={nodeId}>{uiNodeView}</DraggableNodeContainer>
 }
 
 export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNode[] }) => {
@@ -1033,7 +1033,8 @@ export const NumberView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-export const BooleanView = ({ node }: { node: BooleanLiteral }) => {
+export const BooleanView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<BooleanLiteral>(nodeId)
   const codeDB = useCodeDB()
 
   const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(false)
@@ -1394,17 +1395,17 @@ const NodeListSpacer = ({
 
 const DraggableNodeContainer = ({
   nodeId,
-  isOverlay,
   children,
 }: {
   nodeId: string
-  isOverlay?: boolean
   children: React.ReactNode
 }) => {
   const codeDB = useCodeDB()
   const node = useNode(nodeId)
 
   const [draggedNodeId] = useAtom(draggedNodeIdAtom)
+
+  const isOverlay = useIsOverlay()
 
   const isDraggedNode = !isOverlay && nodeId === draggedNodeId
 
@@ -1524,6 +1525,8 @@ export const UITextView = ({ nodeId }: { nodeId: string }) => {
   const codeDB = useCodeDB()
   const node = useNode<UITextNode>(nodeId)
 
+  const isOverlay = useIsOverlay()
+
   function handleChange(event: React.ChangeEvent<any>) {
     codeDB?.updateUIText(nodeId, event.target.value)
   }
@@ -1537,7 +1540,7 @@ export const UITextView = ({ nodeId }: { nodeId: string }) => {
         className="text-code-ui-text w-full max-w-lg resize-none rounded border-none border-slate-300 bg-gray-100 px-2 py-0 focus-visible:bg-gray-200 focus-visible:outline-none focus-visible:ring-0"
         value={node.text}
         onChange={handleChange}
-        autoFocus
+        autoFocus={!isOverlay}
       />
     </div>
   )
