@@ -345,6 +345,11 @@ export type NumberLiteral = {
   meta?: CodeMeta
 }
 
+export const BooleanValues = [
+  { name: "true", value: true, description: "Represents a boolean true value" },
+  { name: "false", value: false, description: "Represents a boolean false value" },
+]
+
 export type BooleanLiteral = {
   type: "boolean"
   id: string
