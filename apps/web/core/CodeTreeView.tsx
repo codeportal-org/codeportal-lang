@@ -268,7 +268,6 @@ export const StatementView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay
   return (
     <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
       {statementView}
-      {/* {node.type === "expression" && <ExpressionView node={node.expression} />} */}
     </DraggableNodeContainer>
   )
 }
@@ -1311,16 +1310,6 @@ const DraggableNodeContainer = ({
     [node],
   )
 
-  if (isSelected) {
-    console.log(
-      "isSelected ---",
-      node.type,
-      isInline,
-      node.meta?.parentProperty,
-      nodeTypeMeta[parent.type].expressions,
-    )
-  }
-
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
     data: { type: node.type } satisfies DropData,
@@ -1401,7 +1390,7 @@ const DraggableNodeContainer = ({
           })}
         />
       )}
-      {!isOverlay && node.type !== "empty" && (isSelected || isHovered) && (
+      {!isOverlay && (!isInline || node.type !== "empty") && (isSelected || isHovered) && (
         <div
           className={cn("absolute z-10 rounded-full", {
             "right-[-12px] top-[-12px]": isInline,
@@ -1702,7 +1691,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
   return (
     <div className="relative">
-      {kind !== "expression" && (isSelected || isHovered) && (
+      {kind !== "expression" && (isSelected || isHovered) && false && (
         <div className="absolute right-0 top-0 flex h-full w-[24px] items-center justify-start">
           <button
             className="rounded-full bg-gray-400 p-px text-white transition-colors hover:bg-gray-500"
