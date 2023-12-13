@@ -46,6 +46,8 @@ import {
   AssignmentOperator,
   AssignmentOperators,
   AssignmentStatement,
+  BooleanLiteral,
+  BooleanValues,
   CodeNode,
   EmptyNode,
   ExpressionNode,
@@ -930,8 +932,79 @@ export const NumberView = ({ node }: { node: NumberLiteral }) => {
   return <div className="text-code-number"> {node.value} </div>
 }
 
-export const BooleanView = ({ node }: { node: { value: boolean } }) => {
-  return <div className="text-code-boolean"> {node.value} </div>
+export const BooleanView = ({ node }: { node: BooleanLiteral }) => {
+  const codeDB = useCodeDB()
+
+  const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(false)
+
+  return (
+    <DropdownMenu.Root
+      open={isOperatorDropdownOpen}
+      onOpenChange={(isOpen) => {
+        setIsOperatorDropdownOpen(isOpen)
+      }}
+    >
+      <DropdownMenu.Trigger asChild>
+        <button
+          className={cn(
+            "text-code-boolean outline-none ring-blue-700 ring-offset-1 focus-visible:ring-2",
+            {
+              "ring-2": isOperatorDropdownOpen,
+            },
+          )}
+        >
+          {node.value ? "true" : "false"}
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade min-w-[260px] rounded-md bg-white p-[5px] shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),_0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)] will-change-[opacity,transform]"
+          sideOffset={5}
+          onMouseOver={(event) => {
+            event.preventDefault()
+          }}
+          onMouseLeave={(event) => {
+            event.preventDefault()
+          }}
+          onFocus={(event) => {
+            event.preventDefault()
+          }}
+          onBlur={(event) => {
+            event.preventDefault()
+          }}
+        >
+          {BooleanValues.map(({ name, description, value }) => (
+            <DropdownMenu.Item
+              key={name}
+              onClick={(event) => {
+                event.preventDefault()
+
+                codeDB?.updateNode<BooleanLiteral>(node.id, {
+                  value,
+                })
+
+                setIsOperatorDropdownOpen(false)
+              }}
+              onMouseOver={(event) => {
+                event.preventDefault()
+              }}
+              onMouseLeave={(event) => {
+                event.preventDefault()
+              }}
+              className="w-full cursor-pointer rounded-md px-2 text-left hover:bg-gray-100 hover:outline-none hover:ring-0 focus-visible:border-0 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-0"
+            >
+              <div className="flex flex-row items-center">
+                <div className="text-code-symbol w-1/4">{name}</div>
+                <div className="w-3/4">{description}</div>
+              </div>
+            </DropdownMenu.Item>
+          ))}
+
+          <DropdownMenu.Arrow className="fill-white" />
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  )
 }
 
 export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
@@ -1231,17 +1304,21 @@ const DraggableNodeContainer = ({
   const isSelected = node.meta?.ui?.isSelected
   const isHovered = node.meta?.ui?.isHovered
 
+  const parent = useNode<CodeNode>(node.meta?.parentId!)
+
   const isInline = useMemo(
-    () =>
-      !(
-        (isNodeKind(node, "statement") && !isNodeKind(node, "expression")) ||
-        isNodeKind(node, "ui")
-      ),
+    () => parent && nodeTypeMeta[parent.type].expressions?.includes(node.meta?.parentProperty!),
     [node],
   )
 
   if (isSelected) {
-    console.log("isSelected kind", node.type, isInline, isNodeKind(node, "ui"))
+    console.log(
+      "isSelected ---",
+      node.type,
+      isInline,
+      node.meta?.parentProperty,
+      nodeTypeMeta[parent.type].expressions,
+    )
   }
 
   const { attributes, listeners, setNodeRef } = useDraggable({
@@ -1258,7 +1335,7 @@ const DraggableNodeContainer = ({
         {
           "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
           "w-full": !isOverlay && !isInline,
-          "ring-2 ring-blue-700 ring-offset-1": isInline && isSelected,
+          "outline outline-blue-700": isInline && isSelected,
         },
       )}
       ref={setNodeRef}
@@ -1487,7 +1564,7 @@ export type NodeAutocompleteMeta = {
   buildNode: (codeDB: CodeDB) => CodeNode
 }
 
-export const baseNodeMetaList = [
+export const baseNodeList = [
   {
     type: "print",
     title: nodeTypeMeta.print.title,
@@ -1497,6 +1574,16 @@ export const baseNodeMetaList = [
     type: "string",
     title: nodeTypeMeta.string.title,
     buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("string", { value: "" })!,
+  },
+  {
+    type: "number",
+    title: nodeTypeMeta.number.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("number", { value: 0 })!,
+  },
+  {
+    type: "boolean",
+    title: nodeTypeMeta.boolean.title,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("boolean", { value: false })!,
   },
   {
     type: "var",
@@ -1541,8 +1628,8 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
   const kind = node.kind
 
-  const filteredBaseNodeMetaList = React.useMemo(
-    () => baseNodeMetaList.filter((node) => nodeTypeMeta[node.type].kinds.includes(kind)),
+  const filteredBaseNodeList = React.useMemo(
+    () => baseNodeList.filter((node) => nodeTypeMeta[node.type].kinds.includes(kind)),
     [kind],
   )
 
@@ -1600,9 +1687,14 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
   const [searchValue, setSearchValue] = React.useState("")
 
+  if (isSelected) {
+    console.log("availableNodeRefs", availableNodeRefs)
+    console.log("filteredBaseNodeList", filteredBaseNodeList)
+  }
+
   const matches = React.useMemo(
     () =>
-      matchSorter([...availableNodeRefs, ...filteredBaseNodeMetaList], searchValue, {
+      matchSorter([...availableNodeRefs, ...filteredBaseNodeList], searchValue, {
         keys: ["title"],
       }),
     [searchValue],
@@ -1636,7 +1728,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
       >
         <Combobox
           placeholder="..."
-          className="w-full max-w-sm border-0 p-0 pl-1 focus-visible:ring-0"
+          className="w-full max-w-sm rounded-xl border-0 p-0 pl-1 focus-visible:ring-0"
           autoFocus={isSelected}
           autoSelect
         />

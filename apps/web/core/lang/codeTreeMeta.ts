@@ -147,8 +147,14 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     title: "String (text)",
     kinds: ["expression"],
   },
-  number: { kinds: ["expression"] },
-  boolean: { kinds: ["expression"] },
+  number: {
+    title: "Number",
+    kinds: ["expression"],
+  },
+  boolean: {
+    title: "Boolean",
+    kinds: ["expression"],
+  },
 }
 
 export const uiNodeTypes = Object.entries(nodeTypeMeta)
