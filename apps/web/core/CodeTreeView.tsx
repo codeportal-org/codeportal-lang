@@ -960,7 +960,6 @@ export const NumberView = ({ nodeId }: { nodeId: string }) => {
         },
       })
     } else {
-      console.log("-- numericValue", numericValue)
       codeDB?.updateNode<NumberLiteral>(nodeId, {
         value: numericValue,
         meta: {
