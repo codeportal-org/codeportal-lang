@@ -178,13 +178,22 @@ function AugmentedEditorUI({ codeDB }: { codeDB: CodeDB }) {
   } | null>(null)
 
   React.useEffect(() => {
-    const unsubscribeNodeChangeHandler = codeDB.onNodeChange(({ nodeId }) => {
+    const unsubscribeNodeChangeHandler = codeDB.onNodeChange(() => {
       if (codeDB.hoveredNodeId) {
-        const element = document.querySelector(
-          `[data-codeportal-node-id="${codeDB.hoveredNodeId}"]`,
-        )
+        let hoveredNode = codeDB.getNodeByID(codeDB.hoveredNodeId)
+
+        // for "ui text" nodes, the hovered node is the parent
+        if (hoveredNode.type === "ui text") {
+          hoveredNode = codeDB.getNodeByID(hoveredNode.meta?.parentId!)
+        }
+
+        if (!hoveredNode) {
+          return
+        }
+
+        const element = document.querySelector(`[data-codeportal-node-id="${hoveredNode.id}"]`)
         if (element) {
-          setHoveredNode(codeDB.getNodeByID<UINode>(codeDB.hoveredNodeId))
+          setHoveredNode(codeDB.getNodeByID<UINode>(hoveredNode.id))
           setHoveredRect({
             x: element.getBoundingClientRect().x,
             y: element.getBoundingClientRect().y,
