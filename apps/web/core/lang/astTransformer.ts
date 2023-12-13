@@ -26,6 +26,7 @@ import {
 } from "estree-jsx"
 
 import {
+  AssignmentOperator,
   AssignmentStatement,
   ComponentNode,
   ElseIfNode,
@@ -686,7 +687,7 @@ export class ASTtoCTTransformer {
     return {
       type: "assignment",
       id: assignmentNodeId,
-      operator: node.operator,
+      operator: node.operator.replace("=", "←") as AssignmentOperator,
       left: leftNode,
       right: this.transformExpression(node.right),
     }
