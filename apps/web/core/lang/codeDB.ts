@@ -230,7 +230,7 @@ export class CodeDB {
 
     const node = this.getNodeByID(nodeId)
     if (!node || !node.meta?.ui) {
-      throw new Error("Node not found")
+      return
     }
 
     node.meta.ui.isHovered = false
@@ -263,7 +263,7 @@ export class CodeDB {
   selectNodeOff(nodeId: string) {
     const node = this.getNodeByID(nodeId)
     if (!node || !node.meta?.ui) {
-      throw new Error("Node not found")
+      return
     }
 
     node.meta.ui.isSelected = false
