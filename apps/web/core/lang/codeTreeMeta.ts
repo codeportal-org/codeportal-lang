@@ -89,8 +89,8 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
   unary: { kinds: ["statement"], expressions: ["arg"] },
   nary: {
     title: "Expression",
-    kinds: ["statement"],
-    childLists: [{ name: "args", kind: "statement" }],
+    kinds: ["expression"],
+    childLists: [{ name: "args", kind: "expression" }],
   },
   function: {
     kinds: ["statement"],

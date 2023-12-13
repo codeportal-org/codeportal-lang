@@ -112,14 +112,11 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   const draggedNode = draggedNodeId ? codeDB?.getNodeByID(draggedNodeId) : null
 
   const handleDragStart = ({ active }: DragStartEvent) => {
-    console.log("drag start")
-
     setDraggedNodeId(active.id as string)
     setDroppedOnNodeId(null)
   }
 
   function handleDragOver({ active, over }: DragOverEvent) {
-    console.log("drag over", over?.id)
     setDroppedOnNodeId(over?.id as string)
   }
 
@@ -1368,9 +1365,7 @@ const NodeListSpacer = ({
   return (
     <button
       ref={setNodeRef}
-      className={cn("w-full pb-1 transition-colors hover:bg-gray-100", {
-        "bg-lime-600 hover:bg-lime-600": isDroppedOnNode,
-      })}
+      className="w-full py-0.5"
       onClick={(event) => {
         if (event.defaultPrevented) {
           return
@@ -1385,7 +1380,15 @@ const NodeListSpacer = ({
         event.preventDefault()
         codeDB?.removeHover()
       }}
-    />
+    >
+      <div
+        className={cn("w-full pb-1 transition-colors hover:bg-gray-100", {
+          "bg-lime-600 hover:bg-lime-600": isDroppedOnNode,
+        })}
+      >
+        {/* visible part of the spacer */}
+      </div>
+    </button>
   )
 }
 
@@ -1411,7 +1414,12 @@ const DraggableNodeContainer = ({
   const parent = useNode<CodeNode>(node.meta?.parentId!)
 
   const isInline = useMemo(
-    () => parent && nodeTypeMeta[parent.type].expressions?.includes(node.meta?.parentProperty!),
+    () =>
+      parent &&
+      (nodeTypeMeta[parent.type].expressions?.includes(node.meta?.parentProperty!) ||
+        nodeTypeMeta[parent.type].childLists?.find(
+          (list) => list.name === node.meta?.parentProperty!,
+        )?.kind === "expression"),
     [node],
   )
 
@@ -1424,14 +1432,11 @@ const DraggableNodeContainer = ({
 
   return (
     <div
-      className={cn(
-        "relative flex cursor-pointer touch-none select-none flex-col rounded-lg border-2 border-transparent",
-        {
-          "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
-          "w-full": !isOverlay && !isInline,
-          "outline outline-blue-700": isInline && isSelected,
-        },
-      )}
+      className={cn("relative flex cursor-pointer touch-none select-none flex-col rounded-lg", {
+        "bg-code-bg border-2 border-dashed border-slate-400 opacity-95": isOverlay,
+        "w-full": !isOverlay && !isInline,
+        "outline outline-blue-700": !isOverlay && isInline && isSelected,
+      })}
       ref={setNodeRef}
       {...listeners}
       {...attributes}
