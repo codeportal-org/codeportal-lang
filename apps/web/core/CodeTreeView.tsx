@@ -196,8 +196,10 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
               <UINodeView nodeId={draggedNode.id} isOverlay={true} />
             ) : draggedNode.type === "empty" ? (
               <EmptyNodeView nodeId={draggedNode.id} />
-            ) : (
+            ) : isNodeKind(draggedNode, "statement") ? (
               <StatementView nodeId={draggedNode.id} isOverlay={true} />
+            ) : (
+              <ExpressionView nodeId={draggedNode.id} isOverlay={true} />
             )
           ) : null}
         </DragOverlay>,
@@ -394,7 +396,7 @@ export const PrintStatementView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
+export const ExpressionView = ({ nodeId, isOverlay }: { nodeId: string; isOverlay?: boolean }) => {
   const node = useNode<ExpressionNode>(nodeId)
 
   if (!node) return null
@@ -402,7 +404,11 @@ export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
   if (uiNodeTypes.includes(node.type)) {
     return <UINodeView nodeId={node.id} />
   } else {
-    return <InlineExpressionContainer node={node} />
+    return (
+      <DraggableNodeContainer nodeId={nodeId} isOverlay={isOverlay}>
+        <InlineExpressionContainer node={node} />
+      </DraggableNodeContainer>
+    )
   }
 }
 
@@ -432,7 +438,7 @@ export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
   if (node.type === "string") {
     return <StringView nodeId={node.id} />
   } else if (node.type === "number") {
-    return <NumberView node={node} />
+    return <NumberView nodeId={node.id} />
   } else if (node.type === "boolean") {
     return <BooleanView node={node} />
   } else if (node.type === "function") {
@@ -870,7 +876,6 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<StringLiteral>(nodeId)
 
   const isHovered = node.meta?.ui?.isHovered
-  const isSelected = node.meta?.ui?.isSelected
 
   function handleChange(event: React.ChangeEvent<any>) {
     codeDB?.updateNode<StringLiteral>(nodeId, {
@@ -927,8 +932,109 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-export const NumberView = ({ node }: { node: NumberLiteral }) => {
-  return <div className="text-code-number"> {node.value} </div>
+export const NumberView = ({ nodeId }: { nodeId: string }) => {
+  const codeDB = useCodeDB()
+  const node = useNode<NumberLiteral>(nodeId)
+
+  const isHovered = node.meta?.ui?.isHovered
+
+  function handleChange(event: React.ChangeEvent<any>) {
+    let filteredText = event.target.value.replace(/[^0-9.]/g, "")
+
+    // remove dots if there are more than one, allow one dot only
+    const dotIndex = filteredText.indexOf(".")
+    if (dotIndex !== -1) {
+      filteredText =
+        filteredText.substr(0, dotIndex + 1) + filteredText.substr(dotIndex + 1).replace(".", "")
+    }
+
+    const numericValue = Number(filteredText)
+
+    if (isNaN(numericValue)) {
+      codeDB?.updateNode<NumberLiteral>(nodeId, {
+        meta: {
+          ...node.meta,
+          extras: {
+            textValue: filteredText,
+          },
+        },
+      })
+    } else {
+      console.log("-- numericValue", numericValue)
+      codeDB?.updateNode<NumberLiteral>(nodeId, {
+        value: numericValue,
+        meta: {
+          ...node.meta,
+          extras: {
+            textValue: filteredText,
+          },
+        },
+      })
+    }
+  }
+
+  return (
+    <div
+      className={cn("text-code-string relative rounded-md bg-gray-50 transition-colors", {
+        "bg-gray-100": isHovered,
+      })}
+      onMouseOver={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
+        codeDB?.hoverNode(nodeId)
+      }}
+      onMouseLeave={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
+        codeDB?.hoverNodeOff(nodeId)
+      }}
+    >
+      <ContentEditable
+        tagName="div"
+        role="textbox"
+        className="text-code-string inline-block h-full rounded-md px-1 outline-none"
+        html={node.meta?.extras?.textValue ?? node.value.toString()}
+        onChange={handleChange}
+        onFocus={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
+
+          codeDB?.selectNode(nodeId)
+        }}
+        onBlur={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
+
+          codeDB?.updateNode<NumberLiteral>(nodeId, {
+            meta: {
+              ...node.meta,
+              extras: {
+                textValue: node.value.toString(),
+              },
+            },
+          })
+        }}
+        onClick={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
+
+          codeDB?.selectNode(nodeId)
+        }}
+      />
+    </div>
+  )
 }
 
 export const BooleanView = ({ node }: { node: BooleanLiteral }) => {
@@ -1320,7 +1426,7 @@ const DraggableNodeContainer = ({
   return (
     <div
       className={cn(
-        "relative flex cursor-pointer touch-none select-none flex-col rounded-xl border-2 border-transparent",
+        "relative flex cursor-pointer touch-none select-none flex-col rounded-lg border-2 border-transparent",
         {
           "bg-code-bg border-dashed border-slate-400 opacity-95": isOverlay,
           "w-full": !isOverlay && !isInline,
@@ -1676,11 +1782,6 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
   const [searchValue, setSearchValue] = React.useState("")
 
-  if (isSelected) {
-    console.log("availableNodeRefs", availableNodeRefs)
-    console.log("filteredBaseNodeList", filteredBaseNodeList)
-  }
-
   const matches = React.useMemo(
     () =>
       matchSorter([...availableNodeRefs, ...filteredBaseNodeList], searchValue, {
@@ -1717,7 +1818,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
       >
         <Combobox
           placeholder="..."
-          className="w-full max-w-sm rounded-xl border-0 p-0 pl-1 focus-visible:ring-0"
+          className="w-full max-w-sm rounded-xl border-0 p-0 pl-1 outline-none focus-visible:ring-0"
           autoFocus={isSelected}
           autoSelect
         />
