@@ -182,8 +182,8 @@ function AugmentedEditorUI({ codeDB }: { codeDB: CodeDB }) {
       if (codeDB.hoveredNodeId) {
         let hoveredNode = codeDB.getNodeByID(codeDB.hoveredNodeId)
 
-        // for "ui text" nodes, the hovered node is the parent
-        if (hoveredNode.type === "ui text") {
+        // for "ui text" and "ui expression" nodes, the hovered node is the parent
+        if (hoveredNode.type === "ui text" || hoveredNode.type === "ui expression") {
           hoveredNode = codeDB.getNodeByID(hoveredNode.meta?.parentId!)
         }
 
