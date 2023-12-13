@@ -1510,12 +1510,12 @@ export const baseNodeMetaList = [
   {
     type: "ui element",
     title: "Box element (HTML div)",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "div" })!,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui element", { name: "div" })!,
   },
   {
     type: "ui element",
     title: "Heading element (HTML h1)",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var", { name: "h1" })!,
+    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui element", { name: "h1" })!,
   },
   {
     type: "ui text",
