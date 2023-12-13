@@ -16,6 +16,7 @@ export type SpecialNodes =
 export type CodeMeta = {
   parentId?: string
   parentProperty?: string
+  createdAt: string
   extras?: Record<string, any>
   ui?: {
     isHovered: boolean

@@ -695,7 +695,7 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                           onClick={() => {
                             console.log("clicked", match)
 
-                            const newNode = codeDB?.newNodeFromType<UIStyleNode>("ui style", {
+                            const newNode = codeDB?.createNodeFromType<UIStyleNode>("ui style", {
                               name: match.name,
                               tag: match.tag,
                               args: match.args,
@@ -950,7 +950,7 @@ export const NumberView = ({ nodeId }: { nodeId: string }) => {
     if (isNaN(numericValue)) {
       codeDB?.updateNode<NumberLiteral>(nodeId, {
         meta: {
-          ...node.meta,
+          ...node.meta!,
           extras: {
             textValue: filteredText,
           },
@@ -960,7 +960,7 @@ export const NumberView = ({ nodeId }: { nodeId: string }) => {
       codeDB?.updateNode<NumberLiteral>(nodeId, {
         value: numericValue,
         meta: {
-          ...node.meta,
+          ...node.meta!,
           extras: {
             textValue: filteredText,
           },
@@ -1013,7 +1013,7 @@ export const NumberView = ({ nodeId }: { nodeId: string }) => {
 
           codeDB?.updateNode<NumberLiteral>(nodeId, {
             meta: {
-              ...node.meta,
+              ...node.meta!,
               extras: {
                 textValue: node.value.toString(),
               },
@@ -1527,6 +1527,11 @@ export const UITextView = ({ nodeId }: { nodeId: string }) => {
 
   const isOverlay = useIsOverlay()
 
+  const wasNodeCreatedRecently = React.useMemo(
+    () => Date.now() - new Date(node.meta?.createdAt!).getTime() < 300,
+    [],
+  )
+
   function handleChange(event: React.ChangeEvent<any>) {
     codeDB?.updateUIText(nodeId, event.target.value)
   }
@@ -1540,7 +1545,7 @@ export const UITextView = ({ nodeId }: { nodeId: string }) => {
         className="text-code-ui-text w-full max-w-lg resize-none rounded border-none border-slate-300 bg-gray-100 px-2 py-0 focus-visible:bg-gray-200 focus-visible:outline-none focus-visible:ring-0"
         value={node.text}
         onChange={handleChange}
-        autoFocus={!isOverlay}
+        autoFocus={!isOverlay && wasNodeCreatedRecently}
       />
     </div>
   )
@@ -1663,52 +1668,52 @@ export const baseNodeList = [
   {
     type: "print",
     title: nodeTypeMeta.print.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("print")!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("print")!,
   },
   {
     type: "string",
     title: nodeTypeMeta.string.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("string", { value: "" })!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("string", { value: "" })!,
   },
   {
     type: "number",
     title: nodeTypeMeta.number.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("number", { value: 0 })!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("number", { value: 0 })!,
   },
   {
     type: "boolean",
     title: nodeTypeMeta.boolean.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("boolean", { value: false })!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("boolean", { value: false })!,
   },
   {
     type: "var",
     title: nodeTypeMeta.var.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("var")!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("var")!,
   },
   {
     type: "if",
     title: nodeTypeMeta.if.title,
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("if")!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("if")!,
   },
   {
     type: "ui element",
     title: "Box element (HTML div)",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui element", { name: "div" })!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("ui element", { name: "div" })!,
   },
   {
     type: "ui element",
     title: "Heading element (HTML h1)",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui element", { name: "h1" })!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("ui element", { name: "h1" })!,
   },
   {
     type: "ui text",
     title: "UI Text",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui text")!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("ui text")!,
   },
   {
     type: "ui expression",
     title: "UI expression",
-    buildNode: (codeDB: CodeDB) => codeDB?.newNodeFromType("ui expression")!,
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("ui expression")!,
   },
 ] satisfies NodeAutocompleteMeta[]
 
@@ -1739,7 +1744,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
                 title: `${(node as any).name} (reference to ${node.type})`,
                 type: refNodeType,
                 buildNode: (codeDB: CodeDB) =>
-                  codeDB?.newNodeFromType<ReferenceNode>("ref", {
+                  codeDB?.createNodeFromType<ReferenceNode>("ref", {
                     refId: node.id,
                   })!,
               } satisfies NodeAutocompleteMeta
@@ -1749,11 +1754,11 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
                   title: `assign to ${(node as any).name} (variable)`,
                   type: "assignment",
                   buildNode: (codeDB: CodeDB) => {
-                    const ref = codeDB?.newNodeFromType<ReferenceNode>("ref", {
+                    const ref = codeDB?.createNodeFromType<ReferenceNode>("ref", {
                       refId: node.id,
                     })!
 
-                    return codeDB?.newNodeFromType<AssignmentStatement>("assignment", {
+                    return codeDB?.createNodeFromType<AssignmentStatement>("assignment", {
                       left: ref,
                       operator: "=",
                     })!
@@ -1764,11 +1769,11 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
                   title: `set ${(node as any).name} (state)`,
                   type: "state change",
                   buildNode: (codeDB: CodeDB) => {
-                    const ref = codeDB?.newNodeFromType<ReferenceNode>("ref", {
+                    const ref = codeDB?.createNodeFromType<ReferenceNode>("ref", {
                       refId: node.id,
                     })!
 
-                    return codeDB?.newNodeFromType<StateChangeNode>("state change", {
+                    return codeDB?.createNodeFromType<StateChangeNode>("state change", {
                       state: ref,
                     })!
                   },

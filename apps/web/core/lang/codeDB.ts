@@ -49,6 +49,7 @@ export class CodeDB {
     this.codeTreeWalker.full(programNode, (node, parentMeta) => {
       if (!node.meta) {
         node.meta = {
+          createdAt: new Date().toISOString(),
           ui: {
             isHovered: false,
             isSelected: false,
@@ -659,13 +660,14 @@ export class CodeDB {
     this.notifyNodeChange(parent.id)
   }
 
-  newNodeFromType<T>(type: CodeNode["type"], extras?: Partial<CodeNode>): T {
+  createNodeFromType<T>(type: CodeNode["type"], extras?: Partial<CodeNode>): T {
     const id = this.idCounter.toString()
     this.idCounter++
     const newNode = {
       id,
       type,
       meta: {
+        createdAt: new Date().toISOString(),
         ui: {
           isHovered: false,
           isSelected: false,
