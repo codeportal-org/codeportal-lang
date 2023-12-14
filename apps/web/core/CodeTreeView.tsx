@@ -1414,11 +1414,15 @@ const DraggableNodeContainer = ({
 
   const parent = useNode<CodeNode>(node.meta?.parentId!)
 
-  const isInline =
-    parent &&
-    (nodeTypeMeta[parent.type].expressions?.includes(node.meta?.parentProperty!) ||
-      nodeTypeMeta[parent.type].childLists?.find((list) => list.name === node.meta?.parentProperty!)
-        ?.kind === "expression")
+  const isInline = useMemo(
+    () =>
+      parent &&
+      (nodeTypeMeta[parent.type].expressions?.includes(node.meta?.parentProperty!) ||
+        nodeTypeMeta[parent.type].childLists?.find(
+          (list) => list.name === node.meta?.parentProperty!,
+        )?.kind === "expression"),
+    [node, parent, node.meta?.parentProperty, node.meta?.parentId, parent?.type],
+  )
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
