@@ -366,11 +366,11 @@ export class CodeDB {
     if (node.meta?.parentId) {
       const parent = this.getNodeByID(node.meta.parentId)
       const parentProperty = node.meta.parentProperty
-      const childList = nodeTypeMeta[parent.type]?.childLists?.find(
-        (childList) => childList.name === parentProperty,
-      )
 
       if (parent && parentProperty) {
+        const childList = nodeTypeMeta[parent.type]?.childLists?.find(
+          (childList) => childList.name === parentProperty,
+        )
         if (childList) {
           const nodeList = (parent as any)[parentProperty] as any[]
 
@@ -379,15 +379,30 @@ export class CodeDB {
           if (index !== -1) {
             nodeList.splice(index, 1)
 
-            if (refillAndClean && nodeList.length === 0) {
-              if (childList.kind === "statement" || childList.kind === "ui") {
-                // Always leave an empty statement for UX reasons
-                const emptyStatement = this.newEmptyNode(childList.kind)
-                nodeList.push(emptyStatement)
-                emptyStatement.meta!.parentId = parent.id
-                emptyStatement.meta!.parentProperty = parentProperty
-              } else if (childList.kind === "style") {
-                delete (parent as any)[parentProperty]
+            // refill and clean logic
+            if (refillAndClean) {
+              if (
+                childList.kind === "statement" ||
+                childList.kind === "ui" ||
+                childList.kind === "style"
+              ) {
+                if (nodeList.length === 0) {
+                  if (childList.kind === "statement" || childList.kind === "ui") {
+                    // Always leave an empty statement for UX reasons
+                    const emptyStatement = this.newEmptyNode(childList.kind)
+                    nodeList.push(emptyStatement)
+                    emptyStatement.meta!.parentId = parent.id
+                    emptyStatement.meta!.parentProperty = parentProperty
+                  } else if (childList.kind === "style") {
+                    delete (parent as any)[parentProperty]
+                  }
+                }
+              } else if (childList.kind === "expression") {
+                // Always leave an empty expression in the exact index for UX reasons
+                const emptyExpression = this.newEmptyNode(childList.kind)
+                nodeList.splice(index, 0, emptyExpression)
+                emptyExpression.meta!.parentId = parent.id
+                emptyExpression.meta!.parentProperty = parentProperty
               }
             }
           }
