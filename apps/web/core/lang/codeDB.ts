@@ -4,6 +4,7 @@ import {
   CodeNode,
   EmptyNode,
   FunctionNode,
+  NAryExpression,
   ProgramNode,
   StatementNode,
   UIElementNode,
@@ -473,7 +474,9 @@ export class CodeDB {
 
     this.nodeMap.set(newNode.id, newNode)
 
-    this.notifyNodeChange(newNode.id)
+    if (!this.internalOperation) {
+      this.notifyNodeChange(newNode.id)
+    }
 
     return newNode
   }
@@ -660,8 +663,32 @@ export class CodeDB {
     this.internalOperation = false
 
     this.notifyNodeChange(nodeId)
+    this.notifyNodeChange(emptyNode.id)
     this.notifyNodeChange(nAryExpression.id)
     this.notifyNodeChange(nAryExpression.meta!.parentId!)
+  }
+
+  insertArgInNaryExpression(nodeId: string, index: number) {
+    const nAryExpression = this.getNodeByID<NAryExpression>(nodeId)
+
+    if (!nAryExpression) {
+      throw new Error("Node must exist")
+    }
+
+    this.internalOperation = true
+
+    const emptyNode = this.newEmptyNode("expression")
+
+    nAryExpression.args.splice(index, 0, emptyNode)
+    nAryExpression.operators.splice(index, 0, "+")
+
+    emptyNode.meta!.parentId = nAryExpression.id
+    emptyNode.meta!.parentProperty = "args"
+
+    this.internalOperation = false
+
+    this.notifyNodeChange(emptyNode.id)
+    this.notifyNodeChange(nodeId)
   }
 
   insertNodeInList(parentNodeId: string, parentProperty: string, index: number, newNode: CodeNode) {

@@ -416,9 +416,9 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
 
   return parent.type !== "nary" && node.type !== "nary" && node.type !== "function" ? (
     <div className="flex flex-row">
-      <BasicExpressionView node={node} />
+      <BaseExpressionView node={node} />
       <button
-        className="z-40 h-full w-1 flex-shrink-0 rounded bg-green-300 hover:bg-gray-200"
+        className="z-40 h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
         onClick={(event) => {
           if (event.defaultPrevented) {
             return
@@ -437,11 +437,11 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
   ) : node.type === "function" ? (
     <FunctionView node={node} />
   ) : (
-    <BasicExpressionView node={node} />
+    <BaseExpressionView node={node} />
   )
 }
 
-export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
+export const BaseExpressionView = ({ node }: { node: ExpressionNode }) => {
   if (node.type === "string") {
     return <StringView nodeId={node.id} />
   } else if (node.type === "number") {
@@ -453,7 +453,7 @@ export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
   } else if (node.type === "empty") {
     return <EmptyNodeView nodeId={node.id} />
   } else if (node.type === "nary") {
-    return <NaryExpressionView node={node} />
+    return <NaryExpressionView nodeId={node.id} />
   } else {
     return <div>unknown expression type: {node.type}</div>
   }
@@ -1170,7 +1170,8 @@ const StateChangeView = ({ node }: { node: StateChangeStatement }) => {
   )
 }
 
-const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
+const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
+  const node = useNode<NAryExpression>(nodeId)
   const codeDB = useCodeDB()
 
   const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(false)
@@ -1180,7 +1181,26 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
       {node.args.map((arg, idx) => {
         return (
           <React.Fragment key={arg.id}>
-            <ExpressionView nodeId={arg.id} />
+            <div className="flex flex-row">
+              <ExpressionView nodeId={arg.id} />
+              <button
+                className="z-40 h-full w-1 flex-shrink-0 rounded bg-green-300 hover:bg-gray-200"
+                onClick={(event) => {
+                  if (event.defaultPrevented) {
+                    return
+                  }
+                  event.preventDefault()
+
+                  codeDB?.insertArgInNaryExpression(node.id, idx + 1)
+                }}
+                onFocus={(event) => {
+                  event.preventDefault()
+                }}
+              >
+                &nbsp;
+              </button>
+            </div>
+
             {idx < node.args.length - 1 && (
               <DropdownMenu.Root
                 open={isOperatorDropdownOpen}
@@ -1497,7 +1517,7 @@ const DraggableNodeContainer = ({
       )}
       {!isOverlay && (!isInline || node.type !== "empty") && (isSelected || isHovered) && (
         <div
-          className={cn("absolute z-10 rounded-full", {
+          className={cn("absolute z-20 rounded-full", {
             "right-[-12px] top-[-12px]": isInline,
             "left-[-22px] top-0 h-full w-[22px]": !isInline,
           })}
