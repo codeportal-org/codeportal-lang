@@ -12,7 +12,7 @@ import {
   ProgramNode,
   ReferenceNode,
   ReturnStatementNode,
-  StateChangeNode,
+  StateChangeStatement,
   StateStatement,
   StatementNode,
   UIElementNode,
@@ -105,8 +105,6 @@ export class CodeTreeWalk {
       this.walkNAryExpression(node)
     } else if (node.type === "unary") {
       this.walkUnaryExpression(node)
-    } else if (node.type === "state change") {
-      this.walkStateChangeDeclaration(node)
     } else if (
       node.type === "ui element" ||
       node.type === "ui fragment" ||
@@ -302,7 +300,7 @@ export class CodeTreeWalk {
     this.parentNodeStack.pop()
   }
 
-  private walkStateChangeDeclaration(node: StateChangeNode) {
+  private walkStateChangeDeclaration(node: StateChangeStatement) {
     this.callback(node, this.currentParentNode())
 
     this.parentNodeStack.push({

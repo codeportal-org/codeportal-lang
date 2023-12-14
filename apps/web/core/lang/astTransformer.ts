@@ -44,7 +44,7 @@ import {
   ProgramNode,
   ReferenceNode,
   ReturnStatementNode,
-  StateChangeNode,
+  StateChangeStatement,
   StateStatement,
   StatementNode,
   StringLiteral,
@@ -414,7 +414,8 @@ export class ASTtoCTTransformer {
     } else if (node.type === "JSXElement") {
       return this.transformJSXElement(node)
     } else if (node.type === "CallExpression") {
-      return this.transformCallExpression(node)
+      // TODO: fix this case
+      // return this.transformCallExpression(node)
     } else if (node.type === "MemberExpression") {
       return this.transformMemberExpression(node)
     } else if (node.type === "ObjectExpression") {
@@ -592,7 +593,7 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformCallExpression(node: SimpleCallExpression): FunctionCallNode | StateChangeNode {
+  transformCallExpression(node: SimpleCallExpression): FunctionCallNode | StateChangeStatement {
     const functionCallId = this.getNewId()
 
     let callee: ReferenceNode | PathAccessNode
@@ -646,7 +647,7 @@ export class ASTtoCTTransformer {
             refId: stateId,
           },
           body,
-        } satisfies StateChangeNode
+        } satisfies StateChangeStatement
       }
     } else {
       throw new Error(`Unknown call expression callee type: ${node.callee.type}`)
