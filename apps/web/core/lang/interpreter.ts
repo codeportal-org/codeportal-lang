@@ -13,7 +13,7 @@ import {
   PathAccessNode,
   ProgramNode,
   ReferenceNode,
-  StateChangeNode,
+  StateChangeStatement,
   StateStatement,
   StatementNode,
   UINode,
@@ -183,7 +183,7 @@ export class Interpreter {
     } satisfies StateWrapper)
   }
 
-  private interpretStateChange(node: StateChangeNode) {
+  private interpretStateChange(node: StateChangeStatement) {
     if (this.reactMode === "server") {
       return
     }
