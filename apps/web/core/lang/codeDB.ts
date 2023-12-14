@@ -617,7 +617,6 @@ export class CodeDB {
   }
 
   wrapWithNaryExpression(nodeId: string) {
-    debugger
     const node = this.getNodeByID(nodeId)
 
     if (!node) {
