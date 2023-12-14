@@ -1174,7 +1174,9 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<NAryExpression>(nodeId)
   const codeDB = useCodeDB()
 
-  const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(false)
+  const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(() =>
+    node.operators.map(() => false),
+  )
 
   return (
     <div className="flex flex-row flex-wrap items-start gap-1.5">
@@ -1184,7 +1186,7 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
             <div className="flex flex-row">
               <ExpressionView nodeId={arg.id} />
               <button
-                className="z-40 h-full w-1 flex-shrink-0 rounded bg-green-300 hover:bg-gray-200"
+                className="z-40 h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
                 onClick={(event) => {
                   if (event.defaultPrevented) {
                     return
@@ -1203,9 +1205,13 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
 
             {idx < node.args.length - 1 && (
               <DropdownMenu.Root
-                open={isOperatorDropdownOpen}
+                open={isOperatorDropdownOpen[idx]}
                 onOpenChange={(isOpen) => {
-                  setIsOperatorDropdownOpen(isOpen)
+                  setIsOperatorDropdownOpen((prev) => [
+                    ...prev.slice(0, idx),
+                    isOpen,
+                    ...prev.slice(idx + 1),
+                  ])
                 }}
               >
                 <DropdownMenu.Trigger asChild>
@@ -1213,7 +1219,7 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
                     className={cn(
                       "text-code-symbol outline-none ring-blue-700 ring-offset-1 focus-visible:ring-2",
                       {
-                        "ring-2": isOperatorDropdownOpen,
+                        "ring-2": isOperatorDropdownOpen[idx],
                       },
                     )}
                   >
@@ -1251,7 +1257,11 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
                             ],
                           })
 
-                          setIsOperatorDropdownOpen(false)
+                          setIsOperatorDropdownOpen((prev) => [
+                            ...prev.slice(0, idx),
+                            false,
+                            ...prev.slice(idx + 1),
+                          ])
                         }}
                         onMouseOver={(event) => {
                           event.preventDefault()
