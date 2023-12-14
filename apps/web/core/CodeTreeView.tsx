@@ -1019,6 +1019,8 @@ export const NumberView = ({ nodeId }: { nodeId: string }) => {
               },
             },
           })
+
+          codeDB?.selectNodeOff(nodeId)
         }}
         onClick={(event) => {
           if (event.defaultPrevented) {
