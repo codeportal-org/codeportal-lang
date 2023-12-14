@@ -60,7 +60,7 @@ import {
   PrintStatement,
   ProgramNode,
   ReferenceNode,
-  StateChangeNode,
+  StateChangeStatement,
   StateStatement,
   StatementNode,
   StringLiteral,
@@ -414,11 +414,11 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
   const parent = useNode<CodeNode>(node.meta?.parentId!)
   const codeDB = useCodeDB()
 
-  return parent.type !== "nary" && node.type !== "nary" ? (
+  return parent.type !== "nary" && node.type !== "nary" && node.type !== "function" ? (
     <div className="flex flex-row">
       <BasicExpressionView node={node} />
       <button
-        className="h-full w-1 rounded hover:bg-gray-200"
+        className="z-40 h-full w-1 flex-shrink-0 rounded bg-green-300 hover:bg-gray-200"
         onClick={(event) => {
           if (event.defaultPrevented) {
             return
@@ -430,8 +430,12 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
         onFocus={(event) => {
           event.preventDefault()
         }}
-      ></button>
+      >
+        &nbsp;
+      </button>
     </div>
+  ) : node.type === "function" ? (
+    <FunctionView node={node} />
   ) : (
     <BasicExpressionView node={node} />
   )
@@ -444,14 +448,10 @@ export const BasicExpressionView = ({ node }: { node: ExpressionNode }) => {
     return <NumberView nodeId={node.id} />
   } else if (node.type === "boolean") {
     return <BooleanView nodeId={node.id} />
-  } else if (node.type === "function") {
-    return <FunctionView node={node} />
   } else if (node.type === "ref") {
     return <ReferenceView nodeId={node.id} />
   } else if (node.type === "empty") {
     return <EmptyNodeView nodeId={node.id} />
-  } else if (node.type === "state change") {
-    return <StateChangeView node={node} />
   } else if (node.type === "nary") {
     return <NaryExpressionView node={node} />
   } else {
@@ -1142,10 +1142,10 @@ export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
-const StateChangeView = ({ node }: { node: StateChangeNode }) => {
+const StateChangeView = ({ node }: { node: StateChangeStatement }) => {
   return (
     <div className="flex flex-row flex-wrap items-start gap-1.5">
-      <div className="flex flex-row items-center gap-1.5 border-2 border-transparent">
+      <div className="flex flex-row items-center gap-1.5">
         <span className="text-code-keyword">set</span>
         <ReferenceView nodeId={node.state.id} />
         <span className="text-code-symbol">to</span>
@@ -1772,7 +1772,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
                       refId: node.id,
                     })!
 
-                    return codeDB?.createNodeFromType<StateChangeNode>("state change", {
+                    return codeDB?.createNodeFromType<StateChangeStatement>("state change", {
                       state: ref,
                     })!
                   },
