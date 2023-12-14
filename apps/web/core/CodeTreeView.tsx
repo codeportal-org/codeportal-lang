@@ -147,7 +147,6 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   }
 
   const handleDragCancel = () => {
-    console.log("drag cancel")
     setDraggedNodeId(null)
 
     setDroppedOnNodeId(null)
@@ -156,9 +155,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
   React.useEffect(() => {
     setIsCodeLoadedInDB(codeDB?.isCodeLoaded)
 
-    console.log("***** codeDB?.onCodeLoaded")
     const unsubscribe = codeDB?.onCodeLoaded(() => {
-      console.log("***** code loaded ----")
       setIsCodeLoadedInDB(true)
     })
 
@@ -415,6 +412,7 @@ export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
 
 export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) => {
   const parent = useNode<CodeNode>(node.meta?.parentId!)
+  const codeDB = useCodeDB()
 
   return parent.type !== "nary" && node.type !== "nary" ? (
     <div className="flex flex-row">
@@ -422,8 +420,12 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
       <button
         className="h-full w-1 rounded hover:bg-gray-200"
         onClick={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
           event.preventDefault()
-          console.log("clicked")
+
+          codeDB?.wrapWithNaryExpression(node.id)
         }}
         onFocus={(event) => {
           event.preventDefault()
@@ -693,8 +695,6 @@ export const StylesView = ({ nodeId, style }: { nodeId: string; style: UIStyleNo
                             transform: `translateY(${virtualItem.start}px)`,
                           }}
                           onClick={() => {
-                            console.log("clicked", match)
-
                             const newNode = codeDB?.createNodeFromType<UIStyleNode>("ui style", {
                               name: match.name,
                               tag: match.tag,
@@ -1174,7 +1174,7 @@ const NaryExpressionView = ({ node }: { node: NAryExpression }) => {
   const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(false)
 
   return (
-    <div className="flex flex-row flex-wrap items-start gap-1.5 border-2 border-transparent">
+    <div className="flex flex-row flex-wrap items-start gap-1.5">
       {node.args.map((arg, idx) => {
         return (
           <React.Fragment key={arg.id}>
@@ -1414,15 +1414,11 @@ const DraggableNodeContainer = ({
 
   const parent = useNode<CodeNode>(node.meta?.parentId!)
 
-  const isInline = useMemo(
-    () =>
-      parent &&
-      (nodeTypeMeta[parent.type].expressions?.includes(node.meta?.parentProperty!) ||
-        nodeTypeMeta[parent.type].childLists?.find(
-          (list) => list.name === node.meta?.parentProperty!,
-        )?.kind === "expression"),
-    [node],
-  )
+  const isInline =
+    parent &&
+    (nodeTypeMeta[parent.type].expressions?.includes(node.meta?.parentProperty!) ||
+      nodeTypeMeta[parent.type].childLists?.find((list) => list.name === node.meta?.parentProperty!)
+        ?.kind === "expression")
 
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: nodeId,
@@ -1446,7 +1442,6 @@ const DraggableNodeContainer = ({
           return
         }
         event.preventDefault()
-        console.log("hovering", nodeId)
         codeDB?.hoverNode(nodeId)
       }}
       onMouseLeave={(event) => {

@@ -106,7 +106,6 @@ export class Interpreter {
 
     const scope = this.getScopeValues()
     const component = (props: any) => {
-      console.log("calling component", node.id)
       this.newScope()
       if (node.props) {
         for (let i = 0; i < node.props.length; i++) {
@@ -366,7 +365,6 @@ export class Interpreter {
   private interpretFunction(node: FunctionNode): any {
     const scope = this.getScopeValues()
     const func = (...args: any[]) => {
-      console.log("calling function", node.id)
       this.newScope()
       if (node.params) {
         for (let i = 0; i < node.params.length; i++) {

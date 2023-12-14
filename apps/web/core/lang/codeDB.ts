@@ -32,6 +32,11 @@ export class CodeDB {
 
   nodeMap = new Map<string, CodeNode>()
 
+  /**
+   * This flag is used to avoid emitting events when the CodeDB is being modified internally.
+   */
+  internalOperation = false
+
   private events = createNanoEvents()
 
   reset() {
@@ -82,18 +87,14 @@ export class CodeDB {
   }
 
   notifyCodeLoaded() {
-    console.log("--- notifyCodeLoaded")
     this.events.emit("code-loaded")
   }
 
   onCodeLoaded(callback: () => void) {
-    console.log("--- onCodeLoaded")
     return this.events.on("code-loaded", callback)
   }
 
   notifyNodeChange(nodeId: string, source: "sync" | "editor" = "editor") {
-    console.log("--- notifyNodeChange", nodeId)
-
     this.events.emit("node-change", { nodeId, source })
   }
 
@@ -285,7 +286,9 @@ export class CodeDB {
       ;(node as any)[property] = (data as any)[property]
     }
 
-    this.notifyNodeChange(nodeId)
+    if (!this.internalOperation) {
+      this.notifyNodeChange(nodeId)
+    }
   }
 
   /**
@@ -549,7 +552,7 @@ export class CodeDB {
   /**
    * Replaces a node in a property of it's parent node.
    */
-  replaceNode(nodeId: string, newNode: CodeNode) {
+  replaceNode(nodeId: string, newNode: CodeNode, deleteNode = true) {
     const node = this.getNodeByID(nodeId)
     if (!node) {
       return
@@ -589,7 +592,9 @@ export class CodeDB {
       ;(parent as any)[parentProperty] = newNode
     }
 
-    this.nodeMap.delete(nodeId)
+    if (deleteNode) {
+      this.nodeMap.delete(nodeId)
+    }
 
     if (this.selectedNodeIds.includes(nodeId)) {
       this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
@@ -605,8 +610,44 @@ export class CodeDB {
       throw new Error("New node must have meta")
     }
 
-    this.notifyNodeChange(newNode.id)
-    this.notifyNodeChange(parent.id)
+    if (!this.internalOperation) {
+      this.notifyNodeChange(newNode.id)
+      this.notifyNodeChange(parent.id)
+    }
+  }
+
+  wrapWithNaryExpression(nodeId: string) {
+    debugger
+    const node = this.getNodeByID(nodeId)
+
+    if (!node) {
+      throw new Error("Node must exist")
+    }
+
+    this.internalOperation = true
+
+    const nAryExpression = this.createNodeFromType<FunctionNode>("nary")
+
+    this.replaceNode(nodeId, nAryExpression, false)
+
+    const emptyNode = this.newEmptyNode("expression")
+
+    this.updateNode(nAryExpression.id, {
+      operators: ["+"],
+      args: [node, emptyNode],
+    })
+
+    node.meta!.parentId = nAryExpression.id
+    node.meta!.parentProperty = "args"
+
+    emptyNode.meta!.parentId = nAryExpression.id
+    emptyNode.meta!.parentProperty = "args"
+
+    this.internalOperation = false
+
+    this.notifyNodeChange(nodeId)
+    this.notifyNodeChange(nAryExpression.id)
+    this.notifyNodeChange(nAryExpression.meta!.parentId!)
   }
 
   insertNodeInList(parentNodeId: string, parentProperty: string, index: number, newNode: CodeNode) {
