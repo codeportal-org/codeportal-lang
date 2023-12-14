@@ -414,8 +414,8 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
   const parent = useNode<CodeNode>(node.meta?.parentId!)
   const codeDB = useCodeDB()
 
-  return parent.type !== "nary" && node.type !== "nary" && node.type !== "function" ? (
-    <div className="flex flex-row">
+  return parent.type !== "nary" && node.type !== "function" ? (
+    <div className="flex flex-row font-mono">
       <BaseExpressionView node={node} />
       <button
         className="z-40 h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
@@ -548,7 +548,7 @@ export const UINodeView = ({ nodeId }: { nodeId: string }) => {
     )
   } else if (node.type === "ui expression") {
     uiNodeView = (
-      <div className="flex flex-row gap-1.5">
+      <div className="flex flex-row gap-1.5 font-mono">
         {"{"}
         <ExpressionView nodeId={node.expression.id} />
         {"}"}
@@ -905,7 +905,7 @@ export const StringView = ({ nodeId }: { nodeId: string }) => {
       <ContentEditable
         tagName="div"
         role="textbox"
-        className="text-code-string inline-block h-full rounded-md px-1 outline-none"
+        className="text-code-string inline-block h-full rounded-md px-1 font-sans outline-none"
         html={node.value}
         onChange={handleChange}
         onFocus={(event) => {
@@ -1119,7 +1119,7 @@ export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
   return (
     <span
       className={cn(
-        "text-code-name rounded-md bg-gray-100 px-1 transition-colors hover:bg-gray-200",
+        "text-code-name rounded-md bg-gray-100 px-1 font-mono transition-colors hover:bg-gray-200",
         {
           "bg-gray-200": referencedNode.meta?.ui?.isHovered,
         },
@@ -1174,12 +1174,17 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<NAryExpression>(nodeId)
   const codeDB = useCodeDB()
 
+  const parent = useNode<CodeNode>(node.meta?.parentId!)
+
+  const isParentNAry = parent?.type === "nary"
+
   const [isOperatorDropdownOpen, setIsOperatorDropdownOpen] = React.useState(() =>
     node.operators.map(() => false),
   )
 
   return (
     <div className="flex flex-row flex-wrap items-start gap-1.5">
+      {isParentNAry && <span className="text-code-bracket-highlighting-0">(</span>}
       {node.args.map((arg, idx) => {
         return (
           <React.Fragment key={arg.id}>
@@ -1286,6 +1291,8 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
           </React.Fragment>
         )
       })}
+
+      {isParentNAry && <span className="text-code-bracket-highlighting-0">)</span>}
     </div>
   )
 }
@@ -1680,7 +1687,7 @@ export const EditableNodeName = ({ nodeId }: { nodeId: string }) => {
       <ContentEditable
         tagName="span"
         role="textbox"
-        className="text-code-name inline-block h-full px-1 outline-none focus-visible:bg-gray-200"
+        className="text-code-name inline-block h-full px-1 font-mono outline-none focus-visible:bg-gray-200"
         html={node.name}
         onChange={handleChange}
       />
@@ -1827,7 +1834,7 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   )
 
   return (
-    <div className="relative">
+    <div className="relative font-sans">
       {kind !== "expression" && (isSelected || isHovered) && false && (
         <div className="absolute right-0 top-0 flex h-full w-[24px] items-center justify-start">
           <button
