@@ -78,6 +78,7 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     title: "State declaration",
     description: "This node is used to declare a state in the current scope",
     hasName: true,
+    canReference: true,
     kinds: ["statement"],
     expressions: ["value"],
   },
