@@ -1847,8 +1847,10 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   }, [])
 
   React.useEffect(() => {
-    codeDB?.onNodeChange(() => {
-      setAvailableNodeRefs(getAvailableNodeRefs() as NodeAutocompleteMeta[])
+    return codeDB?.onNodeChange(() => {
+      if (codeDB?.getNodeByID(nodeId)) {
+        setAvailableNodeRefs(getAvailableNodeRefs() as NodeAutocompleteMeta[])
+      }
     })
   }, [])
 

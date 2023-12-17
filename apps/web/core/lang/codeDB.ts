@@ -157,7 +157,7 @@ export class CodeDB {
     const nodeIndex = (nodeParent as any)[nodeParentProperty].indexOf(node)
 
     if (nodeIndex === -1) {
-      throw new Error("Node must be in its parent")
+      throw new Error(`Node must be in its parent ${node.id}, parent ${nodeParent.id}`)
     }
 
     // remove node from parent
@@ -414,12 +414,22 @@ export class CodeDB {
             ;(parent as any)[parentProperty].meta!.parentProperty = parentProperty
           }
         }
-
-        this.notifyNodeChange(parent.id)
       }
     }
 
     this.nodeMap.delete(nodeId)
+
+    this.codeTreeWalker.walkNode(node, (node) => {
+      this.nodeMap.delete(node.id)
+
+      if (this.selectedNodeIds.includes(node.id)) {
+        this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== node.id)
+      }
+      if (this.hoveredNodeId === node.id) {
+        this.hoveredNodeId = undefined
+      }
+    })
+
     if (this.selectedNodeIds.includes(nodeId)) {
       this.selectedNodeIds = this.selectedNodeIds.filter((id) => id !== nodeId)
     }
@@ -427,7 +437,17 @@ export class CodeDB {
       this.hoveredNodeId = undefined
     }
 
+    // notify changes
+
     this.notifyNodeChange(nodeId)
+
+    this.codeTreeWalker.walkNode(node, (node) => {
+      this.notifyNodeChange(node.id)
+    })
+
+    if (node.meta?.parentId) {
+      this.notifyNodeChange(node.meta.parentId)
+    }
   }
 
   updateUIText(nodeId: string, text: string) {
@@ -508,7 +528,7 @@ export class CodeDB {
     const index = nodeList.indexOf(node)
 
     if (index === -1) {
-      throw new Error("Node must be in its parent")
+      throw new Error(`Node must be in its parent ${nodeId}, parent ${parent.id}`)
     }
 
     ;(parent as any)[parentProperty].splice(index, 0, newNode)
@@ -551,7 +571,7 @@ export class CodeDB {
     const index = nodeList.indexOf(node)
 
     if (index === -1) {
-      throw new Error("Node must be in its parent")
+      throw new Error(`Node must be in its parent ${nodeId}, parent ${parent.id}`)
     }
 
     ;(parent as any)[parentProperty].splice(index + 1, 0, newNode)
@@ -601,7 +621,7 @@ export class CodeDB {
       const index = nodeList.indexOf(node)
 
       if (index === -1) {
-        throw new Error("Node must be in its parent")
+        throw new Error(`Node must be in its parent ${nodeId}, parent ${parent.id}`)
       }
 
       ;(parent as any)[parentProperty].splice(index, 1, newNode)
@@ -811,7 +831,8 @@ export class CodeDB {
       const parent = this.getNodeByID(currentNode.meta.parentId)
 
       if (!parent) {
-        throw new Error("Node must have a parent")
+        // throw new Error("Node must have a parent")
+        return []
       }
 
       const parentProperty = currentNode.meta.parentProperty
@@ -830,7 +851,7 @@ export class CodeDB {
         const index = nodeList.indexOf(currentNode)
 
         if (index === -1) {
-          throw new Error("Node must be in its parent")
+          throw new Error(`Node must be in its parent ${nodeId}, parent ${parent.id}`)
         }
 
         for (let i = 0; i < index; i++) {
