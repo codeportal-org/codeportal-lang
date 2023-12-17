@@ -9,6 +9,7 @@ import {
   LiteralNode,
   NAryExpression,
   PathAccessNode,
+  PrintStatement,
   ProgramNode,
   ReferenceNode,
   ReturnStatementNode,
@@ -53,6 +54,61 @@ export class CodeTreeWalk {
     this.reset()
   }
 
+  walkNode(node: CodeNode, callback: (node: CodeNode) => void) {
+    this.callback = callback
+    if (node.type === "program") {
+      this.walkProgram(node)
+    } else if (node.type === "var") {
+      this.walkVariableDeclaration(node)
+    } else if (node.type === "return") {
+      this.walkReturnStatement(node)
+    } else if (node.type === "if") {
+      this.walkIfStatement(node)
+    } else if (node.type === "function") {
+      this.walkFunctionDeclaration(node)
+    } else if (node.type === "component") {
+      this.walkComponent(node)
+    } else if (node.type === "function call") {
+      this.walkFunctionCall(node)
+    } else if (node.type === "state") {
+      this.walkStateDeclaration(node)
+    } else if (node.type === "state change") {
+      this.walkStateChangeDeclaration(node)
+    } else if (node.type === "string" || node.type === "number" || node.type === "boolean") {
+      this.walkLiteral(node)
+    } else if (node.type === "ref") {
+      this.walkRef(node)
+    } else if (node.type === "path access") {
+      this.walkPathAccess(node)
+    } else if (node.type === "ui element") {
+      this.walkUIElement(node)
+    } else if (node.type === "ui fragment") {
+      this.walkUIFragment(node)
+    } else if (node.type === "ui text") {
+      this.walkUIText(node)
+    } else if (node.type === "ui expression") {
+      this.walkUIExpression(node)
+    } else if (node.type === "nary") {
+      this.walkNAryExpression(node)
+    } else if (node.type === "unary") {
+      this.walkUnaryExpression(node)
+    } else if (node.type === "ui prop") {
+      this.walkUIPropNode(node)
+    } else if (node.type === "ui spread prop") {
+      this.walkUISpreadPropNode(node)
+    } else if (node.type === "ui prop declaration") {
+      this.walkPropDeclaration(node)
+    } else if (node.type === "else if") {
+      this.walkElseIfStatement(node)
+    } else if (node.type === "print") {
+      this.walkPrintStatement(node)
+    } else {
+      throw new Error(`Unknown node type: ${node.type}`)
+    }
+
+    this.reset()
+  }
+
   private currentParentNode(): ParentMeta | undefined {
     return this.parentNodeStack[this.parentNodeStack.length - 1]
   }
@@ -87,6 +143,10 @@ export class CodeTreeWalk {
       this.walkStateDeclaration(node)
     } else if (node.type === "state change") {
       this.walkStateChangeDeclaration(node)
+    } else if (node.type === "print") {
+      this.walkPrintStatement(node)
+    } else if (node.type === "empty") {
+      this.walkEmptyNode(node)
     } else {
       throw new Error(`Unknown statement type: ${node.type}`)
     }
@@ -112,6 +172,8 @@ export class CodeTreeWalk {
       node.type === "ui expression"
     ) {
       this.walkUI(node)
+    } else if (node.type === "empty") {
+      this.walkEmptyNode(node)
     } else {
       throw new Error(`Unknown expression type: ${node.type}`)
     }
@@ -458,5 +520,21 @@ export class CodeTreeWalk {
     this.walkExpression(node.arg)
 
     this.parentNodeStack.pop()
+  }
+
+  private walkPrintStatement(node: PrintStatement) {
+    this.callback(node, this.currentParentNode())
+    this.parentNodeStack.push({
+      parent: node,
+      property: "arg",
+    })
+
+    this.walkExpression(node.arg)
+
+    this.parentNodeStack.pop()
+  }
+
+  walkEmptyNode(node: CodeNode) {
+    this.callback(node, this.currentParentNode())
   }
 }
