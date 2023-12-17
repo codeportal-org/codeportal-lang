@@ -86,8 +86,10 @@ const droppedOnNodeIdAtom = atom<string | null>(null)
 export const indentationClass = "pl-6"
 
 const OverlayContext = React.createContext<{ isOverlay: boolean }>({ isOverlay: false })
-
 const useIsOverlay = () => React.useContext(OverlayContext).isOverlay
+
+const InlineContext = React.createContext<{ isInline: boolean }>({ isInline: false })
+const useIsInline = () => React.useContext(InlineContext).isInline
 
 export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => {
   const codeDB = useCodeDB()
@@ -288,10 +290,9 @@ export const VariableStatementView = ({ nodeId }: { nodeId: string }) => {
 
 export const StateStatementView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<StateStatement>(nodeId)
-  const codeDB = useCodeDB()
 
   return (
-    <div className="flex flex-row gap-1.5">
+    <div className="flex flex-row items-start gap-1.5">
       <span className="text-code-keyword">state</span>
       <EditableNodeName nodeId={nodeId} />
       <span className="text-code-symbol">←</span>
@@ -418,7 +419,7 @@ export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) =>
     <div className="flex flex-row font-mono">
       <BaseExpressionView node={node} />
       <button
-        className="z-40 h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
+        className="h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
         onClick={(event) => {
           if (event.defaultPrevented) {
             return
@@ -1191,7 +1192,7 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
             <div className="flex flex-row">
               <ExpressionView nodeId={arg.id} />
               <button
-                className="z-40 h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
+                className="h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
                 onClick={(event) => {
                   if (event.defaultPrevented) {
                     return
@@ -1471,91 +1472,94 @@ const DraggableNodeContainer = ({
   if (!node) return null
 
   return (
-    <div
-      className={cn("relative flex cursor-pointer touch-none select-none flex-col rounded-lg", {
-        "bg-code-bg border-2 border-dashed border-slate-400 opacity-95": isOverlay,
-        "w-full": !isOverlay && !isInline,
-        "outline outline-blue-700": !isOverlay && isInline && isSelected,
-      })}
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      onMouseOver={(event) => {
-        if (event.defaultPrevented) {
-          return
-        }
-        event.preventDefault()
-        codeDB?.hoverNode(nodeId)
-      }}
-      onMouseLeave={(event) => {
-        if (event.defaultPrevented) {
-          return
-        }
-        event.preventDefault()
+    <InlineContext.Provider value={{ isInline }}>
+      <div
+        className={cn("relative flex cursor-pointer touch-none select-none flex-col rounded-lg", {
+          "bg-code-bg border-2 border-dashed border-slate-400 opacity-95": isOverlay,
+          "w-full": !isOverlay && !isInline,
+          "outline outline-blue-700": !isOverlay && isInline && isSelected,
+        })}
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        onMouseOver={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
+          codeDB?.hoverNode(nodeId)
+        }}
+        onMouseLeave={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
 
-        codeDB?.hoverNodeOff(nodeId)
-      }}
-      onClick={(event) => {
-        if (event.defaultPrevented) {
-          return
-        }
-        event.preventDefault()
+          codeDB?.hoverNodeOff(nodeId)
+        }}
+        onClick={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
 
-        codeDB?.selectNode(nodeId)
-      }}
-      onFocus={(event) => {
-        if (event.defaultPrevented) {
-          return
-        }
-        event.preventDefault()
+          codeDB?.selectNode(nodeId)
+        }}
+        onFocus={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
+          event.preventDefault()
 
-        codeDB?.selectNode(nodeId)
-      }}
-      onBlur={(event) => {
-        if (event.defaultPrevented) {
-          return
-        }
+          codeDB?.selectNode(nodeId)
+        }}
+        onBlur={(event) => {
+          if (event.defaultPrevented) {
+            return
+          }
 
-        codeDB?.selectNodeOff(nodeId)
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "Backspace" && event.target === event.currentTarget) {
-          codeDB?.deleteNode(nodeId)
-        }
-      }}
-    >
-      {(isSelected || isHovered) && !isOverlay && !isInline && (
-        <div
-          className={cn("absolute left-[-5px] top-0 h-full w-1 rounded opacity-50", {
-            "bg-gray-300": isDraggedNode || isHovered,
-            "bg-blue-500": isSelected,
-          })}
-        />
-      )}
-      {!isOverlay && (!isInline || node.type !== "empty") && (isSelected || isHovered) && (
-        <div
-          className={cn("absolute z-20 rounded-full", {
-            "right-[-12px] top-[-12px]": isInline,
-            "left-[-22px] top-0 h-full w-[22px]": !isInline,
-          })}
-        >
-          <button
-            className="rounded-full bg-gray-400 text-white transition-colors hover:bg-gray-500"
-            onClick={(event) => {
-              if (event.defaultPrevented) {
-                return
-              }
-              event.preventDefault()
+          codeDB?.selectNodeOff(nodeId)
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Backspace" && event.target === event.currentTarget) {
+            codeDB?.deleteNode(nodeId)
+          }
+        }}
+      >
+        {(isSelected || isHovered) && !isOverlay && !isInline && (
+          <div
+            className={cn("absolute left-[-5px] top-0 h-full w-1 rounded opacity-50", {
+              "bg-gray-300": isDraggedNode || isHovered,
+              "bg-blue-500": isSelected,
+            })}
+          />
+        )}
+        {children}
 
-              codeDB?.deleteNode(nodeId)
-            }}
+        {!isOverlay && (!isInline || node.type !== "empty") && (isSelected || isHovered) && (
+          <div
+            className={cn("absolute z-20 rounded-full", {
+              "right-[-12px] top-[-12px]": isInline,
+              "left-[-22px] top-0 h-full w-[22px]": !isInline,
+            })}
           >
-            <X size={16} />
-          </button>
-        </div>
-      )}
-      {children}
-    </div>
+            <button
+              className="z-20 rounded-full bg-gray-400 text-white transition-colors hover:bg-gray-500"
+              onClick={(event) => {
+                if (event.defaultPrevented) {
+                  return
+                }
+                event.preventDefault()
+
+                codeDB?.deleteNode(nodeId)
+              }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+    </InlineContext.Provider>
   )
 }
 
@@ -1759,6 +1763,8 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<EmptyNode>(nodeId)
   const codeDB = useCodeDB()
 
+  const isInline = useIsInline()
+
   const isSelected = node.meta?.ui?.isSelected
   const isHovered = node.meta?.ui?.isHovered
 
@@ -1861,7 +1867,12 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
       >
         <Combobox
           placeholder="..."
-          className="w-full max-w-sm rounded-xl border-0 p-0 pl-1 outline-none focus-visible:ring-0"
+          className={cn(
+            "w-full max-w-sm rounded-xl border-0 p-0 pl-1 outline-none focus-visible:ring-0",
+            {
+              "max-w-[80px]": isInline,
+            },
+          )}
           autoFocus={isSelected}
           autoSelect
         />
