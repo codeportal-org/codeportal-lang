@@ -1765,6 +1765,8 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
   const isInline = useIsInline()
 
+  const [availableNodeRefs, setAvailableNodeRefs] = React.useState<NodeAutocompleteMeta[]>([])
+
   const isSelected = node.meta?.ui?.isSelected
   const isHovered = node.meta?.ui?.isHovered
 
@@ -1777,8 +1779,8 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
     [kind],
   )
 
-  const availableNodeRefs = React.useMemo(
-    () =>
+  function getAvailableNodeRefs() {
+    const nodeRefs =
       kind === "expression" || kind === "ui" || kind === "statement"
         ? codeDB!.availableNodeRefs(nodeId).map((node) => {
             const refNodeType = nodeTypeMeta[node.type].referencedBy!
@@ -1825,9 +1827,10 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
               }
             }
           })
-        : ([] as NodeAutocompleteMeta[]),
-    [nodeId],
-  )
+        : ([] as NodeAutocompleteMeta[])
+
+    return nodeRefs
+  }
 
   const [searchValue, setSearchValue] = React.useState("")
 
@@ -1836,8 +1839,18 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
       matchSorter([...availableNodeRefs, ...filteredBaseNodeList], searchValue, {
         keys: ["title"],
       }),
-    [searchValue],
+    [searchValue, availableNodeRefs],
   )
+
+  React.useEffect(() => {
+    setAvailableNodeRefs(getAvailableNodeRefs() as NodeAutocompleteMeta[])
+  }, [])
+
+  React.useEffect(() => {
+    codeDB?.onNodeChange(() => {
+      setAvailableNodeRefs(getAvailableNodeRefs() as NodeAutocompleteMeta[])
+    })
+  }, [])
 
   return (
     <div className="relative font-sans">
