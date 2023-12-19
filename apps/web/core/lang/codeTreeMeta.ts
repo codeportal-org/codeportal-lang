@@ -81,6 +81,7 @@ export const nodeTypeMeta: Record<CodeNode["type"], NodeTypeMeta> = {
     canReference: true,
     kinds: ["statement"],
     expressions: ["value"],
+    referencedBy: "state change",
   },
   print: {
     title: "Print",
