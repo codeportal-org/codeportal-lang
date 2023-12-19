@@ -833,9 +833,10 @@ export class CodeDB {
       return []
     }
 
-    const parentChildListKind = nodeTypeMeta[parent.type]?.childLists?.find(
-      (childList) => childList.name === node.meta?.parentProperty,
-    )?.kind!
+    const parentChildListKind =
+      nodeTypeMeta[parent.type]?.childLists?.find(
+        (childList) => childList.name === node.meta?.parentProperty,
+      )?.kind! || "expression"
 
     let availableRefs: NodeAutocompleteMeta[] = []
 
@@ -873,8 +874,6 @@ export class CodeDB {
           const sibling: CodeNode = nodeList[i]
 
           if (referenceableNodeTypes.find(({ type }) => type === sibling.type)) {
-            const refNodeType = nodeTypeMeta[sibling.type as CodeNode["type"]].referencedBy!
-
             if (nodeTypeMeta[sibling.type].kinds.includes("statement")) {
               if (sibling.type === "var") {
                 availableRefs.push({
@@ -908,10 +907,11 @@ export class CodeDB {
               }
             }
 
+            // reference to a variable or state
             if (sibling.type === "state" || sibling.type === "var") {
               availableRefs.push({
-                title: `${(sibling as any).name} (reference to ${refNodeType})`,
-                type: refNodeType,
+                title: `${(sibling as any).name} (reference to ${sibling.type})`,
+                type: "ref",
                 buildNode: (codeDB: CodeDB) =>
                   codeDB?.createNodeFromType<ReferenceNode>("ref", {
                     refId: sibling.id,
@@ -925,10 +925,9 @@ export class CodeDB {
       currentNode = parent
     }
 
-    // filter
-    // availableRefs = availableRefs.filter((ref) =>
-    //   nodeTypeMeta[ref.type].kinds.includes(parentChildListKind),
-    // )
+    availableRefs = availableRefs.filter((ref) =>
+      nodeTypeMeta[ref.type].kinds.includes(parentChildListKind),
+    )
 
     return availableRefs
   }
