@@ -1,11 +1,15 @@
 import { createNanoEvents } from "nanoevents"
 
+import { NodeAutocompleteMeta } from "../CodeTreeView"
 import {
+  AssignmentStatement,
   CodeNode,
   EmptyNode,
   FunctionNode,
   NAryExpression,
   ProgramNode,
+  ReferenceNode,
+  StateChangeStatement,
   StatementNode,
   UIElementNode,
   UIStyleNode,
@@ -816,13 +820,24 @@ export class CodeDB {
     return newNode as T
   }
 
-  availableNodeRefs(nodeId: string): CodeNode[] {
+  availableNodeRefs(nodeId: string): NodeAutocompleteMeta[] {
     const node = this.getNodeByID(nodeId)
+
     if (!node) {
       return []
     }
 
-    const availableRefs: CodeNode[] = []
+    const parent = this.getNodeByID(node.meta?.parentId!)
+
+    if (!parent) {
+      return []
+    }
+
+    const parentChildListKind = nodeTypeMeta[parent.type]?.childLists?.find(
+      (childList) => childList.name === node.meta?.parentProperty,
+    )?.kind!
+
+    let availableRefs: NodeAutocompleteMeta[] = []
 
     // with a while visit all the ancestors to looks for available refs
     let currentNode = node
@@ -855,16 +870,65 @@ export class CodeDB {
         }
 
         for (let i = 0; i < index; i++) {
-          const sibling = nodeList[i]
+          const sibling: CodeNode = nodeList[i]
 
           if (referenceableNodeTypes.find(({ type }) => type === sibling.type)) {
-            availableRefs.push(sibling)
+            const refNodeType = nodeTypeMeta[sibling.type as CodeNode["type"]].referencedBy!
+
+            if (nodeTypeMeta[sibling.type].kinds.includes("statement")) {
+              if (sibling.type === "var") {
+                availableRefs.push({
+                  title: `assign to ${(sibling as any).name} (variable)`,
+                  type: "assignment",
+                  buildNode: (codeDB: CodeDB) => {
+                    const ref = codeDB?.createNodeFromType<ReferenceNode>("ref", {
+                      refId: sibling.id,
+                    })!
+
+                    return codeDB?.createNodeFromType<AssignmentStatement>("assignment", {
+                      left: ref,
+                      operator: "=",
+                    })!
+                  },
+                } satisfies NodeAutocompleteMeta)
+              } else if (sibling.type === "state") {
+                availableRefs.push({
+                  title: `set ${(sibling as any).name} (state)`,
+                  type: "state change",
+                  buildNode: (codeDB: CodeDB) => {
+                    const ref = codeDB?.createNodeFromType<ReferenceNode>("ref", {
+                      refId: sibling.id,
+                    })!
+
+                    return codeDB?.createNodeFromType<StateChangeStatement>("state change", {
+                      state: ref,
+                    })!
+                  },
+                } satisfies NodeAutocompleteMeta)
+              }
+            }
+
+            if (sibling.type === "state" || sibling.type === "var") {
+              availableRefs.push({
+                title: `${(sibling as any).name} (reference to ${refNodeType})`,
+                type: refNodeType,
+                buildNode: (codeDB: CodeDB) =>
+                  codeDB?.createNodeFromType<ReferenceNode>("ref", {
+                    refId: sibling.id,
+                  })!,
+              } satisfies NodeAutocompleteMeta)
+            }
           }
         }
       }
 
       currentNode = parent
     }
+
+    // filter
+    // availableRefs = availableRefs.filter((ref) =>
+    //   nodeTypeMeta[ref.type].kinds.includes(parentChildListKind),
+    // )
 
     return availableRefs
   }

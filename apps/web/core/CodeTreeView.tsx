@@ -1774,59 +1774,24 @@ export const EmptyNodeView = ({ nodeId }: { nodeId: string }) => {
 
   const kind = node.kind
 
+  const parent = useNode<CodeNode>(node.meta?.parentId!)
+
+  const parentChildListKind =
+    nodeTypeMeta[parent.type].childLists?.find((list) => list.name === node.meta?.parentProperty!)
+      ?.kind || "expression"
+
   const filteredBaseNodeList = React.useMemo(
-    () => baseNodeList.filter((node) => nodeTypeMeta[node.type].kinds.includes(kind)),
-    [kind],
+    () =>
+      baseNodeList.filter((baseNode) =>
+        nodeTypeMeta[baseNode.type].kinds.includes(parentChildListKind!),
+      ),
+    [parentChildListKind],
   )
 
   function getAvailableNodeRefs() {
     const nodeRefs =
       kind === "expression" || kind === "ui" || kind === "statement"
-        ? codeDB!.availableNodeRefs(nodeId).map((node) => {
-            const refNodeType = nodeTypeMeta[node.type].referencedBy!
-
-            if (kind === "expression" || kind === "ui") {
-              return {
-                title: `${(node as any).name} (reference to ${node.type})`,
-                type: refNodeType,
-                buildNode: (codeDB: CodeDB) =>
-                  codeDB?.createNodeFromType<ReferenceNode>("ref", {
-                    refId: node.id,
-                  })!,
-              } satisfies NodeAutocompleteMeta
-            } else {
-              if (node.type === "var") {
-                return {
-                  title: `assign to ${(node as any).name} (variable)`,
-                  type: "assignment",
-                  buildNode: (codeDB: CodeDB) => {
-                    const ref = codeDB?.createNodeFromType<ReferenceNode>("ref", {
-                      refId: node.id,
-                    })!
-
-                    return codeDB?.createNodeFromType<AssignmentStatement>("assignment", {
-                      left: ref,
-                      operator: "=",
-                    })!
-                  },
-                } satisfies NodeAutocompleteMeta
-              } else if (node.type === "state change") {
-                return {
-                  title: `set ${(node as any).name} (state)`,
-                  type: "state change",
-                  buildNode: (codeDB: CodeDB) => {
-                    const ref = codeDB?.createNodeFromType<ReferenceNode>("ref", {
-                      refId: node.id,
-                    })!
-
-                    return codeDB?.createNodeFromType<StateChangeStatement>("state change", {
-                      state: ref,
-                    })!
-                  },
-                } satisfies NodeAutocompleteMeta
-              }
-            }
-          })
+        ? codeDB!.availableNodeRefs(nodeId)
         : ([] as NodeAutocompleteMeta[])
 
     return nodeRefs
