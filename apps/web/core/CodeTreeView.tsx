@@ -1724,7 +1724,12 @@ export const baseNodeList = [
   },
   {
     type: "boolean",
-    title: nodeTypeMeta.boolean.title,
+    title: "True (boolean)",
+    buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("boolean", { value: true })!,
+  },
+  {
+    type: "boolean",
+    title: "False (boolean)",
     buildNode: (codeDB: CodeDB) => codeDB?.createNodeFromType("boolean", { value: false })!,
   },
   {
