@@ -1447,7 +1447,7 @@ const DraggableNodeContainer = ({
 
   const isOverlay = useIsOverlay()
 
-  const isDraggedNode = !isOverlay && nodeId === draggedNodeId
+  const isDraggedNode = nodeId === draggedNodeId
 
   const isSelected = node.meta?.ui?.isSelected
   const isHovered = node.meta?.ui?.isHovered
@@ -1475,7 +1475,8 @@ const DraggableNodeContainer = ({
     <InlineContext.Provider value={{ isInline }}>
       <div
         className={cn("relative flex cursor-pointer touch-none select-none flex-col rounded-lg", {
-          "bg-code-bg border-2 border-dashed border-slate-400 opacity-95": isOverlay,
+          "bg-code-bg border-2 border-dashed border-slate-400 opacity-95":
+            isOverlay && isDraggedNode,
           "w-full": !isOverlay && !isInline,
           "outline outline-blue-700": !isOverlay && isInline && isSelected,
         })}
@@ -1529,7 +1530,7 @@ const DraggableNodeContainer = ({
         {(isSelected || isHovered) && !isOverlay && !isInline && (
           <div
             className={cn("absolute left-[-5px] top-0 h-full w-1 rounded opacity-50", {
-              "bg-gray-300": isDraggedNode || isHovered,
+              "bg-gray-300": (isDraggedNode && !isOverlay) || isHovered,
               "bg-blue-500": isSelected,
             })}
           />
