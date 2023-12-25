@@ -5,10 +5,16 @@ import { CodeNode } from "./codeTree"
 
 const CodeDBContext = React.createContext<CodeDB | null>(null)
 
-export function CodeDBProvider({ children }: { children: React.ReactNode }) {
-  const [codeDB] = React.useState(() => new CodeDB())
+export function CodeDBProvider({
+  children,
+  codeDB,
+}: {
+  children: React.ReactNode
+  codeDB?: CodeDB
+}) {
+  const [_codeDB] = React.useState(() => codeDB || new CodeDB())
 
-  return <CodeDBContext.Provider value={codeDB}>{children}</CodeDBContext.Provider>
+  return <CodeDBContext.Provider value={_codeDB}>{children}</CodeDBContext.Provider>
 }
 
 export function useCodeDB() {
