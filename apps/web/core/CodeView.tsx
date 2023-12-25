@@ -2,14 +2,12 @@
 
 import React from "react"
 
-import { TooltipProvider } from "@/components/ui/tooltip"
-
 import { CodeTreeView } from "./CodeTreeView"
 import { editorEvents } from "./editorEvents"
 import { ASTtoCTTransformer } from "./lang/astTransformer"
-import { CodeDBProvider, useCodeDB } from "./lang/codeDBContext"
+import { useCodeDB } from "./lang/codeDBContext"
 import { CodeProcessor } from "./lang/codeProcessor"
-import { ProgramNode, UITextNode } from "./lang/codeTree"
+import { ProgramNode } from "./lang/codeTree"
 
 const astTransformer = new ASTtoCTTransformer()
 const codeProcessor = new CodeProcessor({ appId: "test" })
@@ -46,17 +44,13 @@ export const CodeView = React.forwardRef<
 >(({ appId, code, isFinished, codeTree, isLoading }, ref) => {
   return (
     <div className="h-full">
-      <TooltipProvider>
-        <CodeDBProvider>
-          <CodeContainer
-            ref={ref}
-            code={code}
-            isFinished={isFinished}
-            codeTree={codeTree}
-            isLoading={isLoading}
-          />
-        </CodeDBProvider>
-      </TooltipProvider>
+      <CodeContainer
+        ref={ref}
+        code={code}
+        isFinished={isFinished}
+        codeTree={codeTree}
+        isLoading={isLoading}
+      />
     </div>
   )
 })

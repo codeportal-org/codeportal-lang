@@ -38,10 +38,11 @@ import { createPortal } from "react-dom"
 import TextareaAutosize from "react-textarea-autosize"
 import sanitizeHtml from "sanitize-html"
 
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn, isTouchEnabled } from "@/lib/utils"
 
 import { CodeDB } from "./lang/codeDB"
-import { useCodeDB, useNode } from "./lang/codeDBContext"
+import { CodeDBProvider, useCodeDB, useNode } from "./lang/codeDBContext"
 import {
   AssignmentOperator,
   AssignmentOperators,
@@ -91,7 +92,23 @@ const useIsOverlay = () => React.useContext(OverlayContext).isOverlay
 const InlineContext = React.createContext<{ isInline: boolean }>({ isInline: false })
 const useIsInline = () => React.useContext(InlineContext).isInline
 
-export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => {
+export const CodeTreeView = ({
+  codeTree,
+  codeDB,
+}: {
+  codeTree: ProgramNode | null
+  codeDB?: CodeDB
+}) => {
+  return (
+    <TooltipProvider>
+      <CodeDBProvider codeDB={codeDB}>
+        <CodeTreeViewInternal codeTree={codeTree} />
+      </CodeDBProvider>
+    </TooltipProvider>
+  )
+}
+
+const CodeTreeViewInternal = ({ codeTree }: { codeTree: ProgramNode | null }) => {
   const codeDB = useCodeDB()
 
   const pointerSensor = useSensor(CustomPointerSensor, {
@@ -183,7 +200,12 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
         },
       }}
     >
-      <div className="h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4 py-2">
+      <div
+        className={cn(
+          "h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4",
+          indentationClass,
+        )}
+      >
         <OverlayContext.Provider value={{ isOverlay: false }}>
           {codeTree.type === "program" &&
             codeTree.body.map((node) => {
@@ -191,24 +213,25 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
             })}
         </OverlayContext.Provider>
       </div>
-      {createPortal(
-        <DragOverlay>
-          <OverlayContext.Provider value={{ isOverlay: true }}>
-            {draggedNode ? (
-              uiNodeTypes.includes(draggedNode.type) ? (
-                <UINodeView nodeId={draggedNode.id} />
-              ) : draggedNode.type === "empty" ? (
-                <EmptyNodeView nodeId={draggedNode.id} />
-              ) : isNodeKind(draggedNode, "statement") ? (
-                <StatementView nodeId={draggedNode.id} />
-              ) : (
-                <ExpressionView nodeId={draggedNode.id} />
-              )
-            ) : null}
-          </OverlayContext.Provider>
-        </DragOverlay>,
-        document.body,
-      )}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <DragOverlay>
+            <OverlayContext.Provider value={{ isOverlay: true }}>
+              {draggedNode ? (
+                uiNodeTypes.includes(draggedNode.type) ? (
+                  <UINodeView nodeId={draggedNode.id} />
+                ) : draggedNode.type === "empty" ? (
+                  <EmptyNodeView nodeId={draggedNode.id} />
+                ) : isNodeKind(draggedNode, "statement") ? (
+                  <StatementView nodeId={draggedNode.id} />
+                ) : (
+                  <ExpressionView nodeId={draggedNode.id} />
+                )
+              ) : null}
+            </OverlayContext.Provider>
+          </DragOverlay>,
+          document.body,
+        )}
     </DndContext>
   )
 }
@@ -216,7 +239,7 @@ export const CodeTreeView = ({ codeTree }: { codeTree: ProgramNode | null }) => 
 export const StatementView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<StatementNode>(nodeId)
 
-  if (!node) return null
+  if (!node) return <div>null</div>
 
   let statementView: React.ReactNode
 
@@ -413,32 +436,39 @@ export const ExpressionView = ({ nodeId }: { nodeId: string }) => {
 
 export const InlineExpressionContainer = ({ node }: { node: ExpressionNode }) => {
   const parent = useNode<CodeNode>(node.meta?.parentId!)
-  const codeDB = useCodeDB()
 
   return parent.type !== "nary" && node.type !== "function" ? (
     <div className="flex flex-row font-mono">
       <BaseExpressionView node={node} />
-      <button
-        className="h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
-        onClick={(event) => {
-          if (event.defaultPrevented) {
-            return
-          }
-          event.preventDefault()
-
-          codeDB?.wrapWithNaryExpression(node.id)
-        }}
-        onFocus={(event) => {
-          event.preventDefault()
-        }}
-      >
-        &nbsp;
-      </button>
+      <InlineExpressionContainerButtonExpander node={node} />
     </div>
   ) : node.type === "function" ? (
     <FunctionView node={node} />
   ) : (
     <BaseExpressionView node={node} />
+  )
+}
+
+const InlineExpressionContainerButtonExpander = ({ node }: { node: ExpressionNode }) => {
+  const codeDB = useCodeDB()
+
+  return (
+    <button
+      className="h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
+      onClick={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
+        codeDB?.wrapWithNaryExpression(node.id)
+      }}
+      onFocus={(event) => {
+        event.preventDefault()
+      }}
+    >
+      &nbsp;
+    </button>
   )
 }
 
@@ -1535,6 +1565,7 @@ const DraggableNodeContainer = ({
             })}
           />
         )}
+
         {children}
 
         {!isOverlay && (!isInline || node.type !== "empty") && (isSelected || isHovered) && (
