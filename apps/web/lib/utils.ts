@@ -6,9 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function isTouchEnabled() {
-  return (
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0 ||
-    (navigator as any).msMaxTouchPoints > 0
-  )
+  if (typeof window !== "undefined" && typeof navigator !== "undefined") {
+    return (
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      (navigator as any).msMaxTouchPoints > 0
+    )
+  }
+
+  // SSR
+  return false
 }
