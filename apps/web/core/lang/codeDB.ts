@@ -144,13 +144,7 @@ export class CodeDB {
     parentProperty: string,
     index: number,
   ) {
-    const nodeParent = this.getNodeByID(node.meta?.parentId!) as FunctionNode
-
-    if (!(statementTypes.includes(node.type as any) || uiNodeTypes.includes(node.type as any))) {
-      throw new Error(
-        `This method can only move statement or UI nodes, attempted to move ${node.type}`,
-      )
-    }
+    const nodeParent = this.getNodeByID(node.meta?.parentId!)
 
     if (!nodeParent || !targetParent) {
       throw new Error("Node and target must have parents")
@@ -169,7 +163,11 @@ export class CodeDB {
     nodeParentList.splice(nodeIndex, 1)
 
     const insertionIndex =
-      nodeParent.id === targetParent.id && index > nodeIndex ? index - 1 : index
+      nodeParent.id === targetParent.id && nodeParent.type === "nary" // expression case
+        ? index
+        : index > nodeIndex // condition for statements and ui
+        ? index - 1
+        : index
 
     // add node to parent at target index
     ;(targetParent as any)[parentProperty].splice(insertionIndex, 0, node)

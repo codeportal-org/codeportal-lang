@@ -26,7 +26,7 @@ export default function LangDemoPage() {
   return (
     <div className="mx-auto flex max-w-4xl flex-col items-center px-2 pb-10 text-gray-700">
       <h1 className="text-primary-500 mb-8 mt-10 text-center text-3xl font-bold sm:text-5xl">
-        Visual Language
+        ⬥ Portal Visual Language
       </h1>
 
       <h2 className="text-primary-500 mx-2 mb-4 w-full text-left text-lg font-bold sm:text-xl">
@@ -38,7 +38,7 @@ export default function LangDemoPage() {
     let count = 0
     if (count > 10) {
       count = 0
-      count = 1 + 1 + 1
+      count = 1 + 2 + 3
     }
   `}
       />

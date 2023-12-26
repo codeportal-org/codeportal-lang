@@ -1328,7 +1328,10 @@ const NAryExpressionSpacer = ({ nodeId, index }: { nodeId: string; index: number
 
   return (
     <button
-      className="h-full w-1 flex-shrink-0 rounded bg-blue-400 hover:bg-gray-200"
+      ref={setNodeRef}
+      className={cn("h-full w-1 flex-shrink-0 rounded hover:bg-gray-200", {
+        "bg-lime-600 hover:bg-lime-600": isDroppedOnNode,
+      })}
       onClick={(event) => {
         if (event.defaultPrevented) {
           return
@@ -1338,6 +1341,9 @@ const NAryExpressionSpacer = ({ nodeId, index }: { nodeId: string; index: number
         codeDB?.insertArgInNaryExpression(node.id, index + 1)
       }}
       onFocus={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
         event.preventDefault()
       }}
     >
@@ -1474,9 +1480,7 @@ const NodeListSpacer = ({
         className={cn("w-full pb-1 transition-colors hover:bg-gray-100", {
           "bg-lime-600 hover:bg-lime-600": isDroppedOnNode,
         })}
-      >
-        {/* visible part of the spacer */}
-      </div>
+      ></div>
     </button>
   )
 }
