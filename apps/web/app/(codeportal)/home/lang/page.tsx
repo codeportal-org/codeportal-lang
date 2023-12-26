@@ -1,14 +1,55 @@
 "use client"
 
+import React from "react"
+
 import { CodeTreeView } from "@/core/CodeTreeView"
-import { ASTtoCTTransformer } from "@/core/lang/astTransformer"
 import { CodeDB } from "@/core/lang/codeDB"
-import { CodeProcessor } from "@/core/lang/codeProcessor"
+import { importJS } from "@/core/lang/js-interop/importJS"
 
-const astTransformer = new ASTtoCTTransformer()
-const codeProcessor = new CodeProcessor({ appId: "test" })
+export function CodeSnippet({ code }: { code: string }) {
+  const codeTree = React.useMemo(() => importJS(code), [code])
 
-const testCode = `
+  const [codeDB] = React.useState<CodeDB>(() => {
+    const _codeDB = new CodeDB()
+
+    if (codeTree) {
+      _codeDB.load(codeTree)
+    }
+
+    return _codeDB
+  })
+
+  return <CodeTreeView codeDB={codeDB} codeTree={codeTree} />
+}
+
+export default function LangDemoPage() {
+  return (
+    <div className="mx-auto flex max-w-4xl flex-col items-center px-2 pb-10 text-gray-700">
+      <h1 className="text-primary-500 mb-8 mt-10 text-center text-3xl font-bold sm:text-5xl">
+        Visual Language
+      </h1>
+
+      <h2 className="text-primary-500 mx-2 mb-4 w-full text-left text-lg font-bold sm:text-xl">
+        If statement
+      </h2>
+
+      <CodeSnippet
+        code={`
+    let count = 0
+    if (count > 10) {
+      count = 0
+    }
+  `}
+      />
+
+      <div className="pt-8">{/* spacer */}</div>
+
+      <h2 className="text-primary-500 mx-2 mb-4 w-full text-left text-lg font-bold sm:text-xl">
+        React component
+      </h2>
+
+      <CodeSnippet
+        code={`
 function App() {
   const [count, setCount] = React.useState(0)
 
@@ -22,28 +63,8 @@ function App() {
       <div>Count: {count}</div>
     </div>
   )
-}
-`
-
-codeProcessor.extend((ast) => astTransformer.transform(ast))
-const testCodeTree = codeProcessor.process(testCode)
-
-const codeDB = new CodeDB()
-
-codeDB.load(testCodeTree)
-
-export default function LangDemoPage() {
-  return (
-    <div className="mx-auto flex max-w-4xl flex-col items-center px-2 text-gray-700">
-      <h1 className="text-primary-500 mb-8 mt-10 text-center text-3xl font-bold sm:text-5xl">
-        Visual Language
-      </h1>
-
-      <p className="mx-2 mb-8 max-w-3xl text-center text-lg sm:text-xl">
-        This is a demo of the visual language we are building.
-      </p>
-
-      <CodeTreeView codeTree={testCodeTree} codeDB={codeDB} />
+  }`}
+      />
     </div>
   )
 }
