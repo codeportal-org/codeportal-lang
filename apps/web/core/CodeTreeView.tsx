@@ -92,13 +92,7 @@ const useIsOverlay = () => React.useContext(OverlayContext).isOverlay
 const InlineContext = React.createContext<{ isInline: boolean }>({ isInline: false })
 const useIsInline = () => React.useContext(InlineContext).isInline
 
-export const CodeTreeView = ({
-  codeTree,
-  codeDB,
-}: {
-  codeTree: ProgramNode | null
-  codeDB?: CodeDB
-}) => {
+export const CodeTreeView = ({ codeTree, codeDB }: { codeTree?: ProgramNode; codeDB?: CodeDB }) => {
   return (
     <TooltipProvider>
       <CodeDBProvider codeDB={codeDB}>
@@ -108,7 +102,7 @@ export const CodeTreeView = ({
   )
 }
 
-const CodeTreeViewInternal = ({ codeTree }: { codeTree: ProgramNode | null }) => {
+const CodeTreeViewInternal = ({ codeTree }: { codeTree?: ProgramNode }) => {
   const codeDB = useCodeDB()
 
   const pointerSensor = useSensor(CustomPointerSensor, {
@@ -202,15 +196,19 @@ const CodeTreeViewInternal = ({ codeTree }: { codeTree: ProgramNode | null }) =>
     >
       <div
         className={cn(
-          "h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border px-4",
+          "h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border py-2",
           indentationClass,
         )}
       >
         <OverlayContext.Provider value={{ isOverlay: false }}>
-          {codeTree.type === "program" &&
-            codeTree.body.map((node) => {
-              return <StatementView nodeId={node.id} key={node.id} />
-            })}
+          {codeTree.type === "program" && (
+            <NodeList
+              nodeId={codeTree.id}
+              parentProperty="body"
+              nodes={codeTree.body}
+              Component={StatementView}
+            />
+          )}
         </OverlayContext.Provider>
       </div>
       {typeof document !== "undefined" &&
