@@ -414,8 +414,7 @@ export class ASTtoCTTransformer {
     } else if (node.type === "JSXElement") {
       return this.transformJSXElement(node)
     } else if (node.type === "CallExpression") {
-      // TODO: fix this case
-      // return this.transformCallExpression(node)
+      return this.transformCallExpression(node)
     } else if (node.type === "MemberExpression") {
       return this.transformMemberExpression(node)
     } else if (node.type === "ObjectExpression") {
@@ -469,12 +468,9 @@ export class ASTtoCTTransformer {
   transformBinaryExpression(node: BinaryExpression): NAryExpression {
     const nAryId = this.getNewId()
     const args: ExpressionNode[] = []
+    const operators: NAryOperator[] = []
 
-    let operator = node.operator
-
-    if (operator === "===") {
-      operator = "=="
-    }
+    let operator = node.operator === "===" ? "==" : (node.operator as NAryOperator)
 
     if (NAryOperatorSymbols.indexOf(operator as any) === -1) {
       throw new Error(`Unknown binary operator: ${node.operator}`)
@@ -483,6 +479,8 @@ export class ASTtoCTTransformer {
     let current: any = node
     while (current.type === "BinaryExpression" && node.operator === current.operator) {
       args.push(this.transformExpression(current.right))
+      operators.push(operator)
+
       current = current.left
     }
 
@@ -491,7 +489,7 @@ export class ASTtoCTTransformer {
     return {
       type: "nary",
       id: nAryId,
-      operators: [operator as NAryOperator],
+      operators,
       args: args.reverse(),
     }
   }
@@ -593,7 +591,7 @@ export class ASTtoCTTransformer {
     }
   }
 
-  transformCallExpression(node: SimpleCallExpression): FunctionCallNode | StateChangeStatement {
+  transformCallExpression(node: SimpleCallExpression): FunctionCallNode {
     const functionCallId = this.getNewId()
 
     let callee: ReferenceNode | PathAccessNode
@@ -602,53 +600,6 @@ export class ASTtoCTTransformer {
       callee = this.transformMemberExpression(node.callee)
     } else if (node.callee.type === "Identifier") {
       callee = this.transformIdentifier(node.callee)
-
-      if (callee.refId.startsWith("#state")) {
-        const stateName = callee.refId.split("-")[1]!
-        const stateId = this.resolveIdentifier(stateName)
-
-        let body: StatementNode[]
-
-        if (node.arguments[0]?.type === "ArrowFunctionExpression") {
-          const arrowFunction = node.arguments[0]
-          if (arrowFunction.params[0]?.type !== "Identifier") {
-            throw new Error("State setter arrow function should have a single identifier param")
-          }
-          const paramName = arrowFunction.params[0].name
-          replaceIdentifierInASTExpression(arrowFunction.body, paramName, stateName)
-
-          if (arrowFunction.body.type === "BlockStatement") {
-            body = this.transformStatementList(arrowFunction.body.body)
-          } else {
-            body = [
-              {
-                type: "return",
-                id: this.getNewId(),
-                arg: this.transformExpression(arrowFunction.body as Expression),
-              } satisfies ReturnStatementNode,
-            ]
-          }
-        } else {
-          body = [
-            {
-              type: "return",
-              id: this.getNewId(),
-              arg: this.transformExpression(node.arguments[0] as Expression),
-            } satisfies ReturnStatementNode,
-          ]
-        }
-
-        return {
-          type: "state change",
-          id: this.getNewId(),
-          state: {
-            type: "ref",
-            id: this.getNewId(),
-            refId: stateId,
-          },
-          body,
-        } satisfies StateChangeStatement
-      }
     } else {
       throw new Error(`Unknown call expression callee type: ${node.callee.type}`)
     }

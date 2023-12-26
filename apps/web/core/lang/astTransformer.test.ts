@@ -4,6 +4,7 @@ import { writeFileSync } from "fs"
 
 import { ASTtoCTTransformer, collapseWhitespace } from "./astTransformer"
 import { ProgramNode } from "./codeTree"
+import { importJS } from "./js-interop/importJS"
 
 describe("collapseWhitespace", () => {
   it("should collapse whitespace", () => {
@@ -29,6 +30,49 @@ describe("ASTtoCTTransformer - astTransformer", () => {
       id: "0",
       idCounter: 1,
       body: [],
+    } satisfies ProgramNode)
+  })
+
+  it("should transform an assignment with an NAry expression", () => {
+    const code = `
+      let x = 1 + 2 + 3
+    `
+
+    const codeTree = importJS(code)
+
+    expect(codeTree).toStrictEqual({
+      type: "program",
+      id: "0",
+      idCounter: 6,
+      body: [
+        {
+          type: "var",
+          id: "1",
+          name: "x",
+          value: {
+            type: "nary",
+            id: "2",
+            operators: ["+", "+"],
+            args: [
+              {
+                type: "number",
+                id: "5",
+                value: 1,
+              },
+              {
+                type: "number",
+                id: "4",
+                value: 2,
+              },
+              {
+                type: "number",
+                id: "3",
+                value: 3,
+              },
+            ],
+          },
+        },
+      ],
     } satisfies ProgramNode)
   })
 
@@ -1305,396 +1349,396 @@ describe("ASTtoCTTransformer - astTransformer", () => {
     } satisfies ProgramNode)
   })
 
-  it("should transform an app with state changes", () => {
-    const transformer = new ASTtoCTTransformer()
+  // it("should transform an app with state changes", () => {
+  //   const transformer = new ASTtoCTTransformer()
 
-    const codeTree = transformer.transform(
-      Parser.extend(acornJSXParser()).parse(
-        `
-          function App() {
-            const [count, setCount] = React.useState(0)
+  //   const codeTree = transformer.transform(
+  //     Parser.extend(acornJSXParser()).parse(
+  //       `
+  //         function App() {
+  //           const [count, setCount] = React.useState(0)
 
-            return (
-              <div>
-                <button onClick={() => setCount((c) => c + 1)}>Increment</button>
-                <button onClick={() => setCount((c) => c + 1)}>Increment</button>
-                <button onClick={() => setCount(count + 1)}>Increment</button>
-                <button onClick={() => setCount((c2) => c2 + 1)}>Increment</button>
-                <button onClick={() => setCount(count + 1)}>Increment</button>
-                <div>{count}</div>
-              </div>
-            )
-          }
-        `,
-        { ecmaVersion: "latest" },
-      ) as any,
-    )
+  //           return (
+  //             <div>
+  //               <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+  //               <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+  //               <button onClick={() => setCount(count + 1)}>Increment</button>
+  //               <button onClick={() => setCount((c2) => c2 + 1)}>Increment</button>
+  //               <button onClick={() => setCount(count + 1)}>Increment</button>
+  //               <div>{count}</div>
+  //             </div>
+  //           )
+  //         }
+  //       `,
+  //       { ecmaVersion: "latest" },
+  //     ) as any,
+  //   )
 
-    // writeFileSync("./codeTree.ts", JSON.stringify(codeTree, null, 2))
-    expect(codeTree).toStrictEqual({
-      type: "program",
-      id: "0",
-      idCounter: 74,
-      body: [
-        {
-          type: "component",
-          id: "1",
-          name: "App",
-          body: [
-            {
-              type: "state",
-              id: "2",
-              name: "count",
-              value: {
-                type: "number",
-                id: "3",
-                value: 0,
-              },
-            },
-            {
-              type: "return",
-              id: "4",
-              arg: {
-                type: "ui element",
-                id: "5",
-                name: "div",
-                props: [],
-                children: [
-                  {
-                    type: "ui element",
-                    id: "6",
-                    name: "button",
-                    props: [
-                      {
-                        type: "ui prop",
-                        id: "7",
-                        name: "onClick",
-                        value: {
-                          type: "function",
-                          id: "8",
-                          params: [],
-                          body: [
-                            {
-                              type: "return",
-                              id: "9",
-                              arg: {
-                                type: "state change",
-                                id: "16",
-                                state: {
-                                  type: "ref",
-                                  id: "17",
-                                  refId: "2",
-                                },
-                                body: [
-                                  {
-                                    type: "return",
-                                    id: "12",
-                                    arg: {
-                                      type: "nary",
-                                      id: "13",
-                                      operators: ["+"],
-                                      args: [
-                                        {
-                                          type: "ref",
-                                          id: "15",
-                                          refId: "2",
-                                        },
-                                        {
-                                          type: "number",
-                                          id: "14",
-                                          value: 1,
-                                        },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                    children: [
-                      {
-                        type: "ui text",
-                        id: "18",
-                        text: "Increment",
-                      },
-                    ],
-                  },
-                  {
-                    type: "ui element",
-                    id: "19",
-                    name: "button",
-                    props: [
-                      {
-                        type: "ui prop",
-                        id: "20",
-                        name: "onClick",
-                        value: {
-                          type: "function",
-                          id: "21",
-                          params: [],
-                          body: [
-                            {
-                              type: "return",
-                              id: "22",
-                              arg: {
-                                type: "state change",
-                                id: "29",
-                                state: {
-                                  type: "ref",
-                                  id: "30",
-                                  refId: "2",
-                                },
-                                body: [
-                                  {
-                                    type: "return",
-                                    id: "25",
-                                    arg: {
-                                      type: "nary",
-                                      id: "26",
-                                      operators: ["+"],
-                                      args: [
-                                        {
-                                          type: "ref",
-                                          id: "28",
-                                          refId: "2",
-                                        },
-                                        {
-                                          type: "number",
-                                          id: "27",
-                                          value: 1,
-                                        },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                    children: [
-                      {
-                        type: "ui text",
-                        id: "31",
-                        text: "Increment",
-                      },
-                    ],
-                  },
-                  {
-                    type: "ui element",
-                    id: "32",
-                    name: "button",
-                    props: [
-                      {
-                        type: "ui prop",
-                        id: "33",
-                        name: "onClick",
-                        value: {
-                          type: "function",
-                          id: "34",
-                          params: [],
-                          body: [
-                            {
-                              type: "return",
-                              id: "35",
-                              arg: {
-                                type: "state change",
-                                id: "42",
-                                state: {
-                                  type: "ref",
-                                  id: "43",
-                                  refId: "2",
-                                },
-                                body: [
-                                  {
-                                    type: "return",
-                                    id: "38",
-                                    arg: {
-                                      type: "nary",
-                                      id: "39",
-                                      operators: ["+"],
-                                      args: [
-                                        {
-                                          type: "ref",
-                                          id: "41",
-                                          refId: "2",
-                                        },
-                                        {
-                                          type: "number",
-                                          id: "40",
-                                          value: 1,
-                                        },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                    children: [
-                      {
-                        type: "ui text",
-                        id: "44",
-                        text: "Increment",
-                      },
-                    ],
-                  },
-                  {
-                    type: "ui element",
-                    id: "45",
-                    name: "button",
-                    props: [
-                      {
-                        type: "ui prop",
-                        id: "46",
-                        name: "onClick",
-                        value: {
-                          type: "function",
-                          id: "47",
-                          params: [],
-                          body: [
-                            {
-                              type: "return",
-                              id: "48",
-                              arg: {
-                                type: "state change",
-                                id: "55",
-                                state: {
-                                  type: "ref",
-                                  id: "56",
-                                  refId: "2",
-                                },
-                                body: [
-                                  {
-                                    type: "return",
-                                    id: "51",
-                                    arg: {
-                                      type: "nary",
-                                      id: "52",
-                                      operators: ["+"],
-                                      args: [
-                                        {
-                                          type: "ref",
-                                          id: "54",
-                                          refId: "2",
-                                        },
-                                        {
-                                          type: "number",
-                                          id: "53",
-                                          value: 1,
-                                        },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                    children: [
-                      {
-                        type: "ui text",
-                        id: "57",
-                        text: "Increment",
-                      },
-                    ],
-                  },
-                  {
-                    type: "ui element",
-                    id: "58",
-                    name: "button",
-                    props: [
-                      {
-                        type: "ui prop",
-                        id: "59",
-                        name: "onClick",
-                        value: {
-                          type: "function",
-                          id: "60",
-                          params: [],
-                          body: [
-                            {
-                              type: "return",
-                              id: "61",
-                              arg: {
-                                type: "state change",
-                                id: "68",
-                                state: {
-                                  type: "ref",
-                                  id: "69",
-                                  refId: "2",
-                                },
-                                body: [
-                                  {
-                                    type: "return",
-                                    id: "64",
-                                    arg: {
-                                      type: "nary",
-                                      id: "65",
-                                      operators: ["+"],
-                                      args: [
-                                        {
-                                          type: "ref",
-                                          id: "67",
-                                          refId: "2",
-                                        },
-                                        {
-                                          type: "number",
-                                          id: "66",
-                                          value: 1,
-                                        },
-                                      ],
-                                    },
-                                  },
-                                ],
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    ],
-                    children: [
-                      {
-                        type: "ui text",
-                        id: "70",
-                        text: "Increment",
-                      },
-                    ],
-                  },
-                  {
-                    type: "ui element",
-                    id: "71",
-                    name: "div",
-                    props: [],
-                    children: [
-                      {
-                        type: "ui expression",
-                        id: "72",
-                        expression: {
-                          type: "ref",
-                          id: "73",
-                          refId: "2",
-                        },
-                      },
-                    ],
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      ],
-    })
-  })
+  //   // writeFileSync("./codeTree.ts", JSON.stringify(codeTree, null, 2))
+  //   expect(codeTree).toStrictEqual({
+  //     type: "program",
+  //     id: "0",
+  //     idCounter: 74,
+  //     body: [
+  //       {
+  //         type: "component",
+  //         id: "1",
+  //         name: "App",
+  //         body: [
+  //           {
+  //             type: "state",
+  //             id: "2",
+  //             name: "count",
+  //             value: {
+  //               type: "number",
+  //               id: "3",
+  //               value: 0,
+  //             },
+  //           },
+  //           {
+  //             type: "return",
+  //             id: "4",
+  //             arg: {
+  //               type: "ui element",
+  //               id: "5",
+  //               name: "div",
+  //               props: [],
+  //               children: [
+  //                 {
+  //                   type: "ui element",
+  //                   id: "6",
+  //                   name: "button",
+  //                   props: [
+  //                     {
+  //                       type: "ui prop",
+  //                       id: "7",
+  //                       name: "onClick",
+  //                       value: {
+  //                         type: "function",
+  //                         id: "8",
+  //                         params: [],
+  //                         body: [
+  //                           {
+  //                             type: "return",
+  //                             id: "9",
+  //                             arg: {
+  //                               type: "state change",
+  //                               id: "16",
+  //                               state: {
+  //                                 type: "ref",
+  //                                 id: "17",
+  //                                 refId: "2",
+  //                               },
+  //                               body: [
+  //                                 {
+  //                                   type: "return",
+  //                                   id: "12",
+  //                                   arg: {
+  //                                     type: "nary",
+  //                                     id: "13",
+  //                                     operators: ["+"],
+  //                                     args: [
+  //                                       {
+  //                                         type: "ref",
+  //                                         id: "15",
+  //                                         refId: "2",
+  //                                       },
+  //                                       {
+  //                                         type: "number",
+  //                                         id: "14",
+  //                                         value: 1,
+  //                                       },
+  //                                     ],
+  //                                   },
+  //                                 },
+  //                               ],
+  //                             },
+  //                           },
+  //                         ],
+  //                       },
+  //                     },
+  //                   ],
+  //                   children: [
+  //                     {
+  //                       type: "ui text",
+  //                       id: "18",
+  //                       text: "Increment",
+  //                     },
+  //                   ],
+  //                 },
+  //                 {
+  //                   type: "ui element",
+  //                   id: "19",
+  //                   name: "button",
+  //                   props: [
+  //                     {
+  //                       type: "ui prop",
+  //                       id: "20",
+  //                       name: "onClick",
+  //                       value: {
+  //                         type: "function",
+  //                         id: "21",
+  //                         params: [],
+  //                         body: [
+  //                           {
+  //                             type: "return",
+  //                             id: "22",
+  //                             arg: {
+  //                               type: "state change",
+  //                               id: "29",
+  //                               state: {
+  //                                 type: "ref",
+  //                                 id: "30",
+  //                                 refId: "2",
+  //                               },
+  //                               body: [
+  //                                 {
+  //                                   type: "return",
+  //                                   id: "25",
+  //                                   arg: {
+  //                                     type: "nary",
+  //                                     id: "26",
+  //                                     operators: ["+"],
+  //                                     args: [
+  //                                       {
+  //                                         type: "ref",
+  //                                         id: "28",
+  //                                         refId: "2",
+  //                                       },
+  //                                       {
+  //                                         type: "number",
+  //                                         id: "27",
+  //                                         value: 1,
+  //                                       },
+  //                                     ],
+  //                                   },
+  //                                 },
+  //                               ],
+  //                             },
+  //                           },
+  //                         ],
+  //                       },
+  //                     },
+  //                   ],
+  //                   children: [
+  //                     {
+  //                       type: "ui text",
+  //                       id: "31",
+  //                       text: "Increment",
+  //                     },
+  //                   ],
+  //                 },
+  //                 {
+  //                   type: "ui element",
+  //                   id: "32",
+  //                   name: "button",
+  //                   props: [
+  //                     {
+  //                       type: "ui prop",
+  //                       id: "33",
+  //                       name: "onClick",
+  //                       value: {
+  //                         type: "function",
+  //                         id: "34",
+  //                         params: [],
+  //                         body: [
+  //                           {
+  //                             type: "return",
+  //                             id: "35",
+  //                             arg: {
+  //                               type: "state change",
+  //                               id: "42",
+  //                               state: {
+  //                                 type: "ref",
+  //                                 id: "43",
+  //                                 refId: "2",
+  //                               },
+  //                               body: [
+  //                                 {
+  //                                   type: "return",
+  //                                   id: "38",
+  //                                   arg: {
+  //                                     type: "nary",
+  //                                     id: "39",
+  //                                     operators: ["+"],
+  //                                     args: [
+  //                                       {
+  //                                         type: "ref",
+  //                                         id: "41",
+  //                                         refId: "2",
+  //                                       },
+  //                                       {
+  //                                         type: "number",
+  //                                         id: "40",
+  //                                         value: 1,
+  //                                       },
+  //                                     ],
+  //                                   },
+  //                                 },
+  //                               ],
+  //                             },
+  //                           },
+  //                         ],
+  //                       },
+  //                     },
+  //                   ],
+  //                   children: [
+  //                     {
+  //                       type: "ui text",
+  //                       id: "44",
+  //                       text: "Increment",
+  //                     },
+  //                   ],
+  //                 },
+  //                 {
+  //                   type: "ui element",
+  //                   id: "45",
+  //                   name: "button",
+  //                   props: [
+  //                     {
+  //                       type: "ui prop",
+  //                       id: "46",
+  //                       name: "onClick",
+  //                       value: {
+  //                         type: "function",
+  //                         id: "47",
+  //                         params: [],
+  //                         body: [
+  //                           {
+  //                             type: "return",
+  //                             id: "48",
+  //                             arg: {
+  //                               type: "state change",
+  //                               id: "55",
+  //                               state: {
+  //                                 type: "ref",
+  //                                 id: "56",
+  //                                 refId: "2",
+  //                               },
+  //                               body: [
+  //                                 {
+  //                                   type: "return",
+  //                                   id: "51",
+  //                                   arg: {
+  //                                     type: "nary",
+  //                                     id: "52",
+  //                                     operators: ["+"],
+  //                                     args: [
+  //                                       {
+  //                                         type: "ref",
+  //                                         id: "54",
+  //                                         refId: "2",
+  //                                       },
+  //                                       {
+  //                                         type: "number",
+  //                                         id: "53",
+  //                                         value: 1,
+  //                                       },
+  //                                     ],
+  //                                   },
+  //                                 },
+  //                               ],
+  //                             },
+  //                           },
+  //                         ],
+  //                       },
+  //                     },
+  //                   ],
+  //                   children: [
+  //                     {
+  //                       type: "ui text",
+  //                       id: "57",
+  //                       text: "Increment",
+  //                     },
+  //                   ],
+  //                 },
+  //                 {
+  //                   type: "ui element",
+  //                   id: "58",
+  //                   name: "button",
+  //                   props: [
+  //                     {
+  //                       type: "ui prop",
+  //                       id: "59",
+  //                       name: "onClick",
+  //                       value: {
+  //                         type: "function",
+  //                         id: "60",
+  //                         params: [],
+  //                         body: [
+  //                           {
+  //                             type: "return",
+  //                             id: "61",
+  //                             arg: {
+  //                               type: "state change",
+  //                               id: "68",
+  //                               state: {
+  //                                 type: "ref",
+  //                                 id: "69",
+  //                                 refId: "2",
+  //                               },
+  //                               body: [
+  //                                 {
+  //                                   type: "return",
+  //                                   id: "64",
+  //                                   arg: {
+  //                                     type: "nary",
+  //                                     id: "65",
+  //                                     operators: ["+"],
+  //                                     args: [
+  //                                       {
+  //                                         type: "ref",
+  //                                         id: "67",
+  //                                         refId: "2",
+  //                                       },
+  //                                       {
+  //                                         type: "number",
+  //                                         id: "66",
+  //                                         value: 1,
+  //                                       },
+  //                                     ],
+  //                                   },
+  //                                 },
+  //                               ],
+  //                             },
+  //                           },
+  //                         ],
+  //                       },
+  //                     },
+  //                   ],
+  //                   children: [
+  //                     {
+  //                       type: "ui text",
+  //                       id: "70",
+  //                       text: "Increment",
+  //                     },
+  //                   ],
+  //                 },
+  //                 {
+  //                   type: "ui element",
+  //                   id: "71",
+  //                   name: "div",
+  //                   props: [],
+  //                   children: [
+  //                     {
+  //                       type: "ui expression",
+  //                       id: "72",
+  //                       expression: {
+  //                         type: "ref",
+  //                         id: "73",
+  //                         refId: "2",
+  //                       },
+  //                     },
+  //                   ],
+  //                 },
+  //               ],
+  //             },
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   })
+  // })
 
   return
 
