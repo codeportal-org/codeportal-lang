@@ -196,10 +196,7 @@ const CodeTreeViewInternal = ({ codeTree }: { codeTree?: ProgramNode }) => {
       }}
     >
       <div
-        className={cn(
-          "h-full w-full overflow-auto whitespace-pre-wrap rounded-xl border py-2",
-          indentationClass,
-        )}
+        className={cn("h-full w-full whitespace-pre-wrap rounded-xl border py-2", indentationClass)}
       >
         <OverlayContext.Provider value={{ isOverlay: false }}>
           {codeTree.type === "program" && (
@@ -1218,26 +1215,13 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
       {node.args.map((arg, idx) => {
         return (
           <React.Fragment key={arg.id}>
+            {/* Arg view and spacer */}
             <div className="flex flex-row">
               <ExpressionView nodeId={arg.id} />
-              <button
-                className="h-full w-1 flex-shrink-0 rounded hover:bg-gray-200"
-                onClick={(event) => {
-                  if (event.defaultPrevented) {
-                    return
-                  }
-                  event.preventDefault()
-
-                  codeDB?.insertArgInNaryExpression(node.id, idx + 1)
-                }}
-                onFocus={(event) => {
-                  event.preventDefault()
-                }}
-              >
-                &nbsp;
-              </button>
+              <NAryExpressionSpacer nodeId={nodeId} index={idx} />
             </div>
 
+            {/* Operator view and dropdown */}
             {idx < node.args.length - 1 && (
               <DropdownMenu.Root
                 open={isOperatorDropdownOpen[idx]}
@@ -1327,6 +1311,41 @@ const NaryExpressionView = ({ nodeId }: { nodeId: string }) => {
   )
 }
 
+const NAryExpressionSpacer = ({ nodeId, index }: { nodeId: string; index: number }) => {
+  const codeDB = useCodeDB()
+  const node = useNode<NAryExpression>(nodeId)
+
+  const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
+
+  const droppableId = `${nodeId}-args-${index}`
+
+  const isDroppedOnNode = droppedOnNodeId === droppableId
+
+  const { setNodeRef } = useDroppable({
+    id: droppableId,
+    data: { type: node.type } satisfies DropData,
+  })
+
+  return (
+    <button
+      className="h-full w-1 flex-shrink-0 rounded bg-blue-400 hover:bg-gray-200"
+      onClick={(event) => {
+        if (event.defaultPrevented) {
+          return
+        }
+        event.preventDefault()
+
+        codeDB?.insertArgInNaryExpression(node.id, index + 1)
+      }}
+      onFocus={(event) => {
+        event.preventDefault()
+      }}
+    >
+      &nbsp;
+    </button>
+  )
+}
+
 const NodeList = ({
   nodeId,
   parentProperty,
@@ -1385,7 +1404,7 @@ const NodeList = ({
         {nodes.map((node, index) => (
           <React.Fragment key={node.id}>
             <NodeListSpacer
-              parentNodeId={nodeId}
+              nodeId={nodeId}
               index={index}
               nodeType={node.type}
               parentProperty={parentProperty}
@@ -1395,7 +1414,7 @@ const NodeList = ({
           </React.Fragment>
         ))}
         <NodeListSpacer
-          parentNodeId={nodeId}
+          nodeId={nodeId}
           index={nodes.length}
           nodeType={nodes[nodes.length - 1]!.type}
           parentProperty={parentProperty}
@@ -1407,13 +1426,13 @@ const NodeList = ({
 }
 
 const NodeListSpacer = ({
-  parentNodeId,
+  nodeId,
   onClick,
   index,
   nodeType,
   parentProperty,
 }: {
-  parentNodeId: string
+  nodeId: string
   index: number
   nodeType: CodeNode["type"]
   parentProperty: string
@@ -1423,7 +1442,7 @@ const NodeListSpacer = ({
 
   const [droppedOnNodeId] = useAtom(droppedOnNodeIdAtom)
 
-  const droppableId = `${parentNodeId}-${parentProperty}-${index}`
+  const droppableId = `${nodeId}-${parentProperty}-${index}`
 
   const isDroppedOnNode = droppedOnNodeId === droppableId
 
