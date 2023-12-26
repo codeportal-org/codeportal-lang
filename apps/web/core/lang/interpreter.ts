@@ -11,6 +11,7 @@ import {
   NAryOperator,
   ObjectNode,
   PathAccessNode,
+  PrintStatement,
   ProgramNode,
   ReferenceNode,
   StateChangeStatement,
@@ -42,6 +43,24 @@ export class Interpreter {
 
   private globalScope: Scope = {
     values: new Map(),
+  }
+
+  addGlobal(name: string, value: any) {
+    this.globalScope.values.set(name, value)
+  }
+
+  removeGlobal(name: string) {
+    this.globalScope.values.delete(name)
+  }
+
+  private commonGlobals = {
+    print: (...args: any[]) => {
+      console.log(...args)
+    },
+  }
+
+  setCommonGlobal(name: "print", value: any) {
+    this.commonGlobals[name] = value
   }
 
   private currentScope: Scope = this.globalScope
@@ -158,11 +177,15 @@ export class Interpreter {
     } else if (node.type === "assignment") {
       this.interpretAssignment(node)
     } else if (node.type === "print") {
-      console.log(this.interpretExpression(node.arg))
+      this.interpretPrintStatement(node)
     } else if (node.type === "empty") {
     } else {
       throw new Error(`Statement type ${node.type} is not implemented`)
     }
+  }
+
+  private interpretPrintStatement(node: PrintStatement) {
+    this.commonGlobals.print(this.interpretExpression(node.arg))
   }
 
   private interpretVariableDeclaration(node: VarStatement) {
@@ -201,8 +224,8 @@ export class Interpreter {
     if (node.left.type === "ref") {
       scope.set(node.left.refId, value)
     } else if (node.left.type === "path access") {
-      const obj = this.interpretPathAccess(node.left, true)
-      const prop = this.interpretExpression(node.left.path[node.left.path.length - 1]!)
+      const obj = this.interpretPathAccess(node.left, true) as Record<string, any>
+      const prop = this.interpretExpression(node.left.path[node.left.path.length - 1]!) as string
 
       obj[prop] = value
     }
@@ -220,7 +243,7 @@ export class Interpreter {
     }
 
     if (node.type === "ui expression") {
-      return this.interpretExpression(node.expression)
+      return this.interpretExpression(node.expression) as React.ReactNode
     }
 
     if (!node.children || node.children.length === 0) {
@@ -301,7 +324,7 @@ export class Interpreter {
     }
   }
 
-  interpretExpression(node: ExpressionNode): any {
+  interpretExpression(node: ExpressionNode): unknown {
     if (node.type === "string") {
       return node.value
     } else if (node.type === "number") {
@@ -396,9 +419,9 @@ export class Interpreter {
         continue
       }
 
-      arg = this.interpretExpression(arg)
+      const argValue = this.interpretExpression(arg)
 
-      result = this.interpretNAryOperator(node.operators[i]!, result, arg)
+      result = this.interpretNAryOperator(node.operators[i]!, result, argValue)
       i++
     }
 
@@ -441,7 +464,7 @@ export class Interpreter {
     const obj: Record<string, any> = {}
 
     for (const prop of node.props) {
-      const name = this.interpretExpression(prop.name)
+      const name = this.interpretExpression(prop.name) as string
 
       obj[name] = this.interpretExpression(prop.value)
     }
@@ -462,12 +485,12 @@ export class Interpreter {
   private interpretPathAccess(node: PathAccessNode, skipLast = false) {
     const obj = this.interpretExpression(node.path[0]!)
 
-    let currentObj = obj
+    let currentObj = obj as Record<string, any>
 
     const offset = skipLast ? 1 : 0
 
     for (let i = 0; i < node.path.length - 1 - offset; i++) {
-      const prop = this.interpretExpression(node.path[i]!)!
+      const prop = this.interpretExpression(node.path[i]!)! as string
 
       currentObj = currentObj[prop]
     }
