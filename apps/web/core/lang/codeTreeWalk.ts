@@ -1,4 +1,5 @@
 import {
+  AssignmentStatement,
   CodeNode,
   ComponentNode,
   ElseIfNode,
@@ -147,9 +148,29 @@ export class CodeTreeWalk {
       this.walkPrintStatement(node)
     } else if (node.type === "empty") {
       this.walkEmptyNode(node)
+    } else if (node.type === "assignment") {
+      this.walkAssignmentStatement(node)
     } else {
       throw new Error(`Unknown statement type: ${node.type}`)
     }
+  }
+
+  private walkAssignmentStatement(node: AssignmentStatement) {
+    this.callback(node, this.currentParentNode())
+
+    this.parentNodeStack.push({
+      parent: node,
+      property: "left",
+    })
+    this.walkExpression(node.left)
+    this.parentNodeStack.pop()
+
+    this.parentNodeStack.push({
+      parent: node,
+      property: "right",
+    })
+    this.walkExpression(node.right)
+    this.parentNodeStack.pop()
   }
 
   private walkExpression(node: ExpressionNode) {
