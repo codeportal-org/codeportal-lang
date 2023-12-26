@@ -181,6 +181,7 @@ const CodeTreeViewInternal = ({ codeTree }: { codeTree?: ProgramNode }) => {
 
   return (
     <DndContext
+      id={`dnd-ctx-code-tree-${codeTree.id}`}
       sensors={sensors}
       collisionDetection={closestTopRightCorner(codeDB)}
       onDragStart={handleDragStart}
