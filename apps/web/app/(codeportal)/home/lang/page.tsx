@@ -8,7 +8,7 @@ import { Interpreter } from "@/core/lang/interpreter"
 import { importJS } from "@/core/lang/js-interop/importJS"
 import { cn } from "@/lib/utils"
 
-export function CodeSnippet({ code }: { code: string }) {
+function CodeSnippet({ code }: { code: string }) {
   const codeTree = React.useMemo(() => importJS(code), [code])
 
   const [isRunning, setIsRunning] = React.useState(false)
