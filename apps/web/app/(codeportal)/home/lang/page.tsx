@@ -38,6 +38,7 @@ export default function LangDemoPage() {
     let count = 0
     if (count > 10) {
       count = 0
+      count = 1 + 1 + 1
     }
   `}
       />
