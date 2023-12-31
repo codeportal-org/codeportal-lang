@@ -103,6 +103,8 @@ export class CodeTreeWalk {
       this.walkElseIfStatement(node)
     } else if (node.type === "print") {
       this.walkPrintStatement(node)
+    } else if (node.type === "assignment") {
+      this.walkAssignmentStatement(node)
     } else {
       throw new Error(`Unknown node type: ${node.type}`)
     }
