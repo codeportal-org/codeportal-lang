@@ -105,6 +105,8 @@ export class CodeTreeWalk {
       this.walkPrintStatement(node)
     } else if (node.type === "assignment") {
       this.walkAssignmentStatement(node)
+    } else if (node.type === "empty") {
+      this.walkEmptyNode(node)
     } else {
       throw new Error(`Unknown node type: ${node.type}`)
     }
