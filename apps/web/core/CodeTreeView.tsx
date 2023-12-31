@@ -1385,7 +1385,7 @@ const NodeList = ({
 
   return (
     <div
-      className={cn("relative border-l border-l-slate-200", indentationClass, className, {
+      className={cn("relative border-l border-l-slate-200", className, {
         "pt-6": !isOpen,
       })}
     >
@@ -1531,6 +1531,7 @@ const DraggableNodeContainer = ({
             isOverlay && isDraggedNode,
           "w-full": !isOverlay && !isInline,
           "outline outline-blue-700": !isOverlay && isInline && isSelected,
+          [indentationClass]: !isInline,
         })}
         ref={setNodeRef}
         {...listeners}
@@ -1581,7 +1582,7 @@ const DraggableNodeContainer = ({
       >
         {(isSelected || isHovered) && !isOverlay && !isInline && (
           <div
-            className={cn("absolute left-[-5px] top-0 h-full w-1 rounded opacity-50", {
+            className={cn("absolute left-[20px] top-0 h-full w-1 rounded opacity-50", {
               "bg-gray-300": (isDraggedNode && !isOverlay) || isHovered,
               "bg-blue-500": isSelected,
             })}
@@ -1594,11 +1595,11 @@ const DraggableNodeContainer = ({
           <div
             className={cn("absolute z-20 rounded-full", {
               "right-[-12px] top-[-12px]": isInline,
-              "left-[-22px] top-0 h-full w-[22px]": !isInline,
+              "left-0 top-0 h-full w-[22px]": !isInline,
             })}
           >
             <button
-              className="z-20 rounded-full bg-gray-400 text-white transition-colors hover:bg-gray-500"
+              className="z-20 rounded-full border bg-gray-400 text-white transition-colors hover:bg-gray-500"
               onClick={(event) => {
                 if (event.defaultPrevented) {
                   return
