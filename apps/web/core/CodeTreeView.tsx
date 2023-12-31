@@ -1392,7 +1392,7 @@ const NodeList = ({
       <button
         aria-expanded={isOpen}
         aria-controls={containerID}
-        className={`absolute left-0 top-0 cursor-pointer ${
+        className={`absolute left-0 top-[-10px] cursor-pointer ${
           isOpen ? (isHovered ? "block" : "hidden") : ""
         }`}
         onClick={(event) => {
@@ -1406,7 +1406,10 @@ const NodeList = ({
           <ChevronRight className="text-gray-400 transition-colors hover:text-gray-500" />
         )}
       </button>
-      <div id={containerID} className={cn("flex-col items-start", isOpen ? "flex" : "hidden")}>
+      <div
+        id={containerID}
+        className={cn("flex-col items-start gap-0.5", isOpen ? "flex" : "hidden")}
+      >
         {nodes.map((node, index) => (
           <React.Fragment key={node.id}>
             <NodeListSpacer
@@ -1460,7 +1463,7 @@ const NodeListSpacer = ({
   return (
     <button
       ref={setNodeRef}
-      className="w-full py-0.5"
+      className="w-full"
       onClick={(event) => {
         if (event.defaultPrevented) {
           return
