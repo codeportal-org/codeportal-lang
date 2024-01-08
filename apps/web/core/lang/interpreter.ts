@@ -5,6 +5,7 @@ import {
   CodeNode,
   ComponentCallNode,
   ComponentNode,
+  ErrorData,
   ExpressionNode,
   FunctionNode,
   IfStatementNode,
@@ -25,12 +26,6 @@ import {
 type StateWrapper = {
   stateArray: [any, React.Dispatch<any>]
   type: Symbol
-}
-
-export type ErrorData = {
-  nodeId: string
-  subNodeIds: string[]
-  message: string
 }
 
 export class Interpreter {
@@ -70,9 +65,12 @@ export class Interpreter {
     print: (...args: any[]) => {
       console.log(...args)
     },
+    error: (errorData: ErrorData) => {
+      console.error(errorData)
+    },
   }
 
-  setCommonGlobal(name: "print", value: any) {
+  setCommonGlobal(name: "print" | "error", value: any) {
     this.commonGlobals[name] = value
   }
 
@@ -86,6 +84,13 @@ export class Interpreter {
 
   private newTailwindClass(className: string) {
     this.tailwindClassesSet.add(className)
+  }
+
+  resetState() {
+    this.errors = []
+    this.currentScope = this.globalScope
+    this.globalScope.values.clear()
+    this.tailwindClassesSet = new Set<string>()
   }
 
   interpret(node: ProgramNode) {
@@ -399,7 +404,6 @@ export class Interpreter {
     }
 
     if (!scope.values.has(nodeId)) {
-      console.log("Value is not resolved - ------ 🎯")
       return { value: undefined, resolved: false }
     }
 
@@ -412,7 +416,6 @@ export class Interpreter {
     const resolvedData = this.resolveValueById(node.refId)
 
     if (!resolvedData.resolved) {
-      console.log("Reference is not defined - ------ 🎯")
       this.handleError({
         nodeId: node.id,
         subNodeIds: [node.refId],
@@ -540,7 +543,7 @@ export class Interpreter {
 
   private handleError(errorData: ErrorData) {
     this.errors.push(errorData)
-    this.commonGlobals.print(errorData.message)
+    this.commonGlobals.error(errorData)
   }
 }
 

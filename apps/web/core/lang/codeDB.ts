@@ -3,8 +3,10 @@ import { createNanoEvents } from "nanoevents"
 import { NodeAutocompleteMeta } from "../CodeTreeView"
 import {
   AssignmentStatement,
+  BaseCodeNode,
   CodeNode,
   EmptyNode,
+  ErrorData,
   FunctionNode,
   NAryExpression,
   ProgramNode,
@@ -35,7 +37,7 @@ export class CodeDB {
 
   codeTreeWalker = new CodeTreeWalk()
 
-  nodeMap = new Map<string, CodeNode>()
+  nodeMap = new Map<string, BaseCodeNode>()
 
   /**
    * This flag is used to avoid emitting events when the CodeDB is being modified internally.
@@ -63,6 +65,8 @@ export class CodeDB {
           ui: {
             isHovered: false,
             isSelected: false,
+            hasError: false,
+            errors: [],
           },
         }
       }
@@ -294,6 +298,17 @@ export class CodeDB {
     }
   }
 
+  removeNodeErrors(nodeId: string) {
+    const node = this.getNodeByID(nodeId)
+    if (!node || !node.meta?.ui) {
+      return
+    }
+
+    node.meta.ui.hasError = false
+    node.meta.ui.errors = []
+    this.notifyNodeChange(nodeId)
+  }
+
   /**
    * Syncs the node state and CodeDB's state.
    */
@@ -481,7 +496,7 @@ export class CodeDB {
   newEmptyNode(kind: EmptyNode["kind"], meta?: Partial<EmptyNode["meta"]>) {
     const id = this.idCounter.toString()
     this.idCounter++
-    const newNode = {
+    const newNode: EmptyNode = {
       id,
       type: "empty",
       kind,
@@ -489,10 +504,13 @@ export class CodeDB {
         ui: {
           isHovered: false,
           isSelected: false,
+          hasError: false,
+          errors: [],
         },
-        ...meta,
+        createdAt: new Date().toISOString(),
+        ...(meta || {}),
       },
-    } as EmptyNode
+    }
 
     this.nodeMap.set(newNode.id, newNode)
 
@@ -767,7 +785,7 @@ export class CodeDB {
   createNodeFromType<T>(type: CodeNode["type"], extras?: Partial<CodeNode>): T {
     const id = this.idCounter.toString()
     this.idCounter++
-    const newNode = {
+    const newNode: BaseCodeNode = {
       id,
       type,
       meta: {
@@ -775,10 +793,12 @@ export class CodeDB {
         ui: {
           isHovered: false,
           isSelected: false,
+          hasError: false,
+          errors: [],
         },
       },
       ...(extras || {}),
-    } as CodeNode
+    }
 
     const typeMeta = nodeTypeMeta[type]
 
@@ -928,5 +948,25 @@ export class CodeDB {
     )
 
     return availableRefs
+  }
+
+  addNodeError(error: ErrorData) {
+    console.log("--- addNodeError", error)
+    const newError = {
+      ...error,
+    }
+
+    const node = this.getNodeByID(newError.nodeId)
+
+    if (!node) {
+      return
+    }
+
+    if (!node.meta?.ui) {
+      return
+    }
+
+    node.meta.ui.hasError = true
+    node.meta.ui.errors.push(newError)
   }
 }

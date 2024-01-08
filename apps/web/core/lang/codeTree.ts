@@ -13,6 +13,12 @@ export type SpecialNodes =
   | ObjectProperty
   | ElseIfNode
 
+export type ErrorData = {
+  nodeId: string
+  subNodeIds: string[]
+  message: string
+}
+
 export type CodeMeta = {
   parentId?: string
   parentProperty?: string
@@ -21,13 +27,24 @@ export type CodeMeta = {
   ui?: {
     isHovered: boolean
     isSelected: boolean
+    hasError: boolean
+    errors: ErrorData[]
   }
+}
+
+/**
+ * Used for general typing purposes.
+ */
+export type BaseCodeNode = {
+  id: string
+  type: CodeNode["type"]
+  meta?: CodeMeta
 }
 
 export type ProgramNode = {
   id: string
-  /** Next id to be used by a node */
-  idCounter: number
+  /** Next id to be used by a node, when not using nano-ids */
+  idCounter?: number
   type: "program"
   body: StatementNode[]
   meta?: CodeMeta

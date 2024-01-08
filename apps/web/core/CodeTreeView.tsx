@@ -1143,13 +1143,19 @@ export const ReferenceView = ({ nodeId }: { nodeId: string }) => {
   const node = useNode<ReferenceNode>(nodeId)
   const referencedNode = useNode<VarStatement>(node.refId)
 
+  const hasError = node.meta?.ui?.hasError
+
   return (
     <span
       className={cn(
-        "text-code-name rounded-md bg-gray-100 px-1 font-mono transition-colors hover:bg-gray-200",
-        {
-          "bg-gray-200": referencedNode.meta?.ui?.isHovered,
-        },
+        "text-code-name rounded-md bg-gray-100 px-1 font-mono transition-colors",
+        hasError
+          ? {
+              "bg-red-100": hasError,
+            }
+          : {
+              "bg-gray-200": referencedNode.meta?.ui?.isHovered,
+            },
       )}
       onMouseOver={(event) => {
         if (event.defaultPrevented) {
@@ -1377,6 +1383,8 @@ const NodeList = ({
       ui: {
         isSelected: true,
         isHovered: false,
+        hasError: false,
+        errors: [],
       },
     })!
 
@@ -1506,6 +1514,7 @@ const DraggableNodeContainer = ({
 
   const isSelected = node.meta?.ui?.isSelected
   const isHovered = node.meta?.ui?.isHovered
+  const hasError = node.meta?.ui?.hasError
 
   const parent = useNode<CodeNode>(node.meta?.parentId!)
 
@@ -1585,10 +1594,17 @@ const DraggableNodeContainer = ({
       >
         {(isSelected || isHovered) && !isOverlay && !isInline && (
           <div
-            className={cn("absolute left-[20px] top-0 h-full w-1 rounded opacity-50", {
-              "bg-gray-300": (isDraggedNode && !isOverlay) || isHovered,
-              "bg-blue-500": isSelected,
-            })}
+            className={cn(
+              "absolute left-[20px] top-0 h-full w-1 rounded opacity-50",
+              hasError
+                ? {
+                    "bg-red-500": hasError,
+                  }
+                : {
+                    "bg-gray-300": (isDraggedNode && !isOverlay) || isHovered,
+                    "bg-blue-500": isSelected,
+                  },
+            )}
           />
         )}
 
