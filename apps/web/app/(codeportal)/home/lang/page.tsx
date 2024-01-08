@@ -18,6 +18,8 @@ function CodeSnippet({ code }: { code: string }) {
   const [codeDB] = React.useState<CodeDB>(() => {
     const _codeDB = new CodeDB()
 
+    _codeDB.setDebugMode(true)
+
     if (codeTree) {
       _codeDB.load(codeTree)
     }

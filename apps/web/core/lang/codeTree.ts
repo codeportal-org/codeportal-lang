@@ -43,8 +43,8 @@ export type BaseCodeNode = {
 
 export type ProgramNode = {
   id: string
-  /** Next id to be used by a node, when not using nano-ids */
-  idCounter?: number
+  /** Next id to be used by a node, when not using nano-ids (for testing and debugging) */
+  idCounter: number
   type: "program"
   body: StatementNode[]
   meta?: CodeMeta

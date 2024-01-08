@@ -1,5 +1,7 @@
 import { createNanoEvents } from "nanoevents"
 
+import { nanoid } from "@/lib/nanoid"
+
 import { NodeAutocompleteMeta } from "../CodeTreeView"
 import {
   AssignmentStatement,
@@ -32,12 +34,24 @@ export class CodeDB {
 
   idCounter = 0
 
+  getNewId() {
+    if (this.useLocalIds) {
+      const newId = this.idCounter.toString()
+      this.idCounter++
+      return newId
+    } else {
+      return nanoid("stronger")
+    }
+  }
+
   selectedNodeIds: string[] = []
   hoveredNodeId: string | undefined = undefined
 
   codeTreeWalker = new CodeTreeWalk()
 
   nodeMap = new Map<string, BaseCodeNode>()
+
+  useLocalIds = false
 
   /**
    * This flag is used to avoid emitting events when the CodeDB is being modified internally.
@@ -48,10 +62,19 @@ export class CodeDB {
 
   reset() {
     this.codeTree = undefined
+    this.idCounter = 0
     this.nodeMap.clear()
     this.events = createNanoEvents()
     this.isCodeLoaded = false
     this.codeTreeWalker.reset()
+    this.selectedNodeIds = []
+    this.hoveredNodeId = undefined
+  }
+
+  setDebugMode(value: boolean) {
+    if (value) {
+      this.useLocalIds = true
+    }
   }
 
   /**
@@ -77,10 +100,11 @@ export class CodeDB {
 
       // add an id to all nodes
       if (!node.id) {
-        node.id = this.idCounter.toString()
-        this.idCounter++
+        node.id = this.getNewId()
       } else {
-        this.idCounter = Math.max(this.idCounter, parseInt(node.id) + 1)
+        if (this.useLocalIds) {
+          this.idCounter = Math.max(this.idCounter, parseInt(node.id) + 1)
+        }
       }
 
       // add nodes to map
@@ -494,8 +518,7 @@ export class CodeDB {
   }
 
   newEmptyNode(kind: EmptyNode["kind"], meta?: Partial<EmptyNode["meta"]>) {
-    const id = this.idCounter.toString()
-    this.idCounter++
+    const id = this.getNewId()
     const newNode: EmptyNode = {
       id,
       type: "empty",
@@ -783,8 +806,7 @@ export class CodeDB {
   }
 
   createNodeFromType<T>(type: CodeNode["type"], extras?: Partial<CodeNode>): T {
-    const id = this.idCounter.toString()
-    this.idCounter++
+    const id = this.getNewId()
     const newNode: BaseCodeNode = {
       id,
       type,
