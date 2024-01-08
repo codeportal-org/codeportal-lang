@@ -2,6 +2,7 @@ import React from "react"
 
 import {
   AssignmentStatement,
+  CodeNode,
   ComponentCallNode,
   ComponentNode,
   ExpressionNode,
@@ -26,14 +27,26 @@ type StateWrapper = {
   type: Symbol
 }
 
+export type ErrorData = {
+  nodeId: string
+  subNodeIds: string[]
+  message: string
+}
+
 export class Interpreter {
-  isDevSite: boolean = false
+  private isDevSite: boolean = false
+
+  private errors: ErrorData[] = []
+
+  getErrors() {
+    return this.errors
+  }
 
   constructor(isDevSite?: boolean) {
     this.isDevSite = isDevSite ?? false
   }
 
-  reactMode: "client" | "server" = "client"
+  private reactMode: "client" | "server" = "client"
 
   setReactMode(mode: "client" | "server") {
     this.reactMode = mode
@@ -76,6 +89,7 @@ export class Interpreter {
   }
 
   interpret(node: ProgramNode) {
+    this.errors = []
     this.currentScope = this.globalScope
 
     for (const statement of node.body) {
@@ -84,7 +98,19 @@ export class Interpreter {
   }
 
   interpretComponentCall(node: ComponentCallNode) {
-    const component = this.resolveValueById(node.comp.refId) as React.FC
+    const componentResolvedData = this.resolveValueById<React.FC>(node.comp.refId)
+
+    if (!componentResolvedData.resolved) {
+      this.handleError({
+        nodeId: node.id,
+        subNodeIds: [node.comp.refId],
+        message: "Component reference is not defined",
+      })
+
+      return null
+    }
+
+    const component = componentResolvedData.value!
 
     const props: Record<string, any> = {}
 
@@ -211,10 +237,20 @@ export class Interpreter {
       return
     }
 
-    const stateWrapper = this.resolveValueById(node.state.refId) as StateWrapper
+    const stateWrapperResolvedData = this.resolveValueById<StateWrapper>(node.state.refId)
+
+    if (!stateWrapperResolvedData.resolved) {
+      this.handleError({
+        nodeId: node.id,
+        subNodeIds: [node.state.refId],
+        message: "State reference is not defined",
+      })
+
+      return
+    }
 
     const result = this.interpretStatementList(node.body)
-    stateWrapper.stateArray[1](result)
+    stateWrapperResolvedData.value!.stateArray[1](result)
   }
 
   private interpretAssignment(node: AssignmentStatement) {
@@ -354,7 +390,7 @@ export class Interpreter {
     }
   }
 
-  private resolveValueById(nodeId: string) {
+  private resolveValueById<T>(nodeId: string): { value: T | undefined; resolved: boolean } {
     let value
     let scope = this.currentScope
 
@@ -363,26 +399,30 @@ export class Interpreter {
     }
 
     if (!scope.values.has(nodeId)) {
-      throw new Error(`Unable to resolve ${nodeId}`)
+      console.log("Value is not resolved - ------ 🎯")
+      return { value: undefined, resolved: false }
     }
 
     value = scope.values.get(nodeId)
 
-    return value
+    return { value, resolved: true }
   }
 
   private interpretRef(node: ReferenceNode) {
-    const value = this.resolveValueById(node.refId)
+    const resolvedData = this.resolveValueById(node.refId)
 
-    if (typeof value === "function") {
-      return value()
+    if (!resolvedData.resolved) {
+      console.log("Reference is not defined - ------ 🎯")
+      this.handleError({
+        nodeId: node.id,
+        subNodeIds: [node.refId],
+        message: "Reference is not defined",
+      })
+
+      return undefined
     }
 
-    if (value && value.type === this.stateSymbol) {
-      return value.stateArray[0]
-    }
-
-    return value
+    return resolvedData.value
   }
 
   private interpretFunction(node: FunctionNode): any {
@@ -496,6 +536,11 @@ export class Interpreter {
     }
 
     return currentObj
+  }
+
+  private handleError(errorData: ErrorData) {
+    this.errors.push(errorData)
+    this.commonGlobals.print(errorData.message)
   }
 }
 

@@ -1463,7 +1463,7 @@ const NodeListSpacer = ({
   return (
     <button
       ref={setNodeRef}
-      className="w-full"
+      className={cn("w-full", indentationClass)}
       onClick={(event) => {
         if (event.defaultPrevented) {
           return

@@ -48,6 +48,7 @@ function CodeSnippet({ code }: { code: string }) {
           setTimeout(() => {
             // this doesn't take into account async work
             interpreter.interpret(codeDB.codeTree!)
+
             setIsRunning(false)
           }, 300) // fake delay
         }}
