@@ -45,7 +45,7 @@ export function CodeSnippetClient({ codeTree }: { codeTree: ProgramNode | undefi
         i++
       }
 
-      const message = name ? `Error in ${name}: ${errorData.message}` : errorData.message
+      const message = name ? `Error in '${name}': ${errorData.message}` : errorData.message
 
       setPrintOutput((prev) => [...prev, message])
     })
