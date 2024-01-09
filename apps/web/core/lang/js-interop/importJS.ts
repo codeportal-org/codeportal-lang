@@ -6,8 +6,8 @@ import { ProgramNode } from "../codeTree"
 
 const JSXParser = Parser.extend(acornJSXParser())
 
-export function importJS(code: string): ProgramNode | undefined {
-  const astTransformer = new ASTtoCTTransformer()
+export function importJS(code: string, debugMode?: boolean): ProgramNode | undefined {
+  const astTransformer = new ASTtoCTTransformer({ debugMode })
 
   let ast: any
   try {

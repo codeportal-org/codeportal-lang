@@ -25,6 +25,8 @@ import {
   VariableDeclaration,
 } from "estree-jsx"
 
+import { nanoid } from "@/lib/nanoid"
+
 import {
   AssignmentOperator,
   AssignmentStatement,
@@ -77,10 +79,16 @@ export class ASTtoCTTransformer {
   /** Next id to be used by a node */
   idCounter = 0
 
+  useLocalIds = false
+
   private getNewId() {
-    const id = this.idCounter.toString()
-    this.idCounter++
-    return id
+    if (this.useLocalIds) {
+      const id = this.idCounter.toString()
+      this.idCounter++
+      return id
+    } else {
+      return nanoid("stronger")
+    }
   }
 
   /**
@@ -132,8 +140,15 @@ export class ASTtoCTTransformer {
     throw new Error(`Identifier ${name} not found`)
   }
 
-  constructor({ topLevelComponent = false }: { topLevelComponent?: boolean } = {}) {
+  constructor({
+    topLevelComponent = false,
+    debugMode = false,
+  }: { topLevelComponent?: boolean; debugMode?: boolean } = {}) {
     this.topLevelComponent = topLevelComponent
+
+    if (debugMode) {
+      this.useLocalIds = true
+    }
   }
 
   reset() {
