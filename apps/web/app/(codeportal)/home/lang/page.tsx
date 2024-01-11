@@ -1,6 +1,6 @@
 import React from "react"
 
-import { CodeSnippet } from "./CodeSnippet"
+import { CodeSnippet } from "@/core/CodeSnippet"
 
 export default function LangDemoPage() {
   return (
