@@ -1,16 +1,18 @@
-"use client"
-
-import { RedirectToSignIn, SignedIn, SignedOut, useUser } from "@clerk/nextjs"
+import { RedirectToSignIn, SignedIn, SignedOut, currentUser } from "@clerk/nextjs"
 import React from "react"
 
 import { PageContainer } from "./PageContainer"
 import { WelcomeSVG } from "./WelcomeSVG"
 
-export default function DashboardEntry({ children }: { children: React.ReactNode }) {
+export default async function DashboardEntry({ children }: { children: React.ReactNode }) {
+  const user = await currentUser()
+
+  const isInvited = (user?.publicMetadata.isInvited as boolean) || false
+
   return (
     <>
       <SignedIn>
-        <DashboardLayout>{children}</DashboardLayout>
+        <DashboardLayout isInvited={isInvited}>{children}</DashboardLayout>
       </SignedIn>
       <SignedOut>
         <RedirectToSignIn />
@@ -19,10 +21,13 @@ export default function DashboardEntry({ children }: { children: React.ReactNode
   )
 }
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useUser()
-  const isInvited = user?.publicMetadata.isInvited || false
-
+function DashboardLayout({
+  children,
+  isInvited,
+}: {
+  children: React.ReactNode
+  isInvited: boolean
+}) {
   return (
     <div className="h-screen">
       {isInvited ? (
