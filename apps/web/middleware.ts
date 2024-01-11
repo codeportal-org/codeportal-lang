@@ -28,10 +28,10 @@ export default function middleware(request: NextRequest, event: NextFetchEvent) 
     if (path.startsWith("/dashboard")) {
       console.log("->>>> dashboard")
 
-      return NextResponse.next()
+      return clerkMiddleware(request, event)
     }
 
-    // rewrites for api endpoints
+    // rewrites for api endpoints (api endpoint to be deprecated soon)
     if (path.startsWith("/api")) {
       console.log("->>>> api")
 
