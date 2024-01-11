@@ -21,11 +21,11 @@ export default function DashboardEntry({ children }: { children: React.ReactNode
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
-  const isInvited = user?.publicMetadata.isInvited
+  const isInvited = user?.publicMetadata.isInvited || false
 
   return (
     <div className="h-screen">
-      {isInvited || !user ? (
+      {isInvited ? (
         children
       ) : (
         <PageContainer>
