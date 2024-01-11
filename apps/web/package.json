@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@ariakit/react": "^0.3.3",
-    "@clerk/nextjs": "^4.27.1",
+    "@clerk/nextjs": "^4.29.2",
     "@codeportal/editor": "workspace:*",
     "@codeportal/lang-core": "workspace:*",
     "@dnd-kit/core": "^6.0.8",
