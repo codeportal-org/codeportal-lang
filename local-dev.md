@@ -9,7 +9,7 @@ Prerequisites:
 
 Run:
 
-- pnpm dev:all
+- pnpm dev:web
 
 Run web tests:
 

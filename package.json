@@ -3,6 +3,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev --filter=web --filter=worker",
+    "dev:web": "turbo dev --filter=web",
     "start:web": "turbo start --filter web",
     "start:worker": "turbo start --filter worker",
     "lint": "turbo lint",
@@ -11,7 +12,6 @@
     "storybook:lang": "turbo storybook --filter @codeportal/lang-ui",
     "format": "prettier --write \"**/*.{css,js,json,jsx,ts,tsx,md}\"",
     "db:push": "turbo run drizzle:push --filter web",
-    "dev:all": "pnpm dev",
     "web:test": "turbo test --filter web",
     "changeset": "changeset",
     "version": "changeset version",
