@@ -32,7 +32,7 @@ import { CodeProcessor } from "./lang/codeProcessor"
 import { ProgramNode } from "./lang/codeTree"
 
 export function Editor({ appId, appName }: { appId: string; appName?: string }) {
-  const clerk = useClerk()
+  // const clerk = useClerk()
   const completionContainerRef = React.useRef<HTMLDivElement>(null)
   const iframeRef = React.useRef<HTMLIFrameElement>(null)
 

@@ -1,6 +1,5 @@
 "use client"
 
-import { useGetApp } from "app/api/apps/[appId]/hooks"
 import { useTrackAppOpened } from "app/api/apps/opened/hooks"
 import { Code, Command, Database, LayoutGrid } from "lucide-react"
 import Link from "next/link"
@@ -8,7 +7,10 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 import { useCommandBarStore } from "@/components/CommandBar/store"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getPlatform } from "@/lib/platform"
+
+import { useGetApp } from "./hooks"
 
 export default function AppEditorLayout({
   children,
@@ -64,13 +66,29 @@ function TopBar({ appName, appId }: { appName: string; appId: string }) {
           <Code className="h-4 w-4" />
           Code
         </Link>
-        <Link
+        {/* <Link
           href={`/dashboard/apps/${appId}/data`}
           className="flex h-6 items-center gap-1 rounded px-2 hover:bg-slate-300"
         >
           <Database className="h-4 w-4" />
           Database
-        </Link>
+        </Link> */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="flex h-6 cursor-not-allowed items-center gap-1 rounded px-2 text-gray-400"
+                disabled
+              >
+                <Database className="h-4 w-4" />
+                Database
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Coming soon!</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <button
           className="flex h-6 items-center gap-1 rounded px-2 hover:bg-slate-300"
           onClick={() => {
