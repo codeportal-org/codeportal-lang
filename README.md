@@ -2,13 +2,11 @@
 <img src="./apps/web/public/favicon.png" width="80" title="CodePortal logo">
 </div>
 
-<div align="center"><strong>CodePortal (Alpha) 🚀</strong></div>
-<div align="center">The full-stack programming platform for modern makers!<br />A place for all your creations. Simple, powerful, and flexible!</div>
+<div align="center"><strong>CodePortal Language and Platform 🚀</strong></div>
+<div align="center">Programming in natural language!<br />An experiment by CodePortal!</div>
 <br />
 <div align="center">
-<a href="https://codeportal.io">Website</a>
-<span> · </span>
-<a href="https://codeportal.io/discord">Discord</a>
+<a href="https://codeportal.io/lang">Website</a>
 </div>
 
 <br />
@@ -19,11 +17,11 @@
 
 ## Introduction
 
-CodePortal is a full-stack visual programming platform for makers looking to avoid the limitations of traditional programming and tools. It empowers you to build digital products faster without losing the power and flexibility of code. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
+CodePortal is a full-stack visual programming platform and language looking to avoid the limitations of traditional programming and tools. It empowers you to build digital products faster without losing the power and flexibility of code. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
 
 Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and visual editor are heavily focused on developer experience, and supporting multiple views of a program. Additionally, they are thought from the ground up to work hand in hand with generative AI.
 
-CodePortal is currently in alpha, so, many of the features are being actively developed, and some are coming soon.
+This is an early experiment by [CodePortal](https://codeportal.io/), a platform to build custom business tools. We love open-source and think the future of software will be very different with LLMs and visual languages. It is currently in early development, at the moment it is just me, Carlos Galarza, the founder, working on it.
 
 ## Design choices
 
@@ -64,10 +62,6 @@ We plan to implement the core parts at first and the others over time. Additiona
 ## Why? (short form)
 
 There is so much clutter in programming right now. And, I don't want to settle with what exists. I want something that truly sparks joy ✨ and that is thought from the ground up to match the experience we expect from our apps today but for our programming tools. I care so much about this that it doesn't matter if we gotta rebuild the whole thing! Lets do it! If you are curious, read the long form of the "why" below. If not, just try the thing! - Carlos Galarza
-
-## Try it!
-
-Go to [codeportal.io](https://codeportal.io), create an account and start using it. It's free to start and then usage based. You can also host it yourself, I will add instructions on how to do that soon. In the meantime, you can check out the code, run it locally, and read how it works below. Also, you can join the [Discord](https://codeportal.io/discord) to get help and chat with other users.
 
 ## How does it work?
 
