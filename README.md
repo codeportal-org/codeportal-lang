@@ -2,7 +2,7 @@
 <img src="./apps/web/public/favicon.png" width="80" title="CodePortal logo">
 </div>
 
-<div align="center"><strong>CodePortal Language and Platform 🚀</strong></div>
+<div align="center"><strong>CodePortal language and platform 🚀</strong></div>
 <div align="center">Programming in natural language!<br />An experiment by CodePortal!</div>
 <br />
 <div align="center">
@@ -17,7 +17,7 @@
 
 ## Introduction
 
-CodePortal is a full-stack visual programming platform and language looking to avoid the limitations of traditional programming and tools. It empowers you to build digital products faster without losing the power and flexibility of code. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
+CodePortal is a full-stack natural-language based, and visual programming platform looking to avoid the limitations of traditional programming and tools. It empowers you to build digital products faster without losing the power and flexibility of code. With CodePortal, you and your teams can create, edit, and deploy web apps, widgets, and APIs faster without installing or configuring anything.
 
 Our goal is to remove as much clutter and unnecessary complexity as possible out of programming. The platform and visual editor are heavily focused on developer experience, and supporting multiple views of a program. Additionally, they are thought from the ground up to work hand in hand with generative AI.
 
