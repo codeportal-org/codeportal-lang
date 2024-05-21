@@ -21,7 +21,7 @@
     "node": ">=18.x",
     "pnpm": ">=8.6.10"
   },
-  "license": "Elastic License 2.0 (ELv2)",
+  "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",

@@ -24,7 +24,7 @@
       ]
     }
   },
-  "license": "Elastic License 2.0 (ELv2)",
+  "license": "MIT",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
